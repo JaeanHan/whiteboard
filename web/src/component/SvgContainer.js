@@ -5,65 +5,48 @@ export const SvgContainer = ({
   children,
   containerRef,
   id,
+  selectSvg,
   addSvgToGroup,
   removeSvgFromGroup,
+  isGrouping,
 }) => {
-  const [objPos, setObjPos] = useState({ x: 0, y: 0 });
-  const [clientPos, setClientPos] = useState({ x: 0, y: 0 });
+  const [objPos, setObjPos] = useState({ x: 150 * id, y: 150 * id });
   const [objSize, setObjSize] = useState({ width: 150, height: 150 });
   const [dragState, setDragState] = useState(dragStateEnum.none);
 
-  const onMouseEnter = () => {
-    if (dragState === dragStateEnum.none) {
-      setDragState(dragStateEnum.select);
-    }
+  const getObjInfo = () => {
+    return { objPos, objSize };
   };
-  const onMouseDown = (e) => {
-    if (dragState !== dragStateEnum.select) return;
-
-    const clientX = e.clientX;
-    const clientY = e.clientY;
-
-    if (clientX < objPos.x || clientX > objPos.x + objSize.width) return;
-
-    if (clientY < objPos.y || clientY > objPos.y + objSize.height) return;
-
-    const diffRatio = { x: e.clientX - objPos.x, y: e.clientY - objPos.y };
-    setDragState(dragStateEnum.drag);
-    setClientPos(diffRatio);
+  const moveOnDrag = (dragPos) => {
+    setObjPos(dragPos);
   };
-  const onMouseMove = (e) => {
-    e.preventDefault();
-    if (dragState === dragStateEnum.drag) {
-      const destPos = {
-        x: e.clientX - clientPos.x,
-        y: e.clientY - clientPos.y,
-      };
-      setObjPos(destPos);
-    }
-  };
-  const onMouseUp = (e) => {
-    if (dragState === dragStateEnum.drag) {
-      const destPos = {
-        x: e.clientX - clientPos.x,
-        y: e.clientY - clientPos.y,
-      };
-      setObjPos(destPos);
+  const stopOnDrop = (isGrouping) => {
+    if (!isGrouping) {
       setDragState(dragStateEnum.none);
     }
   };
-  const onMouseLeave = () => {
-    if (dragState === dragStateEnum.drag) return;
-    setDragState(dragStateEnum.none);
-  };
 
-  const onClick = () => {
+  const onMouseEnter = () => {
+    if (!isGrouping) {
+      selectSvg(id, { getObjInfo, moveOnDrag, stopOnDrop });
+    }
+  };
+  const onMouseLeave = () => {
+    if (dragState === dragStateEnum.group) return;
+    removeSvgFromGroup(id);
+  };
+  const onClick = (e) => {
+    e.preventDefault();
+    if (!e.ctrlKey) return;
+
     if (dragState === dragStateEnum.group) {
+      console.log("remove", id);
       removeSvgFromGroup(id);
       setDragState(dragStateEnum.none);
       return;
     }
-    addSvgToGroup(id);
+
+    addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
     setDragState(dragStateEnum.group);
   };
 
@@ -71,9 +54,6 @@ export const SvgContainer = ({
     <div
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      onMouseUp={onMouseUp}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
       onClick={onClick}
       id={id}
       style={{
@@ -82,10 +62,18 @@ export const SvgContainer = ({
         width: "max-content",
         height: "max-content",
         position: "absolute",
+        opacity: "0.5",
+        border: dragState === dragStateEnum.group ? "dotted black" : "",
         top: objPos.y,
         left: objPos.x,
       }}
     >
+      <div style={{ position: "absolute", color: "black", top: 0, left: 10 }}>
+        x:{objPos.x}px
+      </div>
+      <div style={{ position: "absolute", color: "black", top: 15, left: 10 }}>
+        y:{objPos.y}px
+      </div>
       {children}
     </div>
   );
