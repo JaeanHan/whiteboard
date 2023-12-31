@@ -109,7 +109,6 @@ export const useSelectManager = () => {
 
       if (flag === fitFlagEnum.fit) {
         const fixPos = calcFit(dragPos, diffDistance);
-        console.log("wtf", svgGroup);
         moveOnDrag(fixPos);
         continue;
       }

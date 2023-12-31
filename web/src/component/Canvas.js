@@ -1,6 +1,7 @@
 import { useSelectManager } from "../hooks/useSelectManager";
 import { RectSVG } from "./RectSVG";
 import { useRef, useState } from "react";
+import { LineSVG } from "./LineSVG";
 
 export const Canvas = () => {
   const containerRef = useRef(null);
@@ -69,8 +70,19 @@ export const Canvas = () => {
           addSvgToGroup={addSvgToGroup}
           removeSvgFromGroup={removeSvgFromGroup}
           isGrouping={isGrouping}
+          showPos={true}
         />
       ))}
+      <LineSVG
+        canvasRef={containerRef}
+        id={3}
+        key={3}
+        selectSvg={selectSvg}
+        addSvgToGroup={addSvgToGroup}
+        removeSvgFromGroup={removeSvgFromGroup}
+        isGrouping={isGrouping}
+        showPos={false}
+      />
     </div>
   );
 };

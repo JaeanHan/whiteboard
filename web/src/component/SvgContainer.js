@@ -9,6 +9,7 @@ export const SvgContainer = ({
   addSvgToGroup,
   removeSvgFromGroup,
   isGrouping,
+  showPos,
 }) => {
   const [objPos, setObjPos] = useState({ x: 150 * id, y: 150 * id });
   const [objSize, setObjSize] = useState({ width: 150, height: 150 });
@@ -68,12 +69,23 @@ export const SvgContainer = ({
         left: objPos.x,
       }}
     >
-      <div style={{ position: "absolute", color: "black", top: 0, left: 10 }}>
-        x:{objPos.x}px
-      </div>
-      <div style={{ position: "absolute", color: "black", top: 15, left: 10 }}>
-        y:{objPos.y}px
-      </div>
+      {showPos ? (
+        <>
+          <div
+            style={{ position: "absolute", color: "black", top: 0, left: 10 }}
+          >
+            x:{objPos.x}px
+          </div>
+          <div
+            style={{ position: "absolute", color: "black", top: 15, left: 10 }}
+          >
+            y:{objPos.y}px
+          </div>
+        </>
+      ) : (
+        ""
+      )}
+
       {children}
     </div>
   );
