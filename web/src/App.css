@@ -2,8 +2,9 @@
   text-align: center;
   background-color: #282c34;
   color: white;
-  min-height: 100vh;
-  overflow: hidden
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
 }
 
 .App-logo {

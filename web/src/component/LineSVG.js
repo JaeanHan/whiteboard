@@ -1,38 +1,46 @@
 import { SvgContainer } from "./SvgContainer";
-import { ReactComponent as Line } from "../svgs/line.svg";
-import { useState } from "react";
 export const LineSVG = ({
-  containerRef,
   id,
   selectSvg,
   addSvgToGroup,
   removeSvgFromGroup,
-  isGrouping,
+  showPos,
+  src = { x: 10, y: 10 },
+  dest = { x: 100, y: 100 },
 }) => {
-  const [width, setWidth] = useState(500);
+  const distance = Math.sqrt(
+    (src.x - dest.x) * (src.x - dest.x) + (src.y - dest.y) * (src.y - dest.y),
+  );
+  const theta = Math.atan2(dest.y - src.y, dest.x - src.x);
+  const degrees = (theta * 180) / Math.PI;
+
+  console.log("src, dest, distance, degree", src, distance, degrees);
+
   return (
     <SvgContainer
-      containerRef={containerRef}
       id={id}
       selectSvg={selectSvg}
       addSvgToGroup={addSvgToGroup}
       removeSvgFromGroup={removeSvgFromGroup}
-      isGrouping={isGrouping}
+      degrees={degrees}
+      init={true}
+      src={src}
+      showPos={showPos}
     >
-      <svg width={width + 10} height="20" xmlns="http://www.w3.org/2000/svg">
+      <svg width={distance} height={20} xmlns="http://www.w3.org/2000/svg">
         <line
-          x1="10"
-          y1="10"
-          x2={width + 10}
-          y2="10"
+          x1={0}
+          y1={0}
+          x2={distance}
+          y2={0}
           stroke="black"
-          strokeWidth="8"
+          strokeWidth="3"
           strokeLinecap="round"
         >
           <animate
             attributeName="x2"
-            values="10;500"
-            dur="2s"
+            values={`0;${distance}`}
+            dur="1s"
             fill="freeze"
             repeatCount="1"
           />

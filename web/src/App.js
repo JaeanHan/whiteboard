@@ -1,23 +1,31 @@
 import "./App.css";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { Canvas } from "./component/Canvas";
+import { ToolBar } from "./component/ToolBar";
+import { eventNameEnum } from "./utils/enums";
+import { useState } from "react";
+import { GroupEventManager } from "./eventTarget/GroupEventManager";
 
 function App() {
-  const [comment, setComment] = useState("");
-
-  // test
-  useEffect(() => {
-    axios
-      .get("api/test")
-      .then((res) => setComment(res.data))
-      .catch((err) => alert(err));
-  }, []);
-
+  GroupEventManager.getInstance().addEventListener(
+    GroupEventManager.eventName,
+    (e) => {
+      const { isGrouping } = e.detail;
+      GroupEventManager.getInstance().setGroupingState(isGrouping);
+    },
+  );
+  const [currentEvent, setCurrentEvent] = useState(eventNameEnum.none);
+  // const [leftOffsetWidth, setLeftOffsetWidth] = useState(0);
   return (
     <div className="App">
-      spring: {comment}
-      <Canvas />
+      <ToolBar
+        setCurrentEvent={setCurrentEvent}
+        // setLeftOffsetWidth={setLeftOffsetWidth}
+      />
+      <Canvas
+        currentEvent={currentEvent}
+        setCurrentEvent={setCurrentEvent}
+        // leftOffsetWidth={leftOffsetWidth}
+      />
     </div>
   );
 }

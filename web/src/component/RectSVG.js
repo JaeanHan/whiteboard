@@ -1,25 +1,25 @@
 import { ReactComponent as Rect } from "../svgs/rect.svg";
 import { SvgContainer } from "./SvgContainer";
 export const RectSVG = ({
-  containerRef,
   id,
   selectSvg,
   addSvgToGroup,
   removeSvgFromGroup,
-  isGrouping,
   showPos,
+  src,
 }) => {
+  // const num = id.replace(/[^0-9]/g, "");
+  const num = Number(id.charAt(1));
   return (
     <SvgContainer
-      containerRef={containerRef}
       id={id}
       selectSvg={selectSvg}
       addSvgToGroup={addSvgToGroup}
       removeSvgFromGroup={removeSvgFromGroup}
-      isGrouping={isGrouping}
       showPos={showPos}
+      src={src}
     >
-      <Rect fill={id % 2 === 0 ? "red" : "green"} />
+      <Rect fill={num % 2 === 0 ? "red" : "green"} />
     </SvgContainer>
   );
 };

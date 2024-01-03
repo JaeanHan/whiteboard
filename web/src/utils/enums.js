@@ -21,3 +21,19 @@ export const fitFlagEnum = {
   lowerLeft: "lowerLeft",
   lowerRight: "lowerRight",
 };
+
+export const eventNameEnum = {
+  none: "none",
+  addRect: "addRect",
+  addLine: "addLine",
+};
+
+export const svgTypeEnum = {
+  rect: "r",
+  line: "l",
+};
+
+export const groupingStateEnum = {
+  none: 0,
+  grouping: 1,
+};

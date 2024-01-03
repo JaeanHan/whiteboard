@@ -8,7 +8,7 @@ public class TestController {
     // commit test2
     @GetMapping("api/test")
     public String test() {
-        return "Hi";
+        return "8080 ON";
     }
 }
 

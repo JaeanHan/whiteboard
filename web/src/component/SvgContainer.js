@@ -1,17 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { dragStateEnum } from "../utils/enums";
+import { GroupEventManager } from "../eventTarget/GroupEventManager";
 
 export const SvgContainer = ({
   children,
-  containerRef,
   id,
   selectSvg,
   addSvgToGroup,
   removeSvgFromGroup,
-  isGrouping,
   showPos,
+  degrees,
+  init = false,
+  src = { x: 0, y: 0 },
 }) => {
-  const [objPos, setObjPos] = useState({ x: 150 * id, y: 150 * id });
+  const [objPos, setObjPos] = useState({ x: src.x, y: src.y });
   const [objSize, setObjSize] = useState({ width: 150, height: 150 });
   const [dragState, setDragState] = useState(dragStateEnum.none);
 
@@ -21,14 +23,14 @@ export const SvgContainer = ({
   const moveOnDrag = (dragPos) => {
     setObjPos(dragPos);
   };
-  const stopOnDrop = (isGrouping) => {
-    if (!isGrouping) {
+  const stopOnDrop = (isGrouping, finnishFlag) => {
+    if (!isGrouping || finnishFlag) {
       setDragState(dragStateEnum.none);
     }
   };
 
   const onMouseEnter = () => {
-    if (!isGrouping) {
+    if (!GroupEventManager.getInstance().getGroupingState()) {
       selectSvg(id, { getObjInfo, moveOnDrag, stopOnDrop });
     }
   };
@@ -64,6 +66,8 @@ export const SvgContainer = ({
         height: "max-content",
         position: "absolute",
         opacity: "0.5",
+        transformOrigin: init ? "0% 0%" : "50% 50%",
+        transform: degrees ? "rotate(" + degrees + "deg)" : "",
         border: dragState === dragStateEnum.group ? "dotted black" : "",
         top: objPos.y,
         left: objPos.x,
