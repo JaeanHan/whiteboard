@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fitFlagEnum, SMStateEnum } from "../utils/enums";
+import { arrowKeysEnum, fitFlagEnum, SMStateEnum } from "../utils/enums";
 import {
   calcFit,
   calcLower,
@@ -10,7 +10,10 @@ import {
   calcUpperRight,
   calcXFit,
 } from "../utils/selectManagerTools";
-import { GroupEventManager } from "../eventTarget/GroupEventManager";
+import {
+  GroupEventManager,
+  GroupKeyMapKey,
+} from "../eventTarget/GroupEventManager";
 
 export const useSelectManager = () => {
   const [svgGroup, setSvgGroup] = useState(new Map());
@@ -18,10 +21,76 @@ export const useSelectManager = () => {
   const [SMState, setSMState] = useState(SMStateEnum.none);
   const isGrouping = GroupEventManager.getInstance().getGroupingState();
 
+  useEffect(() => {
+    const moveByKey = () => {
+      const GKM = GroupEventManager.getInstance().getGroupKeyMoveMap();
+
+      for (const [value] of svgGroup) {
+        const moveOnDrag = value.moveOnDrag;
+        const { objPos } = value.getObjInfo();
+        const movePos = {
+          x: objPos.x + GKM.get(GroupKeyMapKey.x),
+          y: objPos.y + GKM.get(GroupKeyMapKey.y),
+        };
+
+        moveOnDrag(movePos);
+      }
+    };
+
+    const onKeyDown = (e) => {
+      //이거 하면 새로고침이랑 개발자도구 안켜짐
+      // e.preventDefault();
+      if (!GroupEventManager.getInstance().getGroupingState()) return;
+
+      const GEM = GroupEventManager.getInstance();
+      const GKM = GEM.getGroupKeyMoveMap();
+
+      const previousX = GKM.get(GroupKeyMapKey.x);
+      const previousY = GKM.get(GroupKeyMapKey.y);
+
+      if (e.key === arrowKeysEnum.left) {
+        const currentX = previousX - 1;
+        GKM.set(GroupKeyMapKey.x, currentX);
+        moveByKey();
+        return;
+      }
+
+      if (e.key === arrowKeysEnum.right) {
+        const currentX = previousX + 1;
+        GKM.set(GroupKeyMapKey.x, currentX);
+        moveByKey();
+        return;
+      }
+
+      if (e.key === arrowKeysEnum.up) {
+        const currentY = previousY - 1;
+        GKM.set(GroupKeyMapKey.y, currentY);
+        moveByKey();
+        return;
+      }
+
+      if (e.key === arrowKeysEnum.down) {
+        const currentY = previousY + 1;
+        GKM.set(GroupKeyMapKey.y, currentY);
+        moveByKey();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+
+      if (svgGroup.size === 0) {
+        GroupEventManager.getInstance().resetGroupKeyMoveMap();
+      }
+    };
+  }, [svgGroup]);
+
   const setDiffPosOnAll = (clientPos) => {
     // if (SMState === SMStateEnum.select)
     for (const [key, value] of svgGroup) {
-      const { objPos, objSize } = value.getObjInfo(clientPos);
+      const { objPos, objSize } = value.getObjInfo();
 
       const clientX = clientPos.x;
       const clientY = clientPos.y;
@@ -155,15 +224,16 @@ export const useSelectManager = () => {
     });
   };
   const removeAllSvg = () => {
-    console.log("remove all");
     setSvgGroup(new Map());
   };
 
   return {
-    selectSvg,
-    addSvgToGroup,
-    removeSvgFromGroup,
-    removeAllSvg,
+    handleSelect: {
+      selectSvg,
+      addSvgToGroup,
+      removeSvgFromGroup,
+      removeAllSvg,
+    },
     setDiffPosOnAll,
     onDrag,
     onDrop,

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { eventNameEnum } from "../utils/enums";
+import { useTrajectoryLineManager } from "../hooks/useTrajectoryLineManager";
 
 export const toolBarWidth = 250;
 
@@ -15,6 +16,7 @@ export const ToolBar = ({ setCurrentEvent }) => {
       .catch((err) => alert(err));
   }, []);
 
+  const Document = () => {};
   const Rect = (e) => {
     e.preventDefault();
     setCurrentEvent(eventNameEnum.addRect);
@@ -25,12 +27,25 @@ export const ToolBar = ({ setCurrentEvent }) => {
     setCurrentEvent(eventNameEnum.addLine);
   };
 
+  const Text = (e) => {
+    e.preventDefault();
+    setCurrentEvent(eventNameEnum.addText);
+  };
+
+  const TrajectoryLine = (e) => {
+    e.preventDefault();
+    setCurrentEvent(eventNameEnum.addTrajectory);
+  };
+
   const ApiPath = (e) => {
     e.preventDefault();
     setCurrentEvent(eventNameEnum.none);
   };
 
-  const temp = useMemo(() => [Rect, Line, ApiPath], []);
+  const temp = useMemo(
+    () => [Document, Rect, Line, TrajectoryLine, Text, ApiPath],
+    [],
+  );
 
   return (
     <div
@@ -44,7 +59,7 @@ export const ToolBar = ({ setCurrentEvent }) => {
       }}
     >
       spring : {comment}
-      {temp.map((el) => {
+      {temp.map((el, index) => {
         return (
           <button
             key={el.name}
@@ -59,7 +74,7 @@ export const ToolBar = ({ setCurrentEvent }) => {
             }}
             onClick={el}
           >
-            generate {el.name}
+            {index === 0 ? " " : "generate"} {el.name}
           </button>
         );
       })}

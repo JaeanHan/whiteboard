@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { dragStateEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
 
 export const SvgContainer = ({
   children,
   id,
-  selectSvg,
-  addSvgToGroup,
-  removeSvgFromGroup,
+  handleSelect,
   showPos,
   degrees,
   init = false,
   src = { x: 0, y: 0 },
 }) => {
+  const { selectSvg, addSvgToGroup, removeSvgFromGroup } = handleSelect;
   const [objPos, setObjPos] = useState({ x: src.x, y: src.y });
   const [objSize, setObjSize] = useState({ width: 150, height: 150 });
   const [dragState, setDragState] = useState(dragStateEnum.none);
@@ -66,7 +65,7 @@ export const SvgContainer = ({
         height: "max-content",
         position: "absolute",
         opacity: "0.5",
-        transformOrigin: init ? "0% 0%" : "50% 50%",
+        transformOrigin: init ? "0% 50%" : "50% 50%",
         transform: degrees ? "rotate(" + degrees + "deg)" : "",
         border: dragState === dragStateEnum.group ? "dotted black" : "",
         top: objPos.y,

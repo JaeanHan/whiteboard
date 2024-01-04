@@ -1,21 +1,16 @@
 import { useSelectManager } from "../hooks/useSelectManager";
 import { RectSVG } from "./RectSVG";
+import { TextSVG } from "./TextSVG";
 import { useEffect, useState } from "react";
 import { LineSVG } from "./LineSVG";
 import { eventNameEnum, svgTypeEnum } from "../utils/enums";
 import { useSvgIdGenerator } from "../hooks/useSvgIdGenerator";
 import { toolBarWidth } from "./ToolBar";
+import { TrajectoryLineSVG } from "./TrajectoryLineSVG";
+import { useTrajectoryLineManager } from "../hooks/useTrajectoryLineManager";
 
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
-  const {
-    selectSvg,
-    addSvgToGroup,
-    removeSvgFromGroup,
-    removeAllSvg,
-    setDiffPosOnAll,
-    onDrag,
-    onDrop,
-  } = useSelectManager();
+  const { handleSelect, setDiffPosOnAll, onDrag, onDrop } = useSelectManager();
   const { generateNextId } = useSvgIdGenerator();
 
   const [testClientPos, setTestClientPos] = useState({ x: 0, y: 0 });
@@ -23,15 +18,20 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   const [posMap, setPosMap] = useState(new Map());
   const [cnt, setCnt] = useState(0);
 
+  const { addPointOnTable, setAmountWillingToUse } = useTrajectoryLineManager(
+    setPosMap,
+    setCurrentEvent,
+  );
+
   const onMouseDown = (e) => {
     setDiffPosOnAll({
       x: e.clientX,
       y: e.clientY,
     });
   };
+
   const onMouseMove = (e) => {
-    e.preventDefault();
-    setTestClientPos({ x: e.clientX, y: e.clientY });
+    // setTestClientPos({ x: e.clientX, y: e.clientY });
 
     if (currentEvent !== eventNameEnum.none) {
       return;
@@ -54,6 +54,27 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       return;
     }
 
+    if (currentEvent === eventNameEnum.addText) {
+      const key = svgTypeEnum.text + generateNextId();
+      const fixPos = {
+        x: e.clientX - toolBarWidth,
+        y: e.clientY,
+      };
+
+      setPosMap((prev) => new Map(prev).set(key, fixPos));
+      setCurrentEvent(eventNameEnum.none);
+    }
+
+    if (currentEvent === eventNameEnum.addTrajectory) {
+      const fixPos = {
+        x: e.clientX - toolBarWidth,
+        y: e.clientY,
+      };
+
+      addPointOnTable(fixPos);
+      return;
+    }
+
     if (currentEvent === eventNameEnum.addLine) {
       if (cnt > 0) {
         const key = svgTypeEnum.line + generateNextId();
@@ -72,9 +93,10 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
         setPosMap((prev) => new Map(prev).set(key, fixPos));
         setCurrentEvent(eventNameEnum.none);
         setCnt(0);
+
         setTimeout(() => {
           setTempPos(new Map());
-        }, 3000);
+        }, 2500);
         return;
       }
 
@@ -93,15 +115,12 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
   };
 
-  const onKeyDown = (e) => {
-    if (e.ctrlKey && e.shiftKey) {
-      console.log("remove detected");
-      removeAllSvg();
-    }
-  };
-
   useEffect(() => {
     console.log("use effect", currentEvent);
+
+    if (currentEvent === eventNameEnum.addTrajectory) {
+      setAmountWillingToUse(Number(window.prompt("How many points?", "3")));
+    }
   }, [currentEvent]);
 
   return (
@@ -116,7 +135,6 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      onKeyDown={onKeyDown}
     >
       <div style={{ position: "absolute", color: "black", top: 0, left: 10 }}>
         clientX : {testClientPos.x}
@@ -156,18 +174,28 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       })}
       {Array.from(posMap).map((value, index) => {
         const key = value[0];
-        const pos = value[1];
+        const attachment = value[1];
 
         if (key.startsWith(svgTypeEnum.rect)) {
           return (
             <RectSVG
               id={key}
               key={key}
-              selectSvg={selectSvg}
-              addSvgToGroup={addSvgToGroup}
-              removeSvgFromGroup={removeSvgFromGroup}
+              handleSelect={handleSelect}
               showPos={true}
-              src={pos}
+              src={attachment}
+            />
+          );
+        }
+
+        if (key.startsWith(svgTypeEnum.text)) {
+          return (
+            <TextSVG
+              id={key}
+              key={key}
+              handleSelect={handleSelect}
+              showPos={true}
+              src={attachment}
             />
           );
         }
@@ -177,12 +205,23 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
             <LineSVG
               id={key}
               key={key}
-              selectSvg={selectSvg}
-              addSvgToGroup={addSvgToGroup}
-              removeSvgFromGroup={removeSvgFromGroup}
+              handleSelect={handleSelect}
               showPos={true}
-              src={pos.src}
-              dest={pos.dest}
+              src={attachment.src}
+              dest={attachment.dest}
+            />
+          );
+        }
+        if (key.startsWith(svgTypeEnum.trajectory)) {
+          return (
+            <TrajectoryLineSVG
+              id={key}
+              key={key}
+              handleSelect={handleSelect}
+              showPos={true}
+              src={{ x: 0, y: 0 }}
+              points={attachment.points}
+              minMaxMap={attachment.minMaxMap}
             />
           );
         }
