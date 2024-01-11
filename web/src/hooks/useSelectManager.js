@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
-import { arrowKeysEnum, fitFlagEnum, SMStateEnum } from "../utils/enums";
+import { SMStateEnum } from "../utils/enums";
 import {
-  calcFit,
-  calcLower,
-  calcLowerLeft,
-  calcLowerRight,
-  calcUpper,
-  calcUpperLeft,
-  calcUpperRight,
-  calcXFit,
+  calcPosOnDrag,
+  generateDiffAndFlag,
+  setMoveMapByKey,
 } from "../utils/selectManagerTools";
 import {
   GroupEventManager,
@@ -22,10 +17,10 @@ export const useSelectManager = () => {
   const isGrouping = GroupEventManager.getInstance().getGroupingState();
 
   useEffect(() => {
-    const moveByKey = () => {
+    const moveOnKeyDown = () => {
       const GKM = GroupEventManager.getInstance().getGroupKeyMoveMap();
 
-      for (const [value] of svgGroup) {
+      for (const [key, value] of getSvgGroup()) {
         const moveOnDrag = value.moveOnDrag;
         const { objPos } = value.getObjInfo();
         const movePos = {
@@ -38,42 +33,10 @@ export const useSelectManager = () => {
     };
 
     const onKeyDown = (e) => {
-      //이거 하면 새로고침이랑 개발자도구 안켜짐
-      // e.preventDefault();
       if (!GroupEventManager.getInstance().getGroupingState()) return;
 
-      const GEM = GroupEventManager.getInstance();
-      const GKM = GEM.getGroupKeyMoveMap();
-
-      const previousX = GKM.get(GroupKeyMapKey.x);
-      const previousY = GKM.get(GroupKeyMapKey.y);
-
-      if (e.key === arrowKeysEnum.left) {
-        const currentX = previousX - 1;
-        GKM.set(GroupKeyMapKey.x, currentX);
-        moveByKey();
-        return;
-      }
-
-      if (e.key === arrowKeysEnum.right) {
-        const currentX = previousX + 1;
-        GKM.set(GroupKeyMapKey.x, currentX);
-        moveByKey();
-        return;
-      }
-
-      if (e.key === arrowKeysEnum.up) {
-        const currentY = previousY - 1;
-        GKM.set(GroupKeyMapKey.y, currentY);
-        moveByKey();
-        return;
-      }
-
-      if (e.key === arrowKeysEnum.down) {
-        const currentY = previousY + 1;
-        GKM.set(GroupKeyMapKey.y, currentY);
-        moveByKey();
-      }
+      setMoveMapByKey(e.key);
+      moveOnKeyDown();
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -121,56 +84,9 @@ export const useSelectManager = () => {
 
       const { diffDistance, flag } = diffAndFlagMap.get(key);
       const moveOnDrag = value.moveOnDrag;
+      const fixPos = calcPosOnDrag(flag, dragPos, diffDistance);
 
-      if (flag === fitFlagEnum.fit) {
-        const fixPos = calcFit(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      if (flag === fitFlagEnum.xFit) {
-        const fixPos = calcXFit(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      if (flag === fitFlagEnum.upper) {
-        const fixPos = calcUpper(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      if (flag === fitFlagEnum.lower) {
-        const fixPos = calcLower(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      if (flag === fitFlagEnum.upperLeft) {
-        const fixPos = calcUpperLeft(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      if (flag === fitFlagEnum.upperRight) {
-        const fixPos = calcUpperRight(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      if (flag === fitFlagEnum.lowerLeft) {
-        const fixPos = calcLowerLeft(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      if (flag === fitFlagEnum.lowerRight) {
-        const fixPos = calcLowerRight(dragPos, diffDistance);
-        moveOnDrag(fixPos);
-        continue;
-      }
-
-      console.log("something not handled !!!", key, value);
+      moveOnDrag(fixPos);
     }
   };
 
@@ -184,7 +100,7 @@ export const useSelectManager = () => {
       removeAllSvg();
       setSMState(SMStateEnum.none);
 
-      const addRectEvent = new CustomEvent(GroupEventManager.eventName, {
+      const quitGroupEvent = new CustomEvent(GroupEventManager.eventName, {
         bubbles: true,
         cancelable: true,
         detail: {
@@ -192,9 +108,11 @@ export const useSelectManager = () => {
         },
       });
 
-      GroupEventManager.getInstance().dispatchEvent(addRectEvent);
+      GroupEventManager.getInstance().dispatchEvent(quitGroupEvent);
     }
   };
+
+  const getSvgGroup = () => svgGroup;
 
   const selectSvg = (id, objTools) => {
     setSvgGroup(() => {
@@ -202,11 +120,12 @@ export const useSelectManager = () => {
     });
     setSMState(SMStateEnum.select);
   };
+
   const addSvgToGroup = (id, objTools) => {
     setSvgGroup((prev) => new Map([...prev, [id, objTools]]));
     setSMState(SMStateEnum.select);
 
-    const addRectEvent = new CustomEvent(GroupEventManager.eventName, {
+    const insertGroupEvent = new CustomEvent(GroupEventManager.eventName, {
       bubbles: true,
       cancelable: true,
       detail: {
@@ -214,8 +133,9 @@ export const useSelectManager = () => {
       },
     });
 
-    GroupEventManager.getInstance().dispatchEvent(addRectEvent);
+    GroupEventManager.getInstance().dispatchEvent(insertGroupEvent);
   };
+
   const removeSvgFromGroup = (id) => {
     setSvgGroup((prev) => {
       const newMap = new Map(prev);
@@ -223,6 +143,7 @@ export const useSelectManager = () => {
       return newMap;
     });
   };
+
   const removeAllSvg = () => {
     setSvgGroup(new Map());
   };
@@ -238,59 +159,4 @@ export const useSelectManager = () => {
     onDrag,
     onDrop,
   };
-};
-
-const generateDiffAndFlag = (objX, objX2, objY, objY2, clientX, clientY) => {
-  const xCollide = objX <= clientX && clientX <= objX2;
-  const yCollide = objY < clientY && clientY <= objY2;
-
-  if (xCollide && yCollide) {
-    return {
-      diffDistance: {
-        x: clientX - objX,
-        y: clientY - objY,
-      },
-      flag: fitFlagEnum.fit,
-    };
-  }
-
-  if (!xCollide && yCollide) {
-    const diffDistance = {
-      x: objX - clientX,
-      y: clientY - objY,
-    };
-    return {
-      diffDistance: diffDistance,
-      flag: fitFlagEnum.xFit,
-    };
-  }
-
-  if (xCollide && !yCollide) {
-    const isClientUpper = objY > clientY;
-    return {
-      diffDistance: {
-        x: clientX - objX,
-        y: isClientUpper ? objY - clientY : clientY - objY,
-      },
-      flag: isClientUpper ? fitFlagEnum.upper : fitFlagEnum.lower,
-    };
-  }
-
-  if (!(xCollide && yCollide)) {
-    const isClientOnLeft = objX > clientX;
-    const isClientUpper = objY > clientY;
-    return {
-      diffDistance: {
-        x: isClientOnLeft ? objX - clientX : clientX - objX,
-        y: isClientUpper ? objY - clientY : clientY - objY,
-      },
-      flag: isClientUpper
-        ? isClientOnLeft
-          ? fitFlagEnum.upperLeft
-          : fitFlagEnum.upperRight
-        : isClientOnLeft
-          ? fitFlagEnum.lowerLeft
-          : fitFlagEnum.lowerRight,
-    };
-  }
 };

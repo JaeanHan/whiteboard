@@ -2,28 +2,36 @@ import { useSelectManager } from "../hooks/useSelectManager";
 import { RectSVG } from "./RectSVG";
 import { TextSVG } from "./TextSVG";
 import { useEffect, useState } from "react";
-import { LineSVG } from "./LineSVG";
+import { SimpleLineSVG } from "./SimpleLineSVG";
 import { eventNameEnum, svgTypeEnum } from "../utils/enums";
 import { useSvgIdGenerator } from "../hooks/useSvgIdGenerator";
 import { toolBarWidth } from "./ToolBar";
-import { TrajectoryLineSVG } from "./TrajectoryLineSVG";
-import { useTrajectoryLineManager } from "../hooks/useTrajectoryLineManager";
+import { useLineGenerator } from "../hooks/useLineGenerator";
+import { MousePoint } from "./MousePoint";
+import { usePathGenerator } from "../hooks/usePathGenerator";
+import { PathSVG } from "./PathSVG";
 
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   const { handleSelect, setDiffPosOnAll, onDrag, onDrop } = useSelectManager();
   const { generateNextId } = useSvgIdGenerator();
 
-  const [testClientPos, setTestClientPos] = useState({ x: 0, y: 0 });
   const [tempPos, setTempPos] = useState(new Map());
   const [posMap, setPosMap] = useState(new Map());
-  const [cnt, setCnt] = useState(0);
 
-  const { addPointOnTable, setAmountWillingToUse } = useTrajectoryLineManager(
+  const { addPoint, quit } = useLineGenerator(
     setPosMap,
     setCurrentEvent,
+    setTempPos,
   );
 
+  const { addPointOnSet, setIsDrawing } = usePathGenerator(setPosMap);
+
   const onMouseDown = (e) => {
+    if (currentEvent === eventNameEnum.addPath) {
+      setIsDrawing(true);
+      return;
+    }
+
     setDiffPosOnAll({
       x: e.clientX,
       y: e.clientY,
@@ -31,82 +39,59 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   };
 
   const onMouseMove = (e) => {
-    // setTestClientPos({ x: e.clientX, y: e.clientY });
-
-    if (currentEvent !== eventNameEnum.none) {
+    if (currentEvent === eventNameEnum.addPath) {
+      const fixPos = {
+        x: e.clientX - toolBarWidth,
+        y: e.clientY,
+      };
+      addPointOnSet(fixPos);
       return;
     }
 
-    const clientPos = { x: e.clientX, y: e.clientY };
-    onDrag(clientPos);
+    if (currentEvent === eventNameEnum.none) {
+      const clientPos = { x: e.clientX, y: e.clientY };
+      onDrag(clientPos);
+    }
   };
 
   const onMouseUp = (e) => {
+    if (currentEvent === eventNameEnum.addPath) {
+      setIsDrawing(false);
+      setCurrentEvent(eventNameEnum.none);
+      return;
+    }
+
+    const fixPos = {
+      x: e.clientX - toolBarWidth,
+      y: e.clientY,
+    };
+
     if (currentEvent === eventNameEnum.addRect) {
       const key = svgTypeEnum.rect + generateNextId();
-      const fixPos = {
-        x: e.clientX - toolBarWidth - 75,
-        y: e.clientY - 75,
+      const centerPos = {
+        x: fixPos.x - 75,
+        y: fixPos.y - 75,
       };
 
-      setPosMap((prev) => new Map(prev).set(key, fixPos));
+      setPosMap((prev) => new Map(prev).set(key, centerPos));
       setCurrentEvent(eventNameEnum.none);
       return;
     }
 
     if (currentEvent === eventNameEnum.addText) {
       const key = svgTypeEnum.text + generateNextId();
-      const fixPos = {
-        x: e.clientX - toolBarWidth,
-        y: e.clientY,
+      const centerPos = {
+        x: fixPos.x - 100,
+        y: fixPos.y - 40,
       };
 
-      setPosMap((prev) => new Map(prev).set(key, fixPos));
+      setPosMap((prev) => new Map(prev).set(key, centerPos));
       setCurrentEvent(eventNameEnum.none);
     }
 
-    if (currentEvent === eventNameEnum.addTrajectory) {
-      const fixPos = {
-        x: e.clientX - toolBarWidth,
-        y: e.clientY,
-      };
-
-      addPointOnTable(fixPos);
-      return;
-    }
-
     if (currentEvent === eventNameEnum.addLine) {
-      if (cnt > 0) {
-        const key = svgTypeEnum.line + generateNextId();
-        const destPos = {
-          x: e.clientX - toolBarWidth,
-          y: e.clientY,
-        };
-
-        setTempPos((prev) => new Map(prev).set(cnt, destPos));
-
-        const fixPos = {
-          src: tempPos.get(0),
-          dest: destPos,
-        };
-
-        setPosMap((prev) => new Map(prev).set(key, fixPos));
-        setCurrentEvent(eventNameEnum.none);
-        setCnt(0);
-
-        setTimeout(() => {
-          setTempPos(new Map());
-        }, 2500);
-        return;
-      }
-
-      setTempPos((prev) =>
-        new Map(prev).set(cnt, {
-          x: e.clientX - toolBarWidth,
-          y: e.clientY,
-        }),
-      );
-      setCnt((cnt) => cnt + 1);
+      setTempPos((prev) => new Map(prev).set(fixPos.x, fixPos));
+      addPoint(fixPos);
       return;
     }
 
@@ -118,9 +103,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   useEffect(() => {
     console.log("use effect", currentEvent);
 
-    if (currentEvent === eventNameEnum.addTrajectory) {
-      setAmountWillingToUse(Number(window.prompt("How many points?", "3")));
-    }
+    // if (currentEvent === eventNameEnum.addTrajectory) {
+    //   setAmountWillingToUse(Number(window.prompt("How many points?", "3")));
+    // }
   }, [currentEvent]);
 
   return (
@@ -136,42 +121,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
     >
-      <div style={{ position: "absolute", color: "black", top: 0, left: 10 }}>
-        clientX : {testClientPos.x}
-      </div>
-      <div style={{ position: "absolute", color: "black", top: 15, left: 10 }}>
-        clientY : {testClientPos.y}
-      </div>
-      {Array.from(tempPos).map((value) => {
-        const pos = value[1];
-        return (
-          <div
-            key={value[0]}
-            style={{
-              position: "absolute",
-              width: 20,
-              height: 20,
-              border: "2px dotted black",
-              borderRadius: "50%",
-              background: "transparent",
-              left: pos.x - 10,
-              top: pos.y - 10,
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                width: 5,
-                height: 5,
-                background: "black",
-                borderRadius: "50%",
-                left: 7.5,
-                top: 7.5,
-              }}
-            ></div>
-          </div>
-        );
-      })}
+      {Array.from(tempPos).map((value) => (
+        <MousePoint value={value} key={value[0]} />
+      ))}
       {Array.from(posMap).map((value, index) => {
         const key = value[0];
         const attachment = value[1];
@@ -202,7 +154,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
         if (key.startsWith(svgTypeEnum.line)) {
           return (
-            <LineSVG
+            <SimpleLineSVG
               id={key}
               key={key}
               handleSelect={handleSelect}
@@ -212,16 +164,16 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
             />
           );
         }
-        if (key.startsWith(svgTypeEnum.trajectory)) {
+
+        if (key.startsWith(svgTypeEnum.path)) {
+          console.log(key, attachment);
           return (
-            <TrajectoryLineSVG
+            <PathSVG
               id={key}
               key={key}
               handleSelect={handleSelect}
               showPos={true}
-              src={{ x: 0, y: 0 }}
-              points={attachment.points}
-              minMaxMap={attachment.minMaxMap}
+              attachment={attachment}
             />
           );
         }

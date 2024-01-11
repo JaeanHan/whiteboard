@@ -65,7 +65,7 @@ export const SvgContainer = ({
         height: "max-content",
         position: "absolute",
         opacity: "0.5",
-        transformOrigin: init ? "0% 50%" : "50% 50%",
+        transformOrigin: init ? "0% 0%" : "50% 50%",
         transform: degrees ? "rotate(" + degrees + "deg)" : "",
         border: dragState === dragStateEnum.group ? "dotted black" : "",
         top: objPos.y,

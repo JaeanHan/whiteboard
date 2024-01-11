@@ -1,8 +1,6 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { eventNameEnum } from "../utils/enums";
-import { useTrajectoryLineManager } from "../hooks/useTrajectoryLineManager";
-
 export const toolBarWidth = 250;
 
 export const ToolBar = ({ setCurrentEvent }) => {
@@ -32,9 +30,9 @@ export const ToolBar = ({ setCurrentEvent }) => {
     setCurrentEvent(eventNameEnum.addText);
   };
 
-  const TrajectoryLine = (e) => {
+  const Path = (e) => {
     e.preventDefault();
-    setCurrentEvent(eventNameEnum.addTrajectory);
+    setCurrentEvent(eventNameEnum.addPath);
   };
 
   const ApiPath = (e) => {
@@ -42,10 +40,7 @@ export const ToolBar = ({ setCurrentEvent }) => {
     setCurrentEvent(eventNameEnum.none);
   };
 
-  const temp = useMemo(
-    () => [Document, Rect, Line, TrajectoryLine, Text, ApiPath],
-    [],
-  );
+  const temp = useMemo(() => [Document, Rect, Text, Path, Line, ApiPath], []);
 
   return (
     <div

@@ -26,15 +26,15 @@ export const eventNameEnum = {
   none: "none",
   addRect: "addRect",
   addLine: "addLine",
-  addTrajectory: "addTrajectory",
   addText: "addText",
+  addPath: "addPath",
 };
 
 export const svgTypeEnum = {
   rect: "r",
   line: "l",
-  trajectory: "j",
   text: "t",
+  path: "p",
 };
 
 export const groupingStateEnum = {
