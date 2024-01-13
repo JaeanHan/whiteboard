@@ -60,7 +60,7 @@ export const usePathGenerator = (addSvgOnStore) => {
       thickness,
     };
 
-    addSvgOnStore((prev) => new Map(prev).set(key, attach));
+    addSvgOnStore(key, attach);
     // }
   }, [pointSet, isDrawing]);
 

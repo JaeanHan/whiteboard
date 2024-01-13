@@ -5,6 +5,7 @@ export const RectSVG = ({
   showPos,
   attachment,
   deleteSvgById,
+  setAdditionalProps,
 }) => {
   const { src, width, height } = attachment;
   // const num = id.replace(/[^0-9]/g, "");
@@ -17,6 +18,8 @@ export const RectSVG = ({
       src={src}
       className={id}
       deleteSvgById={deleteSvgById}
+      widthHeight={{ width: width, height: height }}
+      setAdditionalProps={setAdditionalProps}
     >
       {/*<Rect fill={num % 2 === 0 ? "red" : "green"} />*/}
       <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height}>

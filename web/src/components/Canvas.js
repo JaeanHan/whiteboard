@@ -14,8 +14,8 @@ import { SelectBox } from "./SelectBox";
 import { useSvgStore } from "../hooks/useSvgStore";
 
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
-  // const { addSvgOnStore, updateSvgOnStore, getDisplayFromStore } =
-  //   useSvgStore();
+  const { addSvgOnStore, updateSvgOnStore, setAdditionalProps, liveStore } =
+    useSvgStore();
   const {
     handleSelect,
     setDiffPosOnAll,
@@ -29,27 +29,19 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   const { generateNextId } = useSvgIdGenerator();
 
   const [tempPos, setTempPos] = useState(new Map());
-  // const posMap = getDisplayFromStore();
-  const [posMap, setPosMap] = useState(new Map());
   const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
   const [isErasing, setIsErasing] = useState(false);
 
   const { addPoint, quit } = useLineGenerator(
-    // addSvgOnStore,
-    setPosMap,
+    addSvgOnStore,
     setCurrentEvent,
     setTempPos,
   );
 
-  // const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
-  const { addPointOnSet, setIsDrawing } = usePathGenerator(setPosMap);
+  const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
 
   const deleteSvgById = (id) => {
-    setPosMap((prev) => {
-      prev.delete(id);
-      return new Map(prev);
-    });
-    // updateSvgOnStore(id, false);
+    updateSvgOnStore(id, false);
   };
 
   const onMouseDown = (e) => {
@@ -125,7 +117,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
 
     if (currentEvent === eventNameEnum.multiSelect) {
-      finClientSelectBoxSize(posMap);
+      finClientSelectBoxSize(liveStore);
 
       setCurrentEvent(eventNameEnum.none);
       return;
@@ -147,8 +139,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
         height: 150,
       };
 
-      // addSvgOnStore(key, attachment);
-      setPosMap((prev) => new Map(prev).set(key, attachment));
+      addSvgOnStore(key, attachment);
       setCurrentEvent(eventNameEnum.none);
       return;
     }
@@ -164,7 +155,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
         height: 80,
       };
 
-      setPosMap((prev) => new Map(prev).set(key, attachment));
+      addSvgOnStore(key, attachment);
       setCurrentEvent(eventNameEnum.none);
     }
 
@@ -221,13 +212,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       {Array.from(tempPos).map((value) => (
         <MousePoint src={value[1]} key={value[0]} />
       ))}
-      {Array.from(posMap).map((value, index) => {
-        // {getDisplayFromStore().map((value, index) => {
-        // console.log(value);
-        // const { id: key, attachment } = value;
-        const key = value[0];
-        const attachment = value[1];
-
+      {liveStore.map((value, index) => {
+        const { id: key, attachment } = value;
+        // console.log(key);
         if (key.startsWith(svgTypeEnum.rect)) {
           return (
             <RectSVG
@@ -237,6 +224,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
               showPos={true}
               attachment={attachment}
               deleteSvgById={deleteSvgById}
+              setAdditionalProps={setAdditionalProps}
             />
           );
         }
@@ -250,6 +238,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
               showPos={true}
               attachment={attachment}
               deleteSvgById={deleteSvgById}
+              setAdditionalProps={setAdditionalProps}
             />
           );
         }
@@ -263,6 +252,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
               showPos={true}
               attachment={attachment}
               deleteSvgById={deleteSvgById}
+              setAdditionalProps={setAdditionalProps}
             />
           );
         }
@@ -276,6 +266,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
               showPos={true}
               attachment={attachment}
               deleteSvgById={deleteSvgById}
+              setAdditionalProps={setAdditionalProps}
             />
           );
         }

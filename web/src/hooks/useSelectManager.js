@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SMStateEnum } from "../utils/enums";
+import { SMStateEnum, svgTypeEnum } from "../utils/enums";
 import {
   calcPosOnDrag,
   generateDiffAndFlag,
@@ -170,29 +170,70 @@ export const useSelectManager = () => {
     });
   };
 
-  const isCollision = (objInfo) => {
-    const { objPos, objSize } = objInfo;
-    console.log("isCollision", objPos, objSize);
-  };
-
-  const finClientSelectBoxSize = (posMap) => {
+  const getSelectBoxBounding = () => {
     const leftTop = {
       x: Math.min(selectBoxSize.src.x, selectBoxSize.dest.x),
       y: Math.min(selectBoxSize.src.y, selectBoxSize.dest.y),
     };
     const width = Math.abs(selectBoxSize.src.x - selectBoxSize.dest.x);
     const height = Math.abs(selectBoxSize.src.y - selectBoxSize.dest.y);
+    return {
+      left: leftTop.x,
+      top: leftTop.y,
+      right: leftTop.x + width,
+      bottom: leftTop.y + height,
+    };
+  };
 
-    for (const [key, value] of posMap) {
-      console.log(key, value);
-    }
+  const getObjBounding = (objSrc, width, height) => {
+    return {
+      left: objSrc.x,
+      top: objSrc.y,
+      right: objSrc.x + width,
+      bottom: objSrc.y + height,
+    };
+  };
+
+  const isCollision = (selectBoxBounding, objBounding) => {
+    const overlapWidth =
+      Math.min(selectBoxBounding.right, objBounding.right) -
+      Math.max(selectBoxBounding.left, objBounding.left);
+    const overlapHeight =
+      Math.min(selectBoxBounding.bottom, objBounding.bottom) -
+      Math.max(selectBoxBounding.top, objBounding.top);
+
+    return overlapWidth > 0 && overlapHeight > 0;
+  };
+
+  const finClientSelectBoxSize = (liveStore) => {
+    const selectBoxBounding = getSelectBoxBounding();
+
+    liveStore.map((props) => {
+      const { id: key, attachment } = props;
+
+      const {
+        src: objSrc,
+        width,
+        height,
+        getObjInfo,
+        moveOnDrag,
+        stopOnDrop,
+        setDragStateGroup,
+      } = attachment;
+      const rectBounding = getObjBounding(objSrc, width, height);
+
+      if (isCollision(selectBoxBounding, rectBounding)) {
+        addSvgToGroup(key, { getObjInfo, moveOnDrag, stopOnDrop });
+        setDragStateGroup();
+      }
+    });
 
     setTimeout(() => {
       setSelectBoxSize({
         src: { x: 0, y: 0 },
         dest: { x: 0, y: 0 },
       });
-    }, 400);
+    }, 250);
   };
 
   return {

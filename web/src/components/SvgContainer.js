@@ -13,6 +13,7 @@ export const SvgContainer = ({
   src = { x: 0, y: 0 },
   deleteSvgById,
   widthHeight = { width: 150, height: 150 },
+  setAdditionalProps,
 }) => {
   const { selectSvg, addSvgToGroup, removeSvgFromGroup } = handleSelect;
   const [objPos, setObjPos] = useState({ x: src.x, y: src.y });
@@ -24,6 +25,12 @@ export const SvgContainer = ({
 
   useEffect(() => {
     setObjPos(src);
+    setAdditionalProps(id, {
+      getObjInfo,
+      moveOnDrag,
+      stopOnDrop,
+      setDragStateGroup,
+    });
   }, [src]);
 
   const getObjInfo = () => {
@@ -37,6 +44,7 @@ export const SvgContainer = ({
       setDragState(dragStateEnum.none);
     }
   };
+  const setDragStateGroup = () => setDragState(dragStateEnum.group);
 
   const onMouseEnter = () => {
     if (!GroupEventManager.getInstance().getGroupingState()) {

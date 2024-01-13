@@ -4,9 +4,9 @@ export const useSvgStore = () => {
   const [store, setStore] = useState(new Map());
   const [liveStore, setLiveStore] = useState([]);
 
-  const addSvgOnStore = (id, objInfo) => {
+  const addSvgOnStore = (id, posInfo) => {
     const props = {
-      ...objInfo,
+      ...posInfo,
       display: true,
     };
     setStore((prev) => new Map([...prev, [id, props]]));
@@ -14,6 +14,12 @@ export const useSvgStore = () => {
 
   const updateSvgOnStore = (id, display) => {
     const props = { ...store.get(id), display: display };
+
+    setStore((prev) => new Map(prev).set(id, props));
+  };
+
+  const setAdditionalProps = (id, handleObj) => {
+    const props = { ...store.get(id), ...handleObj };
 
     setStore((prev) => new Map(prev).set(id, props));
   };
@@ -32,13 +38,11 @@ export const useSvgStore = () => {
     console.log(liveSvg);
     setLiveStore(liveSvg);
   }, [store]);
-  const getDisplayFromStore = () => {
-    return liveStore;
-  };
 
   return {
     addSvgOnStore,
     updateSvgOnStore,
-    getDisplayFromStore,
+    setAdditionalProps,
+    liveStore,
   };
 };

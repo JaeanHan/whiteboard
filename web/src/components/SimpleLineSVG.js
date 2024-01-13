@@ -5,11 +5,9 @@ export const SimpleLineSVG = ({
   showPos,
   attachment,
   deleteSvgById,
+  setAdditionalProps,
 }) => {
-  const { src, dest } = attachment;
-  const distance = Math.sqrt(
-    (src.x - dest.x) * (src.x - dest.x) + (src.y - dest.y) * (src.y - dest.y),
-  );
+  const { src, dest, width, height } = attachment;
   const theta = Math.atan2(dest.y - src.y, dest.x - src.x);
   const degrees = (theta * 180) / Math.PI;
 
@@ -45,13 +43,14 @@ export const SimpleLineSVG = ({
       src={src}
       showPos={showPos}
       deleteSvgById={deleteSvgById}
-      widthHeight={{ width: distance, height: 20 }}
+      widthHeight={{ width: width, height: height }}
+      setAdditionalProps={setAdditionalProps}
     >
-      <svg width={distance} height={20} xmlns="http://www.w3.org/2000/svg">
+      <svg width={width} height={height} xmlns="http://www.w3.org/2000/svg">
         <line
           x1={0}
           y1={0}
-          x2={distance}
+          x2={width}
           y2={0}
           stroke="black"
           strokeWidth="3"
@@ -59,7 +58,7 @@ export const SimpleLineSVG = ({
         >
           <animate
             attributeName="x2"
-            values={`0;${distance}`}
+            values={`0;${width}`}
             dur="1s"
             fill="freeze"
             repeatCount="1"

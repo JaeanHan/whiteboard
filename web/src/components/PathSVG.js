@@ -6,6 +6,7 @@ export const PathSVG = ({
   showPos,
   attachment,
   deleteSvgById,
+  setAdditionalProps,
 }) => {
   const { src, width, height, parseArray, thickness } = attachment;
 
@@ -22,6 +23,7 @@ export const PathSVG = ({
       showPos={showPos}
       deleteSvgById={deleteSvgById}
       widthHeight={{ width: width, height: height }}
+      setAdditionalProps={setAdditionalProps}
     >
       <svg
         width={width + thickness / 2}

@@ -6,6 +6,7 @@ export const TextSVG = ({
   showPos,
   attachment,
   deleteSvgById,
+  setAdditionalProps,
 }) => {
   const { src, width, height } = attachment;
   const [text, setText] = useState("test1test2test3");
@@ -44,6 +45,7 @@ export const TextSVG = ({
       showPos={showPos}
       deleteSvgById={deleteSvgById}
       widthHeight={widthHeight}
+      setAdditionalProps={setAdditionalProps}
     >
       <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         <input
