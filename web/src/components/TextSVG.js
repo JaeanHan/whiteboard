@@ -4,10 +4,15 @@ export const TextSVG = ({
   id,
   handleSelect,
   showPos,
-  src = { x: 100, y: 100 },
+  attachment,
+  deleteSvgById,
 }) => {
+  const { src, width, height } = attachment;
   const [text, setText] = useState("test1test2test3");
-  const [widthHeight, setWidthHeight] = useState({ width: 200, height: 80 });
+  const [widthHeight, setWidthHeight] = useState({
+    width: width,
+    height: height,
+  });
   const [isHovered, setHovered] = useState(false);
 
   const onTextChange = (e) => {
@@ -37,6 +42,8 @@ export const TextSVG = ({
       init={true}
       src={src}
       showPos={showPos}
+      deleteSvgById={deleteSvgById}
+      widthHeight={widthHeight}
     >
       <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         <input

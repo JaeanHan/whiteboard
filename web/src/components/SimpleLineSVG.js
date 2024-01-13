@@ -3,16 +3,17 @@ export const SimpleLineSVG = ({
   id,
   handleSelect,
   showPos,
-  src = { x: 100, y: 100 },
-  dest = { x: 200, y: 200 },
+  attachment,
+  deleteSvgById,
 }) => {
+  const { src, dest } = attachment;
   const distance = Math.sqrt(
     (src.x - dest.x) * (src.x - dest.x) + (src.y - dest.y) * (src.y - dest.y),
   );
   const theta = Math.atan2(dest.y - src.y, dest.x - src.x);
   const degrees = (theta * 180) / Math.PI;
 
-  console.log(src, dest, distance, degrees);
+  // console.log(src, dest, distance, degrees);
 
   // const fixedDegrees = degrees < 0 ? degrees + 360 : degrees;
   // const transformRad = (theta + 270) * (Math.PI / 180);
@@ -40,9 +41,11 @@ export const SimpleLineSVG = ({
       id={id}
       handleSelect={handleSelect}
       degrees={degrees}
-      init={true}
+      isLine={true}
       src={src}
       showPos={showPos}
+      deleteSvgById={deleteSvgById}
+      widthHeight={{ width: distance, height: 20 }}
     >
       <svg width={distance} height={20} xmlns="http://www.w3.org/2000/svg">
         <line

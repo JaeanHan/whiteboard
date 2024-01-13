@@ -9,50 +9,60 @@ export const MMMKey = {
   maxY: "maxY",
 };
 
-export const usePathGenerator = (setPosMap) => {
+export const usePathGenerator = (addSvgOnStore) => {
   const [pointSet, setPointSet] = useState(new Set());
   const [isDrawing, setIsDrawing] = useState(false);
   const [minMaxMap, setMinMaxMap] = useState(new Map());
+  const [thickness, setThickness] = useState(3);
+  const [pid, setPid] = useState("");
   const { generateNextId } = useSvgIdGenerator();
 
   useEffect(() => {
     if (pointSet.size === 0) {
+      if (pid === "") {
+        setPid(svgTypeEnum.path + generateNextId());
+      }
       initMinMaxMap();
       return;
     }
 
     if (!isDrawing) {
-      const parseArray = [];
-
-      for (const dataString of pointSet) {
-        const parse = JSON.parse(dataString);
-        const fixPos = {
-          x: parse.x - minMaxMap.get(MMMKey.minX),
-          y: parse.y - minMaxMap.get(MMMKey.minY),
-        };
-        parseArray.push(fixPos);
-      }
-
-      const key = svgTypeEnum.path + generateNextId();
-      const src = {
-        x: minMaxMap.get(MMMKey.minX), // - stroke thickness/2
-        y: minMaxMap.get(MMMKey.minY), // - stroke thickness/2
-      };
-      const width = minMaxMap.get(MMMKey.maxX) - src.x;
-      const height = minMaxMap.get(MMMKey.maxY) - src.y;
-
-      const attach = {
-        src,
-        width,
-        height,
-        parseArray,
-      };
-
-      setPosMap((prev) => new Map(prev).set(key, attach));
-
       setPointSet(new Set());
+      setPid("");
+      return;
     }
-  }, [isDrawing]);
+
+    // if (isDrawing) {
+    const parseArray = [];
+
+    for (const dataString of pointSet) {
+      const parse = JSON.parse(dataString);
+      const fixPos = {
+        x: parse.x - minMaxMap.get(MMMKey.minX) + thickness / 2,
+        y: parse.y - minMaxMap.get(MMMKey.minY) + thickness / 2,
+      };
+      parseArray.push(fixPos);
+    }
+
+    const key = pid;
+    const src = {
+      x: minMaxMap.get(MMMKey.minX) - thickness / 2,
+      y: minMaxMap.get(MMMKey.minY) - thickness / 2,
+    };
+    const width = minMaxMap.get(MMMKey.maxX) - src.x;
+    const height = minMaxMap.get(MMMKey.maxY) - src.y;
+
+    const attach = {
+      src,
+      width,
+      height,
+      parseArray,
+      thickness,
+    };
+
+    addSvgOnStore((prev) => new Map(prev).set(key, attach));
+    // }
+  }, [pointSet, isDrawing]);
 
   const addPointOnSet = (point) => {
     if (isDrawing) {
@@ -98,6 +108,7 @@ export const usePathGenerator = (setPosMap) => {
 
   return {
     addPointOnSet,
+    deletePoint,
     setIsDrawing,
   };
 };

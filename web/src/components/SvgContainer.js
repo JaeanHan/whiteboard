@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { dragStateEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
+import { MousePoint } from "./MousePoint";
 
 export const SvgContainer = ({
   children,
@@ -8,13 +9,22 @@ export const SvgContainer = ({
   handleSelect,
   showPos,
   degrees,
-  init = false,
+  isLine = false,
   src = { x: 0, y: 0 },
+  deleteSvgById,
+  widthHeight = { width: 150, height: 150 },
 }) => {
   const { selectSvg, addSvgToGroup, removeSvgFromGroup } = handleSelect;
   const [objPos, setObjPos] = useState({ x: src.x, y: src.y });
-  const [objSize, setObjSize] = useState({ width: 150, height: 150 });
+  const [objSize, setObjSize] = useState({
+    width: widthHeight.width,
+    height: widthHeight.height,
+  });
   const [dragState, setDragState] = useState(dragStateEnum.none);
+
+  useEffect(() => {
+    setObjPos(src);
+  }, [src]);
 
   const getObjInfo = () => {
     return { objPos, objSize };
@@ -31,11 +41,13 @@ export const SvgContainer = ({
   const onMouseEnter = () => {
     if (!GroupEventManager.getInstance().getGroupingState()) {
       selectSvg(id, { getObjInfo, moveOnDrag, stopOnDrop });
+      setDragState(dragStateEnum.select);
     }
   };
   const onMouseLeave = () => {
     if (dragState === dragStateEnum.group) return;
     removeSvgFromGroup(id);
+    setDragState(dragStateEnum.none);
   };
   const onClick = (e) => {
     e.preventDefault();
@@ -51,13 +63,22 @@ export const SvgContainer = ({
     addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
     setDragState(dragStateEnum.group);
   };
+  const onMouseDown = (e) => {
+    e.preventDefault();
+    if (dragState === dragStateEnum.none) {
+      addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
+      setDragState(dragStateEnum.select);
+    }
+  };
 
   return (
     <div
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onMouseDown={onMouseDown}
       onClick={onClick}
       id={id}
+      key={id}
       style={{
         cursor: "pointer",
         boxSizing: "border-box",
@@ -65,14 +86,42 @@ export const SvgContainer = ({
         height: "max-content",
         position: "absolute",
         opacity: "0.5",
-        transformOrigin: init ? "0% 0%" : "50% 50%",
-        transform: degrees ? "rotate(" + degrees + "deg)" : "",
-        border: dragState === dragStateEnum.group ? "dotted black" : "",
+        transformOrigin: isLine ? "0% 0%" : "50% 50%",
+        transform: isLine ? "rotate(" + degrees + "deg)" : "",
+        border:
+          dragState === dragStateEnum.group
+            ? "dotted black"
+            : dragState === dragStateEnum.select
+              ? "dashed"
+              : "none",
         top: objPos.y,
         left: objPos.x,
       }}
     >
-      {showPos ? (
+      {(dragState === dragStateEnum.group ||
+        dragState === dragStateEnum.select) && (
+        <div
+          style={{
+            borderRadius: 6,
+            position: "absolute",
+            backgroundColor: "red",
+            color: "black",
+            width: 15,
+            height: 15,
+            top: 0,
+            left: objSize.width - 15,
+            textAlign: "center",
+            lineHeight: 0.75,
+            cursor: "not-allowed",
+          }}
+          onClick={() => {
+            deleteSvgById(id);
+          }}
+        >
+          x
+        </div>
+      )}
+      {showPos && (
         <>
           <div
             style={{ position: "absolute", color: "black", top: 0, left: 10 }}
@@ -80,13 +129,16 @@ export const SvgContainer = ({
             x:{objPos.x}px
           </div>
           <div
-            style={{ position: "absolute", color: "black", top: 15, left: 10 }}
+            style={{
+              position: "absolute",
+              color: "black",
+              top: 15,
+              left: 10,
+            }}
           >
             y:{objPos.y}px
           </div>
         </>
-      ) : (
-        ""
       )}
 
       {children}

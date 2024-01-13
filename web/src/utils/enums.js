@@ -24,6 +24,9 @@ export const fitFlagEnum = {
 
 export const eventNameEnum = {
   none: "none",
+  write: "write",
+  erase: "erase",
+  multiSelect: "multiSelect",
   addRect: "addRect",
   addLine: "addLine",
   addText: "addText",
@@ -47,4 +50,10 @@ export const arrowKeysEnum = {
   right: "ArrowRight",
   up: "ArrowUp",
   down: "ArrowDown",
+};
+
+export const cursorModeEnum = {
+  default: "default",
+  write: "write",
+  erase: "erase",
 };

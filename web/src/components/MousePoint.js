@@ -1,6 +1,4 @@
-export const MousePoint = ({ value }) => {
-  const pos = value[1];
-
+export const MousePoint = ({ src }) => {
   return (
     <div
       style={{
@@ -10,8 +8,8 @@ export const MousePoint = ({ value }) => {
         border: "2px dotted black",
         borderRadius: "50%",
         background: "transparent",
-        left: pos.x - 10,
-        top: pos.y - 10,
+        left: src.x - 10,
+        top: src.y - 10,
       }}
     >
       <div

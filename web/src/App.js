@@ -1,6 +1,6 @@
 import "./App.css";
-import { Canvas } from "./component/Canvas";
-import { ToolBar } from "./component/ToolBar";
+import { Canvas } from "./components/Canvas";
+import { ToolBar } from "./components/ToolBar";
 import { eventNameEnum } from "./utils/enums";
 import { useState } from "react";
 import { GroupEventManager } from "./eventTarget/GroupEventManager";
@@ -14,18 +14,11 @@ function App() {
     },
   );
   const [currentEvent, setCurrentEvent] = useState(eventNameEnum.none);
-  // const [leftOffsetWidth, setLeftOffsetWidth] = useState(0);
+
   return (
     <div className="App">
-      <ToolBar
-        setCurrentEvent={setCurrentEvent}
-        // setLeftOffsetWidth={setLeftOffsetWidth}
-      />
-      <Canvas
-        currentEvent={currentEvent}
-        setCurrentEvent={setCurrentEvent}
-        // leftOffsetWidth={leftOffsetWidth}
-      />
+      <ToolBar setCurrentEvent={setCurrentEvent} />
+      <Canvas currentEvent={currentEvent} setCurrentEvent={setCurrentEvent} />
     </div>
   );
 }

@@ -14,13 +14,17 @@ export const useSelectManager = () => {
   const [svgGroup, setSvgGroup] = useState(new Map());
   const [diffAndFlagMap, setDiffAndFlagMap] = useState(new Map());
   const [SMState, setSMState] = useState(SMStateEnum.none);
+  const [selectBoxSize, setSelectBoxSize] = useState({
+    src: { x: 0, y: 0 },
+    dest: { x: 0, y: 0 },
+  });
   const isGrouping = GroupEventManager.getInstance().getGroupingState();
 
   useEffect(() => {
     const moveOnKeyDown = () => {
       const GKM = GroupEventManager.getInstance().getGroupKeyMoveMap();
 
-      for (const [key, value] of getSvgGroup()) {
+      for (const [key, value] of svgGroup) {
         const moveOnDrag = value.moveOnDrag;
         const { objPos } = value.getObjInfo();
         const movePos = {
@@ -112,8 +116,6 @@ export const useSelectManager = () => {
     }
   };
 
-  const getSvgGroup = () => svgGroup;
-
   const selectSvg = (id, objTools) => {
     setSvgGroup(() => {
       return new Map().set(id, objTools);
@@ -148,6 +150,51 @@ export const useSelectManager = () => {
     setSvgGroup(new Map());
   };
 
+  const initClientSelectBoxSize = (fixPos) => {
+    if (isGrouping) return false;
+
+    setSelectBoxSize({
+      src: fixPos,
+      dest: fixPos,
+    });
+
+    return true;
+  };
+
+  const setClientSelectBoxSize = (fixPos) => {
+    setSelectBoxSize((prev) => {
+      return {
+        src: prev.src,
+        dest: fixPos,
+      };
+    });
+  };
+
+  const isCollision = (objInfo) => {
+    const { objPos, objSize } = objInfo;
+    console.log("isCollision", objPos, objSize);
+  };
+
+  const finClientSelectBoxSize = (posMap) => {
+    const leftTop = {
+      x: Math.min(selectBoxSize.src.x, selectBoxSize.dest.x),
+      y: Math.min(selectBoxSize.src.y, selectBoxSize.dest.y),
+    };
+    const width = Math.abs(selectBoxSize.src.x - selectBoxSize.dest.x);
+    const height = Math.abs(selectBoxSize.src.y - selectBoxSize.dest.y);
+
+    for (const [key, value] of posMap) {
+      console.log(key, value);
+    }
+
+    setTimeout(() => {
+      setSelectBoxSize({
+        src: { x: 0, y: 0 },
+        dest: { x: 0, y: 0 },
+      });
+    }, 400);
+  };
+
   return {
     handleSelect: {
       selectSvg,
@@ -158,5 +205,9 @@ export const useSelectManager = () => {
     setDiffPosOnAll,
     onDrag,
     onDrop,
+    selectBoxSize,
+    initClientSelectBoxSize,
+    setClientSelectBoxSize,
+    finClientSelectBoxSize,
   };
 };
