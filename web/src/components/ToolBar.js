@@ -70,6 +70,9 @@ export const ToolBar = ({ setCurrentEvent }) => {
         backgroundColor: "dodgerblue",
         display: "flex",
         flexDirection: "column",
+        position: "fixed",
+        top: 0,
+        left: 0,
       }}
     >
       spring : {comment}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SMStateEnum, svgTypeEnum } from "../utils/enums";
+import { SMStateEnum } from "../utils/enums";
 import {
   calcPosOnDrag,
   generateDiffAndFlag,

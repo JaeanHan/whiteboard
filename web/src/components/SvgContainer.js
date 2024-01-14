@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { dragStateEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
-import { MousePoint } from "./MousePoint";
 
 export const SvgContainer = ({
   children,

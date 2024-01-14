@@ -1,7 +1,7 @@
 import { useSelectManager } from "../hooks/useSelectManager";
 import { RectSVG } from "./RectSVG";
 import { TextSVG } from "./TextSVG";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SimpleLineSVG } from "./SimpleLineSVG";
 import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../utils/enums";
 import { useSvgIdGenerator } from "../hooks/useSvgIdGenerator";
@@ -12,6 +12,7 @@ import { usePathGenerator } from "../hooks/usePathGenerator";
 import { PathSVG } from "./PathSVG";
 import { SelectBox } from "./SelectBox";
 import { useSvgStore } from "../hooks/useSvgStore";
+import { ThrottleManager } from "../eventTarget/ThrottleManager";
 
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   const { addSvgOnStore, updateSvgOnStore, setAdditionalProps, liveStore } =
@@ -28,9 +29,13 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   } = useSelectManager();
   const { generateNextId } = useSvgIdGenerator();
 
+  const [canvasSize, setCanvasSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+  const canvasRef = useRef();
   const [tempPos, setTempPos] = useState(new Map());
   const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
-  const [isErasing, setIsErasing] = useState(false);
 
   const { addPoint, quit } = useLineGenerator(
     addSvgOnStore,
@@ -40,16 +45,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
 
-  const deleteSvgById = (id) => {
-    updateSvgOnStore(id, false);
-  };
-
   const onMouseDown = (e) => {
-    if (cursorMode === cursorModeEnum.erase) {
-      setIsErasing(true);
-      return;
-    }
-
     if (cursorMode === cursorModeEnum.write) {
       setIsDrawing(true);
       return;
@@ -59,8 +55,8 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
     if (currentEvent === eventNameEnum.none && id && id === "root") {
       const fixPos = {
-        x: e.clientX - toolBarWidth,
-        y: e.clientY,
+        x: e.clientX - toolBarWidth + window.scrollX,
+        y: e.clientY + window.scrollY,
       };
 
       if (initClientSelectBoxSize(fixPos)) {
@@ -70,47 +66,67 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
 
     setDiffPosOnAll({
-      x: e.clientX,
-      y: e.clientY,
+      x: e.clientX + window.scrollX,
+      y: e.clientY + window.scrollY,
     });
   };
 
   const onMouseMove = (e) => {
-    if (cursorMode === cursorModeEnum.erase && isErasing) {
-      const id = e.target.parentNode?.parentNode?.id;
-      if (id && id !== "root") {
-        deleteSvgById(id);
-      }
-      return;
-    }
+    e.preventDefault();
 
     if (cursorMode === cursorModeEnum.write) {
       const fixPos = {
-        x: e.clientX - toolBarWidth,
-        y: e.clientY,
+        x: e.clientX - toolBarWidth + window.scrollX,
+        y: e.clientY + window.scrollY,
       };
       addPointOnSet(fixPos);
       return;
     }
 
     if (currentEvent === eventNameEnum.multiSelect) {
-      const clientPos = { x: e.clientX - toolBarWidth, y: e.clientY };
-      setClientSelectBoxSize(clientPos);
+      const fixPos = {
+        x: e.clientX - toolBarWidth + window.scrollX,
+        y: e.clientY + window.scrollY,
+      };
+      setClientSelectBoxSize(fixPos);
       return;
     }
 
+    if (cursorMode === cursorModeEnum.erase) {
+      const isLeftButtonClicked = e.buttons === 1;
+
+      if (isLeftButtonClicked) {
+        const id = e.target.parentNode?.parentNode?.id;
+
+        if (id && id !== "root") {
+          deleteSvgById(id);
+        }
+      }
+      return;
+    }
+
+    const TM = ThrottleManager.getInstance();
+
+    if (TM.getEventThrottling(TM.dragEvent)) {
+      return;
+    }
+
+    TM.setEventMap(TM.dragEvent, true);
+
     if (currentEvent === eventNameEnum.none) {
-      const calcPos = { x: e.clientX, y: e.clientY };
+      const calcPos = {
+        x: e.clientX + window.scrollX,
+        y: e.clientY + window.scrollY,
+      };
       onDrag(calcPos);
     }
+
+    setTimeout(() => {
+      TM.setEventMap(TM.dragEvent, false);
+    }, 10);
   };
 
   const onMouseUp = (e) => {
-    if (cursorMode === cursorModeEnum.erase) {
-      setIsErasing(false);
-      return;
-    }
-
     if (cursorMode === cursorModeEnum.write) {
       setIsDrawing(false);
       return;
@@ -124,8 +140,8 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
 
     const fixPos = {
-      x: e.clientX - toolBarWidth,
-      y: e.clientY,
+      x: e.clientX - toolBarWidth + window.scrollX,
+      y: e.clientY + window.scrollY,
     };
 
     if (currentEvent === eventNameEnum.addRect) {
@@ -170,6 +186,10 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
   };
 
+  const deleteSvgById = (id) => {
+    updateSvgOnStore(id, false);
+  };
+
   useEffect(() => {
     console.log("use effect", currentEvent);
 
@@ -186,13 +206,57 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     setCursorMode(cursorModeEnum.default);
   }, [currentEvent]);
 
+  useEffect(() => {
+    window.addEventListener("scroll", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [canvasSize, setCanvasSize]);
+
+  const onScroll = (e) => {
+    e.preventDefault();
+    const TM = ThrottleManager.getInstance();
+
+    if (TM.getEventThrottling(TM.scrollEvent)) {
+      return;
+    }
+
+    TM.setEventMap(TM.scrollEvent, true);
+
+    setTimeout(() => {
+      const canvasX = canvasSize.width;
+      const hiddenX = window.scrollX;
+      const clientX = window.innerWidth;
+
+      const canvasY = canvasSize.height;
+      const hiddenY = window.scrollY;
+      const clientY = window.innerHeight;
+
+      setCanvasSize((prev) => {
+        return {
+          width:
+            canvasX - (hiddenX + clientX) <= 50 ? canvasX + 100 : prev.width,
+          height:
+            canvasY - (hiddenY + clientY) <= 50 ? canvasY + 100 : prev.height,
+        };
+      });
+
+      TM.setEventMap(TM.scrollEvent, false);
+    }, 150);
+  };
+
   return (
     <div
+      id="canvas"
+      ref={canvasRef}
       style={{
-        width: "100%",
-        height: "100%",
         position: "relative",
         backgroundColor: "white",
+        width: canvasSize.width,
+        height: canvasSize.height,
+        marginLeft: toolBarWidth,
+        scrollBehavior: "smooth",
         cursor:
           currentEvent === eventNameEnum.write
             ? "crosshair"
@@ -205,6 +269,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
+      onScroll={(e) => console.log(e)}
     >
       {selectBoxSize.src.x !== selectBoxSize.dest.x && (
         <SelectBox selectClientBox={selectBoxSize} />
