@@ -10,6 +10,7 @@ export const RectSVG = ({
   const { src, width, height } = attachment;
   // const num = id.replace(/[^0-9]/g, "");
   const num = Number(id.charAt(1));
+  console.log(id);
   return (
     <SvgContainer
       id={id}

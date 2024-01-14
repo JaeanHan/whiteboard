@@ -2,6 +2,7 @@ export class ThrottleManager extends EventTarget {
   static instance = null;
   static dragEvent = "throttleDrag";
   static scrollEvent = "throttleScroll";
+  static keyMoveEvent = "throttleKeyDownMove";
   eventThrottleMap = new Map();
 
   constructor() {

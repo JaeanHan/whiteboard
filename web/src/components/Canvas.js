@@ -1,18 +1,16 @@
 import { useSelectManager } from "../hooks/useSelectManager";
-import { RectSVG } from "./RectSVG";
-import { TextSVG } from "./TextSVG";
-import { useEffect, useRef, useState } from "react";
-import { SimpleLineSVG } from "./SimpleLineSVG";
+import { useEffect, useState } from "react";
 import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../utils/enums";
 import { useSvgIdGenerator } from "../hooks/useSvgIdGenerator";
 import { toolBarWidth } from "./ToolBar";
 import { useLineGenerator } from "../hooks/useLineGenerator";
 import { MousePoint } from "./MousePoint";
 import { usePathGenerator } from "../hooks/usePathGenerator";
-import { PathSVG } from "./PathSVG";
 import { SelectBox } from "./SelectBox";
 import { useSvgStore } from "../hooks/useSvgStore";
 import { ThrottleManager } from "../eventTarget/ThrottleManager";
+import { render } from "../utils/canvasTools";
+import { useStarsGenerator } from "../hooks/useStarsGenerator";
 
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   const { addSvgOnStore, updateSvgOnStore, setAdditionalProps, liveStore } =
@@ -23,19 +21,21 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     onDrag,
     onDrop,
     selectBoxSize,
+    handleSelectBox,
+  } = useSelectManager();
+  const {
     initClientSelectBoxSize,
     setClientSelectBoxSize,
     finClientSelectBoxSize,
-  } = useSelectManager();
+  } = handleSelectBox;
   const { generateNextId } = useSvgIdGenerator();
 
+  const [tempPos, setTempPos] = useState(new Map());
+  const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
   const [canvasSize, setCanvasSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const canvasRef = useRef();
-  const [tempPos, setTempPos] = useState(new Map());
-  const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
 
   const { addPoint, quit } = useLineGenerator(
     addSvgOnStore,
@@ -43,7 +43,45 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     setTempPos,
   );
 
+  const { addStar } = useStarsGenerator(
+    addSvgOnStore,
+    setCurrentEvent,
+    setTempPos,
+  );
+
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
+
+  const onScroll = (e) => {
+    e.preventDefault();
+    const TM = ThrottleManager.getInstance();
+
+    if (TM.getEventThrottling(TM.scrollEvent)) {
+      return;
+    }
+
+    TM.setEventMap(TM.scrollEvent, true);
+
+    setTimeout(() => {
+      const canvasX = canvasSize.width;
+      const hiddenX = window.scrollX;
+      const clientX = window.innerWidth;
+
+      const canvasY = canvasSize.height;
+      const hiddenY = window.scrollY;
+      const clientY = window.innerHeight;
+
+      setCanvasSize((prev) => {
+        return {
+          width:
+            canvasX - (hiddenX + clientX) <= 50 ? canvasX + 100 : prev.width,
+          height:
+            canvasY - (hiddenY + clientY) <= 50 ? canvasY + 100 : prev.height,
+        };
+      });
+
+      TM.setEventMap(TM.scrollEvent, false);
+    }, 150);
+  };
 
   const onMouseDown = (e) => {
     if (cursorMode === cursorModeEnum.write) {
@@ -181,6 +219,11 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       return;
     }
 
+    if (currentEvent === eventNameEnum.addStars) {
+      setTempPos((prev) => new Map(prev).set(fixPos.x, fixPos));
+      addStar(fixPos);
+    }
+
     if (!e.ctrlKey) {
       onDrop();
     }
@@ -212,44 +255,11 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, [canvasSize, setCanvasSize]);
-
-  const onScroll = (e) => {
-    e.preventDefault();
-    const TM = ThrottleManager.getInstance();
-
-    if (TM.getEventThrottling(TM.scrollEvent)) {
-      return;
-    }
-
-    TM.setEventMap(TM.scrollEvent, true);
-
-    setTimeout(() => {
-      const canvasX = canvasSize.width;
-      const hiddenX = window.scrollX;
-      const clientX = window.innerWidth;
-
-      const canvasY = canvasSize.height;
-      const hiddenY = window.scrollY;
-      const clientY = window.innerHeight;
-
-      setCanvasSize((prev) => {
-        return {
-          width:
-            canvasX - (hiddenX + clientX) <= 50 ? canvasX + 100 : prev.width,
-          height:
-            canvasY - (hiddenY + clientY) <= 50 ? canvasY + 100 : prev.height,
-        };
-      });
-
-      TM.setEventMap(TM.scrollEvent, false);
-    }, 150);
-  };
+  }, [canvasSize]);
 
   return (
     <div
       id="canvas"
-      ref={canvasRef}
       style={{
         position: "relative",
         backgroundColor: "white",
@@ -269,7 +279,6 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      onScroll={(e) => console.log(e)}
     >
       {selectBoxSize.src.x !== selectBoxSize.dest.x && (
         <SelectBox selectClientBox={selectBoxSize} />
@@ -277,65 +286,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       {Array.from(tempPos).map((value) => (
         <MousePoint src={value[1]} key={value[0]} />
       ))}
-      {liveStore.map((value, index) => {
-        const { id: key, attachment } = value;
-        // console.log(key);
-        if (key.startsWith(svgTypeEnum.rect)) {
-          return (
-            <RectSVG
-              id={key}
-              key={key}
-              handleSelect={handleSelect}
-              showPos={true}
-              attachment={attachment}
-              deleteSvgById={deleteSvgById}
-              setAdditionalProps={setAdditionalProps}
-            />
-          );
-        }
-
-        if (key.startsWith(svgTypeEnum.text)) {
-          return (
-            <TextSVG
-              id={key}
-              key={key}
-              handleSelect={handleSelect}
-              showPos={true}
-              attachment={attachment}
-              deleteSvgById={deleteSvgById}
-              setAdditionalProps={setAdditionalProps}
-            />
-          );
-        }
-
-        if (key.startsWith(svgTypeEnum.line)) {
-          return (
-            <SimpleLineSVG
-              id={key}
-              key={key}
-              handleSelect={handleSelect}
-              showPos={true}
-              attachment={attachment}
-              deleteSvgById={deleteSvgById}
-              setAdditionalProps={setAdditionalProps}
-            />
-          );
-        }
-
-        if (key.startsWith(svgTypeEnum.path)) {
-          return (
-            <PathSVG
-              id={key}
-              key={key}
-              handleSelect={handleSelect}
-              showPos={true}
-              attachment={attachment}
-              deleteSvgById={deleteSvgById}
-              setAdditionalProps={setAdditionalProps}
-            />
-          );
-        }
-      })}
+      {render(liveStore, handleSelect, deleteSvgById, setAdditionalProps)}
     </div>
   );
 };

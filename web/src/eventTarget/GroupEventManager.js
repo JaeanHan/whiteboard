@@ -12,6 +12,8 @@ export class GroupEventManager extends EventTarget {
   groupKeyMoveMap = new Map();
   isGrouping = groupingStateEnum.none;
   lastEventTimeStamp = 0;
+  keyMoveSpeed = 1;
+  speedLimit = 5;
 
   constructor() {
     super();
@@ -44,8 +46,14 @@ export class GroupEventManager extends EventTarget {
     this.groupKeyMoveMap.set(GroupKeyMapKey.y, 0);
   };
 
-  getLastEventTimeStamp = () => this.lastEventTimeStamp;
-  setLastEventTimeStamp = (currentTimeStamp) => {
-    this.lastEventTimeStamp = currentTimeStamp;
+  getKeyMoveSpeed = () => this.keyMoveSpeed;
+  goFaster = () => {
+    if (this.keyMoveSpeed <= this.speedLimit) {
+      this.keyMoveSpeed += 1;
+      console.log("gem", this.keyMoveSpeed);
+    }
+  };
+  settleDown = () => {
+    this.keyMoveSpeed = 1;
   };
 }

@@ -37,10 +37,14 @@ export const useSelectManager = () => {
     };
 
     const onKeyDown = (e) => {
+      if (e.key === "F5" || e.key === "F12") return;
+      e.preventDefault();
+
       if (!GroupEventManager.getInstance().getGroupingState()) return;
 
       setMoveMapByKey(e.key);
       moveOnKeyDown();
+      GroupEventManager.getInstance().goFaster();
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -51,6 +55,7 @@ export const useSelectManager = () => {
       if (svgGroup.size === 0) {
         GroupEventManager.getInstance().resetGroupKeyMoveMap();
       }
+      GroupEventManager.getInstance().settleDown();
     };
   }, [svgGroup]);
 
@@ -233,7 +238,7 @@ export const useSelectManager = () => {
         src: { x: 0, y: 0 },
         dest: { x: 0, y: 0 },
       });
-    }, 250);
+    }, 100);
   };
 
   return {
@@ -247,8 +252,10 @@ export const useSelectManager = () => {
     onDrag,
     onDrop,
     selectBoxSize,
-    initClientSelectBoxSize,
-    setClientSelectBoxSize,
-    finClientSelectBoxSize,
+    handleSelectBox: {
+      initClientSelectBoxSize,
+      setClientSelectBoxSize,
+      finClientSelectBoxSize,
+    },
   };
 };

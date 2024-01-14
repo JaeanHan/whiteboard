@@ -35,7 +35,7 @@ export const useSvgStore = () => {
         liveSvg.push(viewProps);
       }
     }
-    console.log(liveSvg);
+    console.log("svgStore", liveSvg);
     setLiveStore(liveSvg);
   }, [store]);
 

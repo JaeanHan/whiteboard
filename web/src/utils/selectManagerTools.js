@@ -179,30 +179,31 @@ export const calcPosOnDrag = (flag, dragPos, diffDistance) => {
 export const setMoveMapByKey = (flag) => {
   const GEM = GroupEventManager.getInstance();
   const GKM = GEM.getGroupKeyMoveMap();
+  const speed = GEM.getKeyMoveSpeed();
 
   const previousX = GKM.get(GroupKeyMapKey.x);
   const previousY = GKM.get(GroupKeyMapKey.y);
 
   if (flag === arrowKeysEnum.left) {
-    const currentX = previousX - 1;
+    const currentX = previousX - speed;
     GKM.set(GroupKeyMapKey.x, currentX);
     return;
   }
 
   if (flag === arrowKeysEnum.right) {
-    const currentX = previousX + 1;
+    const currentX = previousX + speed;
     GKM.set(GroupKeyMapKey.x, currentX);
     return;
   }
 
   if (flag === arrowKeysEnum.up) {
-    const currentY = previousY - 1;
+    const currentY = previousY - speed;
     GKM.set(GroupKeyMapKey.y, currentY);
     return;
   }
 
   if (flag === arrowKeysEnum.down) {
-    const currentY = previousY + 1;
+    const currentY = previousY + speed;
     GKM.set(GroupKeyMapKey.y, currentY);
   }
 };

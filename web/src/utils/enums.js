@@ -31,6 +31,7 @@ export const eventNameEnum = {
   addLine: "addLine",
   addText: "addText",
   addPath: "addPath",
+  addStars: "addStars",
 };
 
 export const svgTypeEnum = {
@@ -38,6 +39,7 @@ export const svgTypeEnum = {
   line: "l",
   text: "t",
   path: "p",
+  stars: "s",
 };
 
 export const groupingStateEnum = {

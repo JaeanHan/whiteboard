@@ -1,5 +1,5 @@
 import { SvgContainer } from "./SvgContainer";
-export const SimpleLineSVG = ({
+export const LineSVG = ({
   id,
   handleSelect,
   showPos,

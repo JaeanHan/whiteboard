@@ -44,6 +44,12 @@ export const ToolBar = ({ setCurrentEvent }) => {
     setMode("Default");
   };
 
+  const StarSign = (e) => {
+    e.preventDefault();
+    setCurrentEvent(eventNameEnum.addStars);
+    setMode("Default");
+  };
+
   const Default = (e) => {
     e.preventDefault();
     setCurrentEvent(eventNameEnum.none);
@@ -59,7 +65,10 @@ export const ToolBar = ({ setCurrentEvent }) => {
   };
 
   const cursor = useMemo(() => [Default, Pencil, Eraser], [mode]);
-  const temp = useMemo(() => [Document, Rect, Text, Line, ApiPath], [Document]);
+  const temp = useMemo(
+    () => [Document, Rect, Text, Line, StarSign, ApiPath],
+    [Document],
+  );
 
   return (
     <div
