@@ -2,7 +2,6 @@ export class ThrottleManager extends EventTarget {
   static instance = null;
   static dragEvent = "throttleDrag";
   static scrollEvent = "throttleScroll";
-  registeredEventMap = new Map();
   eventThrottleMap = new Map();
 
   constructor() {
@@ -19,7 +18,7 @@ export class ThrottleManager extends EventTarget {
   };
 
   addEventListener = (type, handler) => {
-    if (!this.registeredEventMap.has(type)) {
+    if (!this.eventThrottleMap.has(type)) {
       super.addEventListener(type, handler);
       this.eventThrottleMap.set(type, handler);
       console.log("registered event", type);
