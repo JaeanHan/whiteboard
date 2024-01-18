@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 export const useSvgStore = () => {
   const [store, setStore] = useState(new Map());
   const [liveStore, setLiveStore] = useState([]);
+  const [isInit, setIsInit] = useState(true);
 
   const load = (loadData) => {
+    if (!isInit) return;
+    setIsInit(false);
+
     const loadMap = new Map();
     for (const [key, value] of Object.entries(loadData)) {
       const parse = JSON.parse(value);
@@ -36,7 +40,7 @@ export const useSvgStore = () => {
   };
 
   useEffect(() => {
-    const liveSvg = [];
+    const updatedLiveSvg = [];
 
     for (const [key, value] of store) {
       if (value.display) {
@@ -44,11 +48,15 @@ export const useSvgStore = () => {
           id: key,
           attachment: value,
         };
-        liveSvg.push(viewProps);
+        updatedLiveSvg.push(viewProps);
       }
     }
-    console.log("svgStore", liveSvg);
-    setLiveStore(liveSvg);
+    console.log("svgStore", updatedLiveSvg);
+    // setLiveStore(updatedLiveSvg);
+    const timer = () => setTimeout(() => setLiveStore(updatedLiveSvg), 5);
+    const name = timer();
+
+    return () => clearTimeout(name);
   }, [store]);
 
   return {

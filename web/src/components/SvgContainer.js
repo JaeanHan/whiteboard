@@ -20,6 +20,7 @@ export const SvgContainer = ({
     width: widthHeight.width,
     height: widthHeight.height,
   });
+  const [scale, setScale] = useState(1);
   const [dragState, setDragState] = useState(dragStateEnum.none);
 
   useEffect(() => {
@@ -59,24 +60,32 @@ export const SvgContainer = ({
   const onClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!e.ctrlKey) return;
+    console.log(1);
 
-    if (dragState === dragStateEnum.group) {
+    if (e.ctrlKey && dragState === dragStateEnum.group) {
       console.log("remove", id);
       removeSvgFromGroup(id);
       setDragState(dragStateEnum.none);
       return;
     }
 
-    addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
-    setDragState(dragStateEnum.group);
+    if (e.ctrlKey) {
+      addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
+      setDragState(dragStateEnum.group);
+    }
   };
+
   const onMouseDown = (e) => {
     e.preventDefault();
     if (dragState === dragStateEnum.none) {
       addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
       setDragState(dragStateEnum.select);
     }
+  };
+
+  const setScaleBy2 = (e) => {
+    e.stopPropagation();
+    setScale(scale === 2 ? 1 : 2);
   };
 
   return (
@@ -95,7 +104,9 @@ export const SvgContainer = ({
         position: "absolute",
         opacity: "0.5",
         transformOrigin: isLine ? "0% 0%" : "50% 50%",
-        transform: isLine ? "rotate(" + degrees + "deg)" : "",
+        transform: isLine
+          ? `rotate(${degrees}deg) scale(${scale})`
+          : `scale(${scale})`,
         border:
           dragState === dragStateEnum.group
             ? "dotted black"
@@ -108,26 +119,46 @@ export const SvgContainer = ({
     >
       {(dragState === dragStateEnum.group ||
         dragState === dragStateEnum.select) && (
-        <div
-          style={{
-            borderRadius: 6,
-            position: "absolute",
-            backgroundColor: "red",
-            color: "black",
-            width: 15,
-            height: 15,
-            top: 0,
-            left: objSize.width - 15,
-            textAlign: "center",
-            lineHeight: 0.75,
-            cursor: "not-allowed",
-          }}
-          onClick={() => {
-            deleteSvgById(id);
-          }}
-        >
-          x
-        </div>
+        <>
+          <div
+            style={{
+              borderRadius: 6,
+              position: "absolute",
+              backgroundColor: "red",
+              color: "black",
+              width: 15,
+              height: 15,
+              top: 0,
+              left: objSize.width - 15,
+              textAlign: "center",
+              lineHeight: 0.75,
+              cursor: "not-allowed",
+            }}
+            onMouseUp={() => {
+              deleteSvgById(id);
+            }}
+          >
+            x
+          </div>
+          <div
+            style={{
+              borderRadius: 6,
+              position: "absolute",
+              backgroundColor: "white",
+              color: "black",
+              width: 15,
+              height: 15,
+              top: objSize.height - 15,
+              left: objSize.width - 15,
+              textAlign: "center",
+              lineHeight: 0.75,
+              cursor: scale > 1 ? "zoom-out" : "zoom-in",
+            }}
+            onMouseUp={setScaleBy2}
+          >
+            o
+          </div>
+        </>
       )}
       {showPos && (
         <>
