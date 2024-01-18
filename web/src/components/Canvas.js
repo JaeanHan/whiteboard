@@ -11,10 +11,18 @@ import { useSvgStore } from "../hooks/useSvgStore";
 import { ThrottleManager } from "../eventTarget/ThrottleManager";
 import { render } from "../utils/canvasTools";
 import { useStarsGenerator } from "../hooks/useStarsGenerator";
+import { useSaveManager } from "../hooks/useSaveManager";
+
+const owner = "jaean";
 
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
-  const { addSvgOnStore, updateSvgOnStore, setAdditionalProps, liveStore } =
-    useSvgStore();
+  const {
+    addSvgOnStore,
+    updateSvgOnStore,
+    setAdditionalProps,
+    liveStore,
+    load,
+  } = useSvgStore();
   const {
     handleSelect,
     setDiffPosOnAll,
@@ -51,8 +59,12 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
 
+  const { save, read } = useSaveManager();
+
   const onScroll = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+
     const TM = ThrottleManager.getInstance();
 
     if (TM.getEventThrottling(TM.scrollEvent)) {
@@ -80,7 +92,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       });
 
       TM.setEventMap(TM.scrollEvent, false);
-    }, 150);
+    }, 500);
   };
 
   const onMouseDown = (e) => {
@@ -152,11 +164,17 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     TM.setEventMap(TM.dragEvent, true);
 
     if (currentEvent === eventNameEnum.none) {
+      // const id = e.target.parentNode?.parentNode?.id;
       const calcPos = {
         x: e.clientX + window.scrollX,
         y: e.clientY + window.scrollY,
       };
+      // console.log("id", id);
+      // if (!id.startsWith(svgTypeEnum.stars)) {
       onDrag(calcPos);
+      // } else {
+      //   console.log("lll");
+      // }
     }
 
     setTimeout(() => {
@@ -246,6 +264,16 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       return;
     }
 
+    if (currentEvent === eventNameEnum.save) {
+      save(owner, liveStore);
+      setCurrentEvent(eventNameEnum.none);
+    }
+
+    if (currentEvent === eventNameEnum.read) {
+      read(owner, load);
+      setCurrentEvent(eventNameEnum.none);
+    }
+
     setCursorMode(cursorModeEnum.default);
   }, [currentEvent]);
 
@@ -279,6 +307,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
+      // onTouchStart={onMouseDown}
+      // onTouchMove={onMouseMove}
+      // onTouchEnd={onMouseUp}
     >
       {selectBoxSize.src.x !== selectBoxSize.dest.x && (
         <SelectBox selectClientBox={selectBoxSize} />

@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SvgContainer } from "./SvgContainer";
+import { toolBarWidth } from "./ToolBar";
+import { ThrottleManager } from "../eventTarget/ThrottleManager";
 
 export const StarsSVG = ({
   id,
@@ -9,40 +11,62 @@ export const StarsSVG = ({
   deleteSvgById,
   setAdditionalProps,
 }) => {
-  const { src, width, height, stars, starRadius } = attachment;
+  const { src, stars, starRadius } = attachment;
   const [points, setPoints] = useState(stars);
-  const [links, setLinks] = useState([]);
+  const [draggingIndex, setDraggingIndex] = useState(null);
 
-  useEffect(() => {
-    const lines = [];
+  const onDragStart = (index) => {
+    setDraggingIndex(index);
+  };
 
-    for (let i = 0; i < points.length - 1; i++) {
-      lines.push(
-        <line
-          key={i}
-          x1={points[i].x}
-          y1={points[i].y}
-          x2={points[i + 1].x}
-          y2={points[i + 1].y}
-          stroke="black"
-          strokeWidth="2"
-        />,
-      );
+  const onDrag = (e) => {
+    if (draggingIndex === null) {
+      return;
     }
+    e.stopPropagation();
 
-    console.log("lines", lines);
-    setLinks(lines);
-  }, [points]);
+    const TM = ThrottleManager.getInstance();
+    if (TM.getEventThrottling(TM.moveStarEvent)) return;
 
-  // const handleDrag = (e, index) => {
-  //   const newPoints = [...points];
-  //   newPoints[index] = {
-  //     x: e.clientX - toolBarWidth + window.scrollX - src.x,
-  //     y: e.clientY + window.scrollY - src.y,
-  //   };
-  //   console.log("newPo", newPoints[index]);
-  //   setPoints(newPoints);
-  // };
+    const newPoints = [...points];
+    const newDest = {
+      x: e.clientX + window.scrollX - toolBarWidth - src.x,
+      y: e.clientY + window.scrollY - src.y,
+    };
+    newPoints[draggingIndex] = newDest;
+    setPoints(newPoints);
+
+    setTimeout(() => {
+      TM.setEventMap(TM.moveStarEvent, false);
+    }, 500);
+  };
+
+  const onDragEnd = () => {
+    setDraggingIndex(null);
+  };
+
+  const xArray = points.map((point) => point.x);
+  const yArray = points.map((point) => point.y);
+  const width = Math.max(...xArray) + starRadius;
+  const height = Math.max(...yArray) + starRadius;
+
+  const lines = [];
+
+  for (let i = 0; i < points.length - 1; i++) {
+    lines.push(
+      <line
+        key={i}
+        x1={points[i].x}
+        y1={points[i].y}
+        x2={points[i + 1].x}
+        y2={points[i + 1].y}
+        stroke="black"
+        strokeWidth="2"
+      />,
+    );
+  }
+
+  console.log("lines", points);
 
   return (
     <SvgContainer
@@ -52,20 +76,33 @@ export const StarsSVG = ({
       src={src}
       showPos={showPos}
       deleteSvgById={deleteSvgById}
-      widthHeight={{ width: width, height: height }}
+      widthHeight={{
+        width: width,
+        height: height,
+      }}
       setAdditionalProps={setAdditionalProps}
     >
-      <svg width={width} height={height}>
-        {links}
+      <svg
+        width={width}
+        height={height}
+        onMouseMove={onDrag}
+        onMouseUp={onDragEnd}
+        onMouseLeave={() => setDraggingIndex(null)}
+        style={{
+          borderTop: draggingIndex === null ? "none" : "dashed dodgerblue",
+          borderLeft: draggingIndex === null ? "none" : "dashed dodgerblue",
+        }}
+      >
+        {lines}
         {points.map((point, index) => (
           <circle
             key={index}
             cx={point.x}
             cy={point.y}
             r={starRadius}
-            fill="blue"
-            // onMouseDown={(e) => handleDrag(e, index)}
-            // style={{ cursor: "grab" }}
+            fill={draggingIndex === index ? "red" : "blue"}
+            onMouseDown={(e) => onDragStart(index)}
+            style={{ cursor: "grab" }}
           />
         ))}
       </svg>

@@ -13,15 +13,18 @@ export const useStarsGenerator = (
   useEffect(() => {
     if (points.length === 0) return;
 
-    const threeSecWatch = () =>
-      setTimeout(() => {
-        if (points.length > 2) {
-          handleTimeout();
-          setTempPos(new Map());
-        }
-      }, 3000);
+    const timer = () =>
+      setTimeout(
+        () => {
+          if (points.length > 2) {
+            handleTimeout();
+            setTempPos(new Map());
+          }
+        },
+        2500 - Math.min(1000, 200 * points.length),
+      );
 
-    const name = threeSecWatch();
+    const name = timer();
     console.log("test");
 
     return () => {
@@ -41,8 +44,8 @@ export const useStarsGenerator = (
       x: Math.min(...xArray) - starRadius,
       y: Math.min(...yArray) - starRadius,
     };
-    const width = Math.max(...xArray) - src.x + starRadius;
-    const height = Math.max(...yArray) - src.y + starRadius;
+    // const width = Math.max(...xArray) - src.x + starRadius;
+    // const height = Math.max(...yArray) - src.y + starRadius;
 
     const stars = [];
 
@@ -56,12 +59,12 @@ export const useStarsGenerator = (
 
     const attachment = {
       src,
-      width,
-      height,
+      // width,
+      // height,
       stars,
       starRadius,
     };
-    console.log("create ", key);
+    console.log("create ", key, attachment);
     setPoints([]);
     addSvgOnStore(key, attachment);
     setCurrentEvent(eventNameEnum.none);

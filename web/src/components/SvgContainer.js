@@ -58,6 +58,7 @@ export const SvgContainer = ({
   };
   const onClick = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!e.ctrlKey) return;
 
     if (dragState === dragStateEnum.group) {

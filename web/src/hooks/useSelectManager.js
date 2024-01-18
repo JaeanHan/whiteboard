@@ -199,7 +199,7 @@ export const useSelectManager = () => {
     };
   };
 
-  const isCollision = (selectBoxBounding, objBounding) => {
+  const isOverlapped = (selectBoxBounding, objBounding) => {
     const overlapWidth =
       Math.min(selectBoxBounding.right, objBounding.right) -
       Math.max(selectBoxBounding.left, objBounding.left);
@@ -227,7 +227,7 @@ export const useSelectManager = () => {
       } = attachment;
       const rectBounding = getObjBounding(objSrc, width, height);
 
-      if (isCollision(selectBoxBounding, rectBounding)) {
+      if (isOverlapped(selectBoxBounding, rectBounding)) {
         addSvgToGroup(key, { getObjInfo, moveOnDrag, stopOnDrop });
         setDragStateGroup();
       }

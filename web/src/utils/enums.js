@@ -32,6 +32,8 @@ export const eventNameEnum = {
   addText: "addText",
   addPath: "addPath",
   addStars: "addStars",
+  save: "save",
+  read: "read",
 };
 
 export const svgTypeEnum = {

@@ -4,6 +4,17 @@ export const useSvgStore = () => {
   const [store, setStore] = useState(new Map());
   const [liveStore, setLiveStore] = useState([]);
 
+  const load = (loadData) => {
+    const loadMap = new Map();
+    for (const [key, value] of Object.entries(loadData)) {
+      const parse = JSON.parse(value);
+      loadMap.set(key, parse);
+    }
+
+    console.log(loadMap);
+    setStore(loadMap);
+  };
+
   const addSvgOnStore = (id, posInfo) => {
     const props = {
       ...posInfo,
@@ -26,6 +37,7 @@ export const useSvgStore = () => {
 
   useEffect(() => {
     const liveSvg = [];
+
     for (const [key, value] of store) {
       if (value.display) {
         const viewProps = {
@@ -44,5 +56,6 @@ export const useSvgStore = () => {
     updateSvgOnStore,
     setAdditionalProps,
     liveStore,
+    load,
   };
 };
