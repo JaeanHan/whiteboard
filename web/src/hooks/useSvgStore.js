@@ -33,6 +33,12 @@ export const useSvgStore = () => {
     setStore((prev) => new Map(prev).set(id, props));
   };
 
+  // const updateWidthHeightOnStore = (id, widthHeight) => {
+  //   const props = { ...store.get(id), ...widthHeight };
+  //   console.log(id, props);
+  //   setStore((prev) => new Map(prev).set(id, props));
+  // };
+
   const setAdditionalProps = (id, handleObj) => {
     const props = { ...store.get(id), ...handleObj };
 
@@ -64,6 +70,7 @@ export const useSvgStore = () => {
     addSvgOnStore,
     updateSvgOnStore,
     setAdditionalProps,
+    // updateWidthHeightOnStore,
     liveStore,
     load,
   };

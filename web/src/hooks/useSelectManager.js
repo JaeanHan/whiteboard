@@ -9,6 +9,7 @@ import {
   GroupEventManager,
   GroupKeyMapKey,
 } from "../eventTarget/GroupEventManager";
+import { StarsSizeStore } from "../eventTarget/StarsSizeStore";
 
 export const useSelectManager = () => {
   const [svgGroup, setSvgGroup] = useState(new Map());
@@ -19,6 +20,7 @@ export const useSelectManager = () => {
     dest: { x: 0, y: 0 },
   });
   const isGrouping = GroupEventManager.getInstance().getGroupingState();
+  const SSS = StarsSizeStore.getInstance();
 
   useEffect(() => {
     const moveOnKeyDown = () => {
@@ -193,13 +195,14 @@ export const useSelectManager = () => {
     };
   };
 
-  const getObjBounding = (objSrc, width, height) => {
+  const getObjBounding = (objSrc, width, height, key) => {
     console.log("nan??", width, height);
+    const startSize = SSS.getSizeById(key);
     return {
       left: objSrc.x,
       top: objSrc.y,
-      right: objSrc.x + width,
-      bottom: objSrc.y + height,
+      right: objSrc.x + (width ?? startSize.width),
+      bottom: objSrc.y + (height ?? startSize.height),
     };
   };
 
@@ -228,13 +231,11 @@ export const useSelectManager = () => {
         stopOnDrop,
         setDragStateGroup,
       } = attachment;
-      const rectBounding = getObjBounding(objSrc, width, height);
-      console.log("key", key, rectBounding, selectBoxBounding, attachment);
+      const rectBounding = getObjBounding(objSrc, width, height, key);
 
       if (isOverlapped(selectBoxBounding, rectBounding)) {
         addSvgToGroup(key, { getObjInfo, moveOnDrag, stopOnDrop });
         setDragStateGroup();
-        console.log("add", key);
       }
     });
 

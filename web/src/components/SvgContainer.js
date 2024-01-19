@@ -33,6 +33,7 @@ export const SvgContainer = ({
   deleteSvgById,
   widthHeight = { width: 150, height: 150 },
   setAdditionalProps,
+  updateWidthHeightOnStore = (a) => {},
 }) => {
   const { selectSvg, addSvgToGroup, removeSvgFromGroup } = handleSelect;
   const [objPos, setObjPos] = useState({ x: src.x, y: src.y });
@@ -54,7 +55,8 @@ export const SvgContainer = ({
   }, [src]);
 
   useEffect(() => {
-    setObjSize(widthHeight);
+    // setObjSize(widthHeight);
+    updateWidthHeightOnStore(widthHeight);
   }, [widthHeight]);
 
   const getObjInfo = () => {
@@ -218,18 +220,18 @@ export const SvgContainer = ({
           </div>
           <svg
             style={{
-              borderRadius: 1,
+              borderRadius: 2,
               border: "solid 1px white",
               position: "absolute",
               backgroundColor: "none",
               color: "black",
-              width: 15,
+              width: 30,
               height: 15,
               // top: objSize.height - 15,
-              left: objSize.width - 35,
+              left: objSize.width - 45,
               textAlign: "center",
               lineHeight: 0.75,
-              cursor: scale > 1 ? "zoom-out" : "zoom-in",
+              // cursor: scale > 1 ? "zoom-out" : "zoom-in",
             }}
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -237,19 +239,19 @@ export const SvgContainer = ({
               style={{ cursor: "zoom-in" }}
               x="0"
               y="0"
-              width="100%"
-              height="50%"
-              fill="whitesmoke"
+              width="50%"
+              height="100%"
+              fill="green"
               onMouseUp={onMouseUpScaleUp}
               onMouseDown={onMouseDownScaleButton}
             />
             <rect
               style={{ cursor: "zoom-out" }}
-              x="0"
-              y="50%"
-              width="100%"
-              height="50%"
-              fill="black"
+              x="50%"
+              y="0"
+              width="50%"
+              height="100%"
+              fill="yellow"
               onMouseUp={onMouseUpScaleDown}
               onMouseDown={onMouseDownScaleButton}
             />

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SvgContainer } from "./SvgContainer";
 import { toolBarWidth } from "./ToolBar";
 import { ThrottleManager } from "../eventTarget/ThrottleManager";
+import { StarsSizeStore } from "../eventTarget/StarsSizeStore";
 
 export const StarsSVG = ({
   id,
@@ -14,6 +15,30 @@ export const StarsSVG = ({
   const { src, stars, starRadius } = attachment;
   const [points, setPoints] = useState(stars);
   const [draggingIndex, setDraggingIndex] = useState(null);
+
+  useEffect(() => {
+    const timer = () =>
+      setTimeout(() => {
+        handleTimeout();
+      }, 10);
+
+    const name = timer();
+
+    return () => {
+      clearTimeout(name);
+    };
+  }, [points]);
+
+  const handleTimeout = () => {
+    const xArray = points.map((point) => point.x);
+    const yArray = points.map((point) => point.y);
+    const width = Math.max(...xArray) + starRadius;
+    const height = Math.max(...yArray) + starRadius;
+    StarsSizeStore.getInstance().setSizeMap(id, {
+      width: width,
+      height: height,
+    });
+  };
 
   const onDragStart = (index) => {
     setDraggingIndex(index);
@@ -50,6 +75,7 @@ export const StarsSVG = ({
   const width = Math.max(...xArray) + starRadius;
   const height = Math.max(...yArray) + starRadius;
 
+  // state로 만들까
   const lines = [];
 
   for (let i = 0; i < points.length - 1; i++) {
@@ -66,13 +92,10 @@ export const StarsSVG = ({
     );
   }
 
-  console.log("lines", points);
-
   return (
     <SvgContainer
       id={id}
       handleSelect={handleSelect}
-      init={true}
       src={src}
       showPos={showPos}
       deleteSvgById={deleteSvgById}
