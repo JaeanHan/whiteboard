@@ -92,7 +92,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       });
 
       TM.setEventMap(TM.scrollEvent, false);
-    }, 500);
+    }, 300);
   };
 
   const onMouseDown = (e) => {
@@ -164,17 +164,11 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     TM.setEventMap(TM.dragEvent, true);
 
     if (currentEvent === eventNameEnum.none) {
-      // const id = e.target.parentNode?.parentNode?.id;
       const calcPos = {
         x: e.clientX + window.scrollX,
         y: e.clientY + window.scrollY,
       };
-      // console.log("id", id);
-      // if (!id.startsWith(svgTypeEnum.stars)) {
       onDrag(calcPos);
-      // } else {
-      //   console.log("lll");
-      // }
     }
 
     setTimeout(() => {

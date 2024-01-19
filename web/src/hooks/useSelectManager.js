@@ -38,13 +38,16 @@ export const useSelectManager = () => {
 
     const onKeyDown = (e) => {
       if (e.key === "F5" || e.key === "F12") return;
+
       e.preventDefault();
+      e.stopPropagation();
 
       if (!GroupEventManager.getInstance().getGroupingState()) return;
 
       setMoveMapByKey(e.key);
       moveOnKeyDown();
       GroupEventManager.getInstance().goFaster();
+      console.log(e.key);
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -191,6 +194,7 @@ export const useSelectManager = () => {
   };
 
   const getObjBounding = (objSrc, width, height) => {
+    console.log("nan??", width, height);
     return {
       left: objSrc.x,
       top: objSrc.y,
@@ -215,7 +219,6 @@ export const useSelectManager = () => {
 
     liveStore.map((props) => {
       const { id: key, attachment } = props;
-
       const {
         src: objSrc,
         width,
@@ -226,10 +229,12 @@ export const useSelectManager = () => {
         setDragStateGroup,
       } = attachment;
       const rectBounding = getObjBounding(objSrc, width, height);
+      console.log("key", key, rectBounding, selectBoxBounding, attachment);
 
       if (isOverlapped(selectBoxBounding, rectBounding)) {
         addSvgToGroup(key, { getObjInfo, moveOnDrag, stopOnDrop });
         setDragStateGroup();
+        console.log("add", key);
       }
     });
 

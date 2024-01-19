@@ -56,7 +56,7 @@ export const ToolBar = ({ setCurrentEvent }) => {
     setMode("Default");
   };
 
-  const Read = (e) => {
+  const LoadSaved = (e) => {
     e.preventDefault();
     setCurrentEvent(eventNameEnum.read);
     setMode("Default");
@@ -79,7 +79,7 @@ export const ToolBar = ({ setCurrentEvent }) => {
 
   const cursor = useMemo(() => [Default, Pencil, Eraser], [mode]);
   const temp = useMemo(
-    () => [Document, Rect, Text, Line, StarSign, ApiPath, Save, Read],
+    () => [Document, Save, LoadSaved, Rect, Text, Line, StarSign],
     [Document],
   );
 
@@ -93,8 +93,6 @@ export const ToolBar = ({ setCurrentEvent }) => {
         display: "flex",
         flexDirection: "column",
         position: "fixed",
-        top: 0,
-        left: 0,
       }}
     >
       spring : {comment}
@@ -138,7 +136,7 @@ export const ToolBar = ({ setCurrentEvent }) => {
             }}
             onClick={el}
           >
-            {index < 1 ? "" : "generate"} {el.name}
+            {index < 3 ? "" : "generate"} {el.name}
           </button>
         );
       })}

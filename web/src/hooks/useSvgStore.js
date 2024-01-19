@@ -53,6 +53,7 @@ export const useSvgStore = () => {
     }
     console.log("svgStore", updatedLiveSvg);
     // setLiveStore(updatedLiveSvg);
+
     const timer = () => setTimeout(() => setLiveStore(updatedLiveSvg), 5);
     const name = timer();
 

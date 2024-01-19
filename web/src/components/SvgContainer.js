@@ -1,6 +1,26 @@
 import { useEffect, useState } from "react";
 import { dragStateEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
+import { toolBarWidth } from "./ToolBar";
+
+const localThrottlingMap = new Map();
+const localScaleSrcMap = new Map();
+
+/***
+ * @param func 콜백 함수
+ * @param id svg 키
+ * @param delay
+ * @param args 콜백 함수 매개변수들
+ */
+const localThrottling = (func, id, delay, ...args) => {
+  if (localThrottlingMap.get(id)) return;
+
+  localThrottlingMap.set(id, true);
+  setTimeout(() => {
+    func(args);
+    localThrottlingMap.set(id, false);
+  }, delay);
+};
 
 export const SvgContainer = ({
   children,
@@ -33,6 +53,10 @@ export const SvgContainer = ({
     });
   }, [src]);
 
+  useEffect(() => {
+    setObjSize(widthHeight);
+  }, [widthHeight]);
+
   const getObjInfo = () => {
     return { objPos, objSize };
   };
@@ -60,7 +84,6 @@ export const SvgContainer = ({
   const onClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(1);
 
     if (e.ctrlKey && dragState === dragStateEnum.group) {
       console.log("remove", id);
@@ -83,16 +106,71 @@ export const SvgContainer = ({
     }
   };
 
-  const setScaleBy2 = (e) => {
-    e.stopPropagation();
-    setScale(scale === 2 ? 1 : 2);
+  const onMouseMove = (e) => {
+    // 드래그 안돼
+    // e.stopPropagation();
   };
+
+  const onMouseUpScaleUp = (e) => {
+    e.stopPropagation();
+    setScale((prev) => prev + 0.02);
+  };
+
+  const onMouseUpScaleDown = (e) => {
+    e.stopPropagation();
+    setScale((prev) => prev - 0.02);
+  };
+
+  const onMouseDownScaleButton = (e) => {
+    e.stopPropagation();
+    // const srcPos = {
+    //   // x: e.clientX + window.scrollX - toolBarWidth - src.x,
+    //   y: e.clientY + window.scrollY - src.y,
+    // };
+    // localScaleSrcMap.set(id, srcPos);
+  };
+
+  // const onMouseMoveScaleButton = (e) => {
+  //   e.stopPropagation();
+
+  // if (e.buttons === 1) {
+  //   const src = {
+  //     x: objPos.x + objSize.width - 15,
+  //     y: objPos.y + objSize.height - 15,
+  //   };
+  //   const destY = e.clientY + window.scrollY - src.y;
+  //
+  //   const calcScaleOnDrag = (diff) => {
+  //     setScale((prev) => prev + diff);
+  //   };
+  //
+  //   localThrottling(calcScaleOnDrag, id, 10, src.y < destY ? 0.2 : -0.2);
+
+  // const diff = (src.y - destY) / 100;
+
+  // const btnPos = objPos.y - 15;
+  // const destY = e.clientY + window.scrollY - src.y;
+
+  // setScale((prev) => prev + (btnPos > destY ? 0.02 : -0.02));
+
+  // console.log("distance", diff);
+  // setObjSize((prev) => {
+  //   return {
+  //     width: prev.width + diff,
+  //     height: prev.height + diff,
+  //   };
+  // });
+
+  // console.log(fixPos);
+  // }
+  // };
 
   return (
     <div
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
       onClick={onClick}
       id={id}
       key={id}
@@ -117,8 +195,7 @@ export const SvgContainer = ({
         left: objPos.x,
       }}
     >
-      {(dragState === dragStateEnum.group ||
-        dragState === dragStateEnum.select) && (
+      {dragState === dragStateEnum.select && (
         <>
           <div
             style={{
@@ -128,7 +205,6 @@ export const SvgContainer = ({
               color: "black",
               width: 15,
               height: 15,
-              top: 0,
               left: objSize.width - 15,
               textAlign: "center",
               lineHeight: 0.75,
@@ -140,24 +216,65 @@ export const SvgContainer = ({
           >
             x
           </div>
-          <div
+          <svg
             style={{
-              borderRadius: 6,
+              borderRadius: 1,
+              border: "solid 1px white",
               position: "absolute",
-              backgroundColor: "white",
+              backgroundColor: "none",
               color: "black",
               width: 15,
               height: 15,
-              top: objSize.height - 15,
-              left: objSize.width - 15,
+              // top: objSize.height - 15,
+              left: objSize.width - 35,
               textAlign: "center",
               lineHeight: 0.75,
               cursor: scale > 1 ? "zoom-out" : "zoom-in",
             }}
-            onMouseUp={setScaleBy2}
+            xmlns="http://www.w3.org/2000/svg"
           >
-            o
-          </div>
+            <rect
+              style={{ cursor: "zoom-in" }}
+              x="0"
+              y="0"
+              width="100%"
+              height="50%"
+              fill="whitesmoke"
+              onMouseUp={onMouseUpScaleUp}
+              onMouseDown={onMouseDownScaleButton}
+            />
+            <rect
+              style={{ cursor: "zoom-out" }}
+              x="0"
+              y="50%"
+              width="100%"
+              height="50%"
+              fill="black"
+              onMouseUp={onMouseUpScaleDown}
+              onMouseDown={onMouseDownScaleButton}
+            />
+          </svg>
+
+          {/*<div*/}
+          {/*  style={{*/}
+          {/*    borderRadius: 6,*/}
+          {/*    position: "absolute",*/}
+          {/*    backgroundColor: "white",*/}
+          {/*    color: "black",*/}
+          {/*    width: 15,*/}
+          {/*    height: 15,*/}
+          {/*    top: objSize.height - 15,*/}
+          {/*    left: objSize.width - 15,*/}
+          {/*    textAlign: "center",*/}
+          {/*    lineHeight: 0.75,*/}
+          {/*    cursor: scale > 1 ? "zoom-out" : "zoom-in",*/}
+          {/*  }}*/}
+          {/*  // onMouseDown={onMouseDownScaleButton}*/}
+          {/*  // onMouseMove={onMouseMoveScaleButton}*/}
+          {/*  onMouseUp={onMouseUpScaleButton}*/}
+          {/*>*/}
+          {/*  +*/}
+          {/*</div>*/}
         </>
       )}
       {showPos && (
