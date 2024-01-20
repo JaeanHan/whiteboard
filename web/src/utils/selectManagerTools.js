@@ -207,3 +207,22 @@ export const setMoveMapByKey = (flag) => {
     GKM.set(GroupKeyMapKey.y, currentY);
   }
 };
+
+const localThrottlingMap = new Map();
+const localScaleSrcMap = new Map();
+
+/***
+ * @param func 콜백 함수
+ * @param id svg 키
+ * @param delay
+ * @param args 콜백 함수 매개변수들
+ */
+const localThrottling = (func, id, delay, ...args) => {
+  if (localThrottlingMap.get(id)) return;
+
+  localThrottlingMap.set(id, true);
+  setTimeout(() => {
+    func(args);
+    localThrottlingMap.set(id, false);
+  }, delay);
+};

@@ -13,6 +13,7 @@ export const render = (
 ) => {
   return liveStore.map((value, index) => {
     const { id: key, attachment } = value;
+
     if (key.startsWith(svgTypeEnum.rect)) {
       return (
         <RectSVG

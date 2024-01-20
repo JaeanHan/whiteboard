@@ -25,12 +25,23 @@ export const TextSVG = ({
   };
 
   const convertTextToLines = (text) => {
-    return text.split("\n").map((line, index) => (
-      // <tspan x="0" dy={`${index === 0 ? 0 : 1}em`} key={index}>
-      <tspan x="0" dy={index === 0 ? 0 : fontStyle.fontSize} key={index}>
-        {line}
-      </tspan>
-    ));
+    let yOffset = 0;
+
+    return text.split("\n").map((line, index) => {
+      if (line === "") {
+        yOffset += fontStyle.fontSize;
+        return null;
+      }
+
+      const dy = yOffset;
+      yOffset = fontStyle.fontSize;
+
+      return (
+        <tspan x="0" dy={dy} key={index}>
+          {line}
+        </tspan>
+      );
+    });
   };
 
   const calculateTextSize = (text = "") => {
@@ -54,11 +65,10 @@ export const TextSVG = ({
     // const calcHeight =
     //   metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + margins;
 
-    console.log("woo", textSpilt.length, longestText, metrics.width);
-
     return {
       width: metrics.width * longestText.length,
-      height: Math.max(height, textSpilt.length * 32),
+      height: Math.max(height, textSpilt.length * 31),
+      // height: Math.max(height, textSpilt.length * fontStyle.fontSize),
     };
   };
 
@@ -75,24 +85,20 @@ export const TextSVG = ({
   const onMouseEnter = (e) => {
     e.stopPropagation();
     setHovered(true);
-    console.log("hi");
   };
 
   const onMouseLeave = () => {
     setHovered(false);
-    console.log("bye", text);
   };
 
-  const onMouseUp = (e) => {
-    if (!e.ctrlKey) {
-      e.target.focus();
+  const onMouseMove = (e) => {
+    if (e.button === 1) {
+      console.log("draging");
     }
-    // 이거 막으면 드래그인줄 아네
-    // e.stopPropagation();
   };
 
-  const onKeyDown = (e) => {
-    e.stopPropagation();
+  const stopPropagation = (e) => {
+    // e.stopPropagation();
   };
 
   return (
@@ -122,16 +128,25 @@ export const TextSVG = ({
                 boxSizing: "border-box",
                 display: "block",
                 border: "none",
+                resize: "none",
+                padding: 0,
                 ...fontStyle,
               }}
+              autoFocus={true}
               value={text}
               onChange={onTextChange}
-              onMouseUp={onMouseUp}
-              onKeyDown={onKeyDown}
+              onMouseMove={onMouseMove}
+              // onKeyDown={stopPropagation}
+              // onMouseDown={stopPropagation}
             />
           </foreignObject>
         ) : (
-          <text style={fontStyle} textAnchor="start" dominantBaseline="hanging">
+          <text
+            style={fontStyle}
+            textAnchor="start"
+            dominantBaseline="hanging"
+            y="4px"
+          >
             {convertTextToLines(text)}
           </text>
         )}

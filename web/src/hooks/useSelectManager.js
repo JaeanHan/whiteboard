@@ -196,7 +196,6 @@ export const useSelectManager = () => {
   };
 
   const getObjBounding = (objSrc, width, height, key) => {
-    console.log("nan??", width, height);
     const startSize = SSS.getSizeById(key);
     return {
       left: objSrc.x,

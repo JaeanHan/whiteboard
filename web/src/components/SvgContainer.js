@@ -1,26 +1,6 @@
 import { useEffect, useState } from "react";
-import { dragStateEnum } from "../utils/enums";
+import { dragStateEnum, svgTypeEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
-import { toolBarWidth } from "./ToolBar";
-
-const localThrottlingMap = new Map();
-const localScaleSrcMap = new Map();
-
-/***
- * @param func 콜백 함수
- * @param id svg 키
- * @param delay
- * @param args 콜백 함수 매개변수들
- */
-const localThrottling = (func, id, delay, ...args) => {
-  if (localThrottlingMap.get(id)) return;
-
-  localThrottlingMap.set(id, true);
-  setTimeout(() => {
-    func(args);
-    localThrottlingMap.set(id, false);
-  }, delay);
-};
 
 export const SvgContainer = ({
   children,
@@ -53,11 +33,6 @@ export const SvgContainer = ({
       setDragStateGroup,
     });
   }, [src]);
-
-  useEffect(() => {
-    // setObjSize(widthHeight);
-    updateWidthHeightOnStore(widthHeight);
-  }, [widthHeight]);
 
   const getObjInfo = () => {
     return { objPos, objSize };
@@ -101,17 +76,17 @@ export const SvgContainer = ({
   };
 
   const onMouseDown = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (dragState === dragStateEnum.none) {
       addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
       setDragState(dragStateEnum.select);
     }
   };
 
-  const onMouseMove = (e) => {
-    // 드래그 안돼
-    // e.stopPropagation();
-  };
+  // const onMouseMove = (e) => {
+  //   // 드래그 안돼
+  //   // e.stopPropagation();
+  // };
 
   const onMouseUpScaleUp = (e) => {
     e.stopPropagation();
@@ -123,13 +98,8 @@ export const SvgContainer = ({
     setScale((prev) => prev - 0.02);
   };
 
-  const onMouseDownScaleButton = (e) => {
+  const stopPropagation = (e) => {
     e.stopPropagation();
-    // const srcPos = {
-    //   // x: e.clientX + window.scrollX - toolBarWidth - src.x,
-    //   y: e.clientY + window.scrollY - src.y,
-    // };
-    // localScaleSrcMap.set(id, srcPos);
   };
 
   // const onMouseMoveScaleButton = (e) => {
@@ -172,7 +142,6 @@ export const SvgContainer = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
       onClick={onClick}
       id={id}
       key={id}
@@ -191,98 +160,99 @@ export const SvgContainer = ({
           dragState === dragStateEnum.group
             ? "dotted black"
             : dragState === dragStateEnum.select
-              ? "dashed"
+              ? id.startsWith(svgTypeEnum.text)
+                ? "none"
+                : "dashed "
               : "none",
         top: objPos.y,
         left: objPos.x,
       }}
     >
       {dragState === dragStateEnum.select && (
-        <>
+        <div
+          style={{
+            position: "absolute",
+            backgroundColor: "black",
+            color: "black",
+            display: "flex",
+            left: objSize.width,
+            width: 48,
+            justifyContent: "space-around",
+            alignItems: "center",
+            height: 16,
+            textAlign: "center",
+            lineHeight: 0.75,
+            overflow: "visible",
+            borderRadius: 2,
+            // "&::before": {
+            //   position: "absolute",
+            //   left: -objSize.width + 45,
+            //   top: 1,
+            //   width: objSize.width - 45,
+            //   height: 2,
+            //   backgroundColor: "black",
+            // },
+          }}
+        >
+          <div
+            style={{
+              borderRadius: "50%",
+              width: 13,
+              height: 13,
+              backgroundColor: "green",
+              cursor: "zoom-in",
+              border: "1px solid gray",
+              textAlign: "center",
+            }}
+            onMouseDown={stopPropagation}
+            onMouseUp={onMouseUpScaleUp}
+          >
+            +
+          </div>
+          <div
+            style={{
+              borderRadius: "50%",
+              width: 13,
+              height: 13,
+              backgroundColor: "yellow",
+              cursor: "zoom-out",
+              border: "1px solid gray",
+            }}
+            onMouseDown={stopPropagation}
+            onMouseUp={onMouseUpScaleDown}
+          >
+            -
+          </div>
           <div
             style={{
               borderRadius: 6,
-              position: "absolute",
+              width: 13,
+              height: 13,
               backgroundColor: "red",
-              color: "black",
-              width: 15,
-              height: 15,
-              left: objSize.width - 15,
-              textAlign: "center",
-              lineHeight: 0.75,
               cursor: "not-allowed",
+              border: "1px solid gray",
             }}
-            onMouseUp={() => {
-              deleteSvgById(id);
-            }}
+            onMouseDown={stopPropagation}
+            onMouseUp={() => deleteSvgById(id)}
           >
             x
           </div>
-          <svg
+          <div
             style={{
-              borderRadius: 2,
-              border: "solid 1px white",
               position: "absolute",
-              backgroundColor: "none",
-              color: "black",
-              width: 30,
-              height: 15,
-              // top: objSize.height - 15,
-              left: objSize.width - 45,
-              textAlign: "center",
-              lineHeight: 0.75,
-              // cursor: scale > 1 ? "zoom-out" : "zoom-in",
+              left: -objSize.width,
+              top: 1,
+              width: objSize.width,
+              height: 2,
+              backgroundColor: "black",
             }}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              style={{ cursor: "zoom-in" }}
-              x="0"
-              y="0"
-              width="50%"
-              height="100%"
-              fill="green"
-              onMouseUp={onMouseUpScaleUp}
-              onMouseDown={onMouseDownScaleButton}
-            />
-            <rect
-              style={{ cursor: "zoom-out" }}
-              x="50%"
-              y="0"
-              width="50%"
-              height="100%"
-              fill="yellow"
-              onMouseUp={onMouseUpScaleDown}
-              onMouseDown={onMouseDownScaleButton}
-            />
-          </svg>
-
-          {/*<div*/}
-          {/*  style={{*/}
-          {/*    borderRadius: 6,*/}
-          {/*    position: "absolute",*/}
-          {/*    backgroundColor: "white",*/}
-          {/*    color: "black",*/}
-          {/*    width: 15,*/}
-          {/*    height: 15,*/}
-          {/*    top: objSize.height - 15,*/}
-          {/*    left: objSize.width - 15,*/}
-          {/*    textAlign: "center",*/}
-          {/*    lineHeight: 0.75,*/}
-          {/*    cursor: scale > 1 ? "zoom-out" : "zoom-in",*/}
-          {/*  }}*/}
-          {/*  // onMouseDown={onMouseDownScaleButton}*/}
-          {/*  // onMouseMove={onMouseMoveScaleButton}*/}
-          {/*  onMouseUp={onMouseUpScaleButton}*/}
-          {/*>*/}
-          {/*  +*/}
-          {/*</div>*/}
-        </>
+          ></div>
+        </div>
       )}
       {showPos && (
         <>
           <div
-            style={{ position: "absolute", color: "black", top: 0, left: 10 }}
+            style={{ position: "absolute", color: "black", top: -35, left: 10 }}
           >
             x:{objPos.x}px
           </div>
@@ -290,7 +260,7 @@ export const SvgContainer = ({
             style={{
               position: "absolute",
               color: "black",
-              top: 15,
+              top: -20,
               left: 10,
             }}
           >

@@ -92,7 +92,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       });
 
       TM.setEventMap(TM.scrollEvent, false);
-    }, 300);
+    }, 150);
   };
 
   const onMouseDown = (e) => {

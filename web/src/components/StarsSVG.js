@@ -20,7 +20,7 @@ export const StarsSVG = ({
     const timer = () =>
       setTimeout(() => {
         handleTimeout();
-      }, 10);
+      }, 100);
 
     const name = timer();
 
@@ -125,7 +125,7 @@ export const StarsSVG = ({
             r={starRadius}
             fill={draggingIndex === index ? "red" : "blue"}
             onMouseDown={(e) => onDragStart(index)}
-            style={{ cursor: "grab" }}
+            style={{ cursor: "all-scroll" }}
           />
         ))}
       </svg>
