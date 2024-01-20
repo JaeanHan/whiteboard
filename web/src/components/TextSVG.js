@@ -98,7 +98,7 @@ export const TextSVG = ({
   };
 
   const stopPropagation = (e) => {
-    // e.stopPropagation();
+    e.stopPropagation();
   };
 
   return (
@@ -136,7 +136,7 @@ export const TextSVG = ({
               value={text}
               onChange={onTextChange}
               onMouseMove={onMouseMove}
-              // onKeyDown={stopPropagation}
+              onKeyDown={stopPropagation}
               // onMouseDown={stopPropagation}
             />
           </foreignObject>
