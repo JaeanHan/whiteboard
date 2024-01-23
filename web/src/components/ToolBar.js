@@ -1,18 +1,24 @@
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { eventNameEnum } from "../utils/enums";
+import { HttpRequestManager } from "../eventTarget/HttpRequestManager";
 export const toolBarWidth = 250;
 
 export const ToolBar = ({ setCurrentEvent }) => {
   const [comment, setComment] = useState("");
   const [mode, setMode] = useState("Default");
+  const httpRequest = HttpRequestManager.getInstance();
 
   // test
   useEffect(() => {
-    axios
+    httpRequest
+      // axios
       .get("api/test")
-      .then((res) => setComment(res.data))
-      .catch((err) => alert(err));
+      .then((res) => {
+        console.log("wtf", res);
+        setComment(res);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
   const Document = () => {

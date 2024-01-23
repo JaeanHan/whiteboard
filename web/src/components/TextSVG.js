@@ -1,6 +1,13 @@
 import { SvgContainer } from "./SvgContainer";
 import { useState } from "react";
 
+const fontStyle = {
+  fontFamily: "Arial",
+  fontSize: 30,
+  fill: "black",
+  lineHeight: 1,
+};
+
 export const TextSVG = ({
   id,
   handleSelect,
@@ -10,19 +17,13 @@ export const TextSVG = ({
   setAdditionalProps,
 }) => {
   const { src, width, height } = attachment;
+  //test1test2test3;'Leckerli One', cursive.red
   const [text, setText] = useState("test1test2test3");
   const [widthHeight, setWidthHeight] = useState({
     width: width,
     height: height,
   });
   const [isHovered, setHovered] = useState(false);
-
-  const fontStyle = {
-    fontFamily: "Arial",
-    fontSize: 30,
-    fill: "black",
-    lineHeight: 1,
-  };
 
   const convertTextToLines = (text) => {
     let yOffset = 0;
@@ -33,12 +34,20 @@ export const TextSVG = ({
         return null;
       }
 
+      const [context, styleInfo] = line.split(";");
+      let font = fontStyle.fontFamily;
+      let fill = fontStyle.fill;
+
+      if (styleInfo) {
+        [font, fill] = styleInfo.split(".");
+      }
+
       const dy = yOffset;
       yOffset = fontStyle.fontSize;
 
       return (
-        <tspan x="0" dy={dy} key={index}>
-          {line}
+        <tspan x="0" dy={dy} key={index} fontFamily={font} fill={fill}>
+          {context}
         </tspan>
       );
     });

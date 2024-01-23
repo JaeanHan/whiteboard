@@ -19,11 +19,14 @@ export const usePathGenerator = (addSvgOnStore) => {
 
   useEffect(() => {
     if (pointSet.size === 0) {
+      initMinMaxMap();
+      return;
+    }
+
+    if (pointSet.size === 1) {
       if (pid === "") {
         setPid(svgTypeEnum.path + generateNextId());
       }
-      initMinMaxMap();
-      return;
     }
 
     if (!isDrawing) {
