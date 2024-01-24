@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
+import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
+import { WindowManager } from "../eventTarget/WindowManager";
 
 export const useSvgStore = () => {
   const [store, setStore] = useState(new Map());
   const [liveStore, setLiveStore] = useState([]);
   const [isInit, setIsInit] = useState(true);
+  const WM = WindowManager.getInstance();
 
   const load = (loadData) => {
     if (!isInit) return;
     setIsInit(false);
 
+    const SIM = SvgIdAndMutablePropsManager.getInstance();
     const loadMap = new Map();
+
     for (const [key, value] of Object.entries(loadData)) {
       const parse = JSON.parse(value);
+      const svgType = key.substring(0, 1);
+      const id = parseInt(key.substring(1));
+
+      SIM.safeSetId(svgType, id);
       loadMap.set(key, parse);
     }
 
@@ -20,9 +29,11 @@ export const useSvgStore = () => {
   };
 
   const addSvgOnStore = (id, posInfo) => {
+    const currentWindow = WM.getCurrentWindow();
     const props = {
       ...posInfo,
       display: true,
+      window: currentWindow,
     };
     setStore((prev) => new Map([...prev, [id, props]]));
   };
@@ -41,8 +52,10 @@ export const useSvgStore = () => {
 
   useEffect(() => {
     const updatedLiveSvg = [];
+    const currentWindow = WM.getCurrentWindow();
 
     for (const [key, value] of store) {
+      // if (value.display && value.window === currentWindow) {
       if (value.display) {
         const viewProps = {
           id: key,
@@ -52,9 +65,8 @@ export const useSvgStore = () => {
       }
     }
     console.log("svgStore", updatedLiveSvg);
-    // setLiveStore(updatedLiveSvg);
 
-    const timer = () => setTimeout(() => setLiveStore(updatedLiveSvg), 5);
+    const timer = () => setTimeout(() => setLiveStore(updatedLiveSvg), 6);
     const name = timer();
 
     return () => clearTimeout(name);

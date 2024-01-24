@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSvgIdGenerator } from "./useSvgIdGenerator";
 import { svgTypeEnum } from "../utils/enums";
+import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 
 export const MMMKey = {
   minX: "minX",
@@ -15,7 +15,8 @@ export const usePathGenerator = (addSvgOnStore) => {
   const [minMaxMap, setMinMaxMap] = useState(new Map());
   const [thickness, setThickness] = useState(3);
   const [pid, setPid] = useState("");
-  const { generateNextId } = useSvgIdGenerator();
+  const generateNextId =
+    SvgIdAndMutablePropsManager.getInstance().generateNextId;
 
   useEffect(() => {
     if (pointSet.size === 0) {

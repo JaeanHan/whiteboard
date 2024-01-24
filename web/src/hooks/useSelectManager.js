@@ -9,7 +9,7 @@ import {
   GroupEventManager,
   GroupKeyMapKey,
 } from "../eventTarget/GroupEventManager";
-import { StarsSizeStore } from "../eventTarget/StarsSizeStore";
+import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 
 export const useSelectManager = () => {
   const [svgGroup, setSvgGroup] = useState(new Map());
@@ -20,7 +20,7 @@ export const useSelectManager = () => {
     dest: { x: 0, y: 0 },
   });
   const isGrouping = GroupEventManager.getInstance().getGroupingState();
-  const SSS = StarsSizeStore.getInstance();
+  const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
   useEffect(() => {
     const moveOnKeyDown = () => {
@@ -196,7 +196,7 @@ export const useSelectManager = () => {
   };
 
   const getObjBounding = (objSrc, width, height, key) => {
-    const startSize = SSS.getSizeById(key);
+    const startSize = SIMP.getSizeById(key);
     return {
       left: objSrc.x,
       top: objSrc.y,

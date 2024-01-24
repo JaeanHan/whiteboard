@@ -1,8 +1,7 @@
 import { useSelectManager } from "../hooks/useSelectManager";
 import { useEffect, useState } from "react";
 import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../utils/enums";
-import { useSvgIdGenerator } from "../hooks/useSvgIdGenerator";
-import { toolBarWidth } from "./ToolBar";
+import { sideBarWidth } from "./SideBar";
 import { useLineGenerator } from "../hooks/useLineGenerator";
 import { MousePoint } from "./MousePoint";
 import { usePathGenerator } from "../hooks/usePathGenerator";
@@ -12,6 +11,9 @@ import { ThrottleManager } from "../eventTarget/ThrottleManager";
 import { render } from "../utils/canvasTools";
 import { useStarsGenerator } from "../hooks/useStarsGenerator";
 import { useSaveManager } from "../hooks/useSaveManager";
+import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
+import { bannerHeight } from "./Banner";
+import { WindowManager } from "../eventTarget/WindowManager";
 
 const owner = "jaean";
 
@@ -36,14 +38,18 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     setClientSelectBoxSize,
     finClientSelectBoxSize,
   } = handleSelectBox;
-  const { generateNextId } = useSvgIdGenerator();
+  const generateNextId =
+    SvgIdAndMutablePropsManager.getInstance().generateNextId;
 
   const [tempPos, setTempPos] = useState(new Map());
   const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
   const [canvasSize, setCanvasSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: window.innerWidth - sideBarWidth,
+    height: window.innerHeight - bannerHeight,
   });
+
+  const TM = ThrottleManager.getInstance();
+  const WM = WindowManager.getInstance();
 
   const { addPoint, quit } = useLineGenerator(
     addSvgOnStore,
@@ -65,11 +71,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const TM = ThrottleManager.getInstance();
-
-    if (TM.getEventThrottling(TM.scrollEvent)) {
-      return;
-    }
+    if (TM.getEventThrottling(TM.scrollEvent)) return;
 
     TM.setEventMap(TM.scrollEvent, true);
 
@@ -83,12 +85,16 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       const clientY = window.innerHeight;
 
       setCanvasSize((prev) => {
-        return {
+        const windowSize = {
           width:
             canvasX - (hiddenX + clientX) <= 50 ? canvasX + 100 : prev.width,
           height:
             canvasY - (hiddenY + clientY) <= 50 ? canvasY + 100 : prev.height,
         };
+
+        WM.setWindowSize(windowSize);
+
+        return windowSize;
       });
 
       TM.setEventMap(TM.scrollEvent, false);
@@ -105,7 +111,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
     if (currentEvent === eventNameEnum.none && id && id === "root") {
       const fixPos = {
-        x: e.clientX - toolBarWidth + window.scrollX,
+        x: e.clientX - sideBarWidth + window.scrollX,
         y: e.clientY + window.scrollY,
       };
 
@@ -126,7 +132,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
     if (cursorMode === cursorModeEnum.write) {
       const fixPos = {
-        x: e.clientX - toolBarWidth + window.scrollX,
+        x: e.clientX - sideBarWidth + window.scrollX,
         y: e.clientY + window.scrollY,
       };
       addPointOnSet(fixPos);
@@ -135,7 +141,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
     if (currentEvent === eventNameEnum.multiSelect) {
       const fixPos = {
-        x: e.clientX - toolBarWidth + window.scrollX,
+        x: e.clientX - sideBarWidth + window.scrollX,
         y: e.clientY + window.scrollY,
       };
       setClientSelectBoxSize(fixPos);
@@ -190,7 +196,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
 
     const fixPos = {
-      x: e.clientX - toolBarWidth + window.scrollX,
+      x: e.clientX - sideBarWidth + window.scrollX,
       y: e.clientY + window.scrollY,
     };
 
@@ -258,6 +264,11 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       return;
     }
 
+    if (currentEvent === eventNameEnum.windowChange) {
+      console.log("window change");
+      setCurrentEvent(eventNameEnum.none);
+    }
+
     if (currentEvent === eventNameEnum.save) {
       save(owner, liveStore);
       setCurrentEvent(eventNameEnum.none);
@@ -287,8 +298,10 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
         backgroundColor: "white",
         width: canvasSize.width,
         height: canvasSize.height,
-        marginLeft: toolBarWidth,
+        marginLeft: sideBarWidth,
+        marginTop: bannerHeight,
         scrollBehavior: "smooth",
+        border: "none",
         cursor:
           currentEvent === eventNameEnum.write
             ? "crosshair"

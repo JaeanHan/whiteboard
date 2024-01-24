@@ -1,9 +1,9 @@
 import { svgTypeEnum } from "./enums";
-import { RectSVG } from "../components/RectSVG";
-import { TextSVG } from "../components/TextSVG";
-import { LineSVG } from "../components/LineSVG";
-import { PathSVG } from "../components/PathSVG";
-import { StarsSVG } from "../components/StarsSVG";
+import { RectSVG } from "../components/svgs/RectSVG";
+import { TextSVG } from "../components/svgs/TextSVG";
+import { LineSVG } from "../components/svgs/LineSVG";
+import { PathSVG } from "../components/svgs/PathSVG";
+import { StarsSVG } from "../components/svgs/StarsSVG";
 
 export const render = (
   liveStore,

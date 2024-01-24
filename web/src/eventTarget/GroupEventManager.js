@@ -11,7 +11,6 @@ export class GroupEventManager extends EventTarget {
   registeredEventMap = new Map();
   groupKeyMoveMap = new Map();
   isGrouping = groupingStateEnum.none;
-  lastEventTimeStamp = 0;
   keyMoveSpeed = 1;
   speedLimit = 5;
 

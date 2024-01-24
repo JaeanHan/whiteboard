@@ -34,6 +34,7 @@ export const eventNameEnum = {
   addStars: "addStars",
   save: "save",
   read: "read",
+  windowChange: "windowChange",
 };
 
 export const svgTypeEnum = {

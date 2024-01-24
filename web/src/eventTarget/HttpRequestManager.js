@@ -2,8 +2,8 @@ export class HttpRequestManager {
   static instance = null;
   abortMap = null;
   lockMap = null;
-  lockDurationMillis = 10;
-  timeoutDuration = 5000;
+  lockDurationMillis = 100;
+  timeoutDuration = 3000;
   contentType = "Content-Type";
   text = "text/plain";
   json = "application/json";
@@ -20,16 +20,22 @@ export class HttpRequestManager {
     return HttpRequestManager.instance;
   };
 
-  setBasicHeader = (XmlHttpRequest) => {
-    XmlHttpRequest.timeout = this.timeoutDuration;
-    XmlHttpRequest.onprogress = (ev) =>
+  setHttpRequestActions = (xmlHttpRequest) => {
+    xmlHttpRequest.onprogress = (ev) =>
       console.log(`Received ${ev.loaded} bytes`, ev);
     // XmlHttpRequest.onerror = (ev) => throw new Error("could not even send");
-    XmlHttpRequest.onerror = (ev) => console.log("could not even send", ev);
-    XmlHttpRequest.onabort = (ev) => console.log("aborted", ev);
+    xmlHttpRequest.onerror = (ev) => console.log("could not even send", ev);
+    xmlHttpRequest.onabort = (ev) => console.log("aborted", ev);
+    xmlHttpRequest.timeout = this.timeoutDuration;
   };
 
-  setLockDurationExtendIfLocked = (url) => {
+  setCredentials = (xmlHttpRequest) => {
+    // includes cors origin, method, headers on preflight
+    xmlHttpRequest.withCredentials = true;
+    xmlHttpRequest.setRequestHeader("Test", "3030");
+  };
+
+  setLockExtendDurationIfLocked = (url) => {
     const unlockTimer = this.lockMap.get(url);
 
     if (unlockTimer) {
@@ -52,7 +58,7 @@ export class HttpRequestManager {
 
   get = (url, lock = true) => {
     if (lock) {
-      if (this.setLockDurationExtendIfLocked(url)) {
+      if (this.setLockExtendDurationIfLocked(url)) {
         return new Promise((resolve, reject = () => {}) => {
           reject("req already sent");
         });
@@ -63,9 +69,23 @@ export class HttpRequestManager {
       const hr = new XMLHttpRequest();
 
       hr.open("GET", url, true);
-      this.setBasicHeader(hr);
+      this.setHttpRequestActions(hr);
+      this.setCredentials(hr);
+
+      console.log("hr", hr);
 
       hr.onload = () => {
+        const responseHeader = hr
+          .getAllResponseHeaders()
+          .split("\r\n")
+          .reduce((result, current) => {
+            let [name, value] = current.split(": ");
+            result[name] = value;
+            return result;
+          }, {});
+
+        console.log("rh", responseHeader);
+
         if (hr.status === 200) {
           const contentType = hr.getResponseHeader(this.contentType);
 
@@ -80,6 +100,7 @@ export class HttpRequestManager {
             return;
           }
         }
+
         reject(hr.status);
       };
 
@@ -90,7 +111,7 @@ export class HttpRequestManager {
 
   post = (url, data, timeout = 5000, lock = true) => {
     if (lock) {
-      if (this.setLockDurationExtendIfLocked(url)) {
+      if (this.setLockExtendDurationIfLocked(url)) {
         return new Promise((resolve, reject = () => {}) => {
           reject("req already sent");
         });
@@ -103,7 +124,8 @@ export class HttpRequestManager {
 
       hr.open("POST", url, true);
       hr.setRequestHeader("Content-Type", this.json);
-      this.setBasicHeader(hr);
+      this.setHttpRequestActions(hr);
+      this.setCredentials(hr);
 
       hr.onload = () => {
         if (hr.status >= 200 && hr.status < 300) {

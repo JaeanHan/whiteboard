@@ -1,13 +1,14 @@
-import { useSvgIdGenerator } from "./useSvgIdGenerator";
 import { useEffect, useState } from "react";
 import { eventNameEnum, svgTypeEnum } from "../utils/enums";
+import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 
 export const useStarsGenerator = (
   addSvgOnStore,
   setCurrentEvent,
   setTempPos,
 ) => {
-  const { generateNextId } = useSvgIdGenerator();
+  const generateNextId =
+    SvgIdAndMutablePropsManager.getInstance().generateNextId;
   const [points, setPoints] = useState([]);
 
   useEffect(() => {

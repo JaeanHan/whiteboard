@@ -1,5 +1,6 @@
-import { SvgContainer } from "./SvgContainer";
+import { SvgContainer } from "../SvgContainer";
 import { useState } from "react";
+import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 
 const fontStyle = {
   fontFamily: "Arial",
@@ -24,6 +25,7 @@ export const TextSVG = ({
     height: height,
   });
   const [isHovered, setHovered] = useState(false);
+  const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
   const convertTextToLines = (text) => {
     let yOffset = 0;
@@ -84,11 +86,13 @@ export const TextSVG = ({
   const onTextChange = (e) => {
     if (e.target.value === "") {
       deleteSvgById(id);
+      SIMP.setTextMap(id, undefined);
       return;
     }
 
     setText(e.target.value);
     setWidthHeight(calculateTextSize(e.target.value));
+    SIMP.setTextMap(id, e.target.value);
   };
 
   const onMouseEnter = (e) => {

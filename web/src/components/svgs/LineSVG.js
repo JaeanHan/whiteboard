@@ -1,4 +1,4 @@
-import { SvgContainer } from "./SvgContainer";
+import { SvgContainer } from "../SvgContainer";
 export const LineSVG = ({
   id,
   handleSelect,

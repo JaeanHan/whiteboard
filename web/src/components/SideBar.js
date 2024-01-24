@@ -1,10 +1,10 @@
-import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { eventNameEnum } from "../utils/enums";
 import { HttpRequestManager } from "../eventTarget/HttpRequestManager";
-export const toolBarWidth = 250;
 
-export const ToolBar = ({ setCurrentEvent }) => {
+export const sideBarWidth = 250;
+
+export const SideBar = ({ setCurrentEvent }) => {
   const [comment, setComment] = useState("");
   const [mode, setMode] = useState("Default");
   const httpRequest = HttpRequestManager.getInstance();
@@ -15,11 +15,10 @@ export const ToolBar = ({ setCurrentEvent }) => {
       // axios
       .get("api/test")
       .then((res) => {
-        console.log("wtf", res);
         setComment(res);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [setComment]);
 
   const Document = () => {
     alert("clicked");
@@ -92,13 +91,14 @@ export const ToolBar = ({ setCurrentEvent }) => {
   return (
     <div
       style={{
-        width: toolBarWidth,
-        minWidth: toolBarWidth,
-        height: "100%",
+        width: sideBarWidth,
+        minWidth: sideBarWidth,
+        height: window.innerHeight,
         backgroundColor: "dodgerblue",
         display: "flex",
         flexDirection: "column",
         position: "fixed",
+        zIndex: 10,
       }}
     >
       spring : {comment}

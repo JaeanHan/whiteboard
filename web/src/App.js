@@ -1,10 +1,11 @@
 import "./App.css";
 import { Canvas } from "./components/Canvas";
-import { ToolBar } from "./components/ToolBar";
+import { SideBar } from "./components/SideBar";
 import { eventNameEnum } from "./utils/enums";
 import { useState } from "react";
 import { GroupEventManager } from "./eventTarget/GroupEventManager";
 import { ThrottleManager } from "./eventTarget/ThrottleManager";
+import { Banner } from "./components/Banner";
 
 function App() {
   GroupEventManager.getInstance().addEventListener(
@@ -28,7 +29,8 @@ function App() {
 
   return (
     <div className="App">
-      <ToolBar setCurrentEvent={setCurrentEvent} />
+      <Banner setCurrentEvent={setCurrentEvent} />
+      <SideBar setCurrentEvent={setCurrentEvent} />
       <Canvas currentEvent={currentEvent} setCurrentEvent={setCurrentEvent} />
     </div>
   );

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { SvgContainer } from "./SvgContainer";
-import { toolBarWidth } from "./ToolBar";
-import { ThrottleManager } from "../eventTarget/ThrottleManager";
-import { StarsSizeStore } from "../eventTarget/StarsSizeStore";
+import { SvgContainer } from "../SvgContainer";
+import { sideBarWidth } from "../SideBar";
+import { ThrottleManager } from "../../eventTarget/ThrottleManager";
+import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 
 export const StarsSVG = ({
   id,
@@ -34,7 +34,7 @@ export const StarsSVG = ({
     const yArray = points.map((point) => point.y);
     const width = Math.max(...xArray) + starRadius;
     const height = Math.max(...yArray) + starRadius;
-    StarsSizeStore.getInstance().setSizeMap(id, {
+    SvgIdAndMutablePropsManager.getInstance().setSizeMap(id, {
       width: width,
       height: height,
     });
@@ -55,7 +55,7 @@ export const StarsSVG = ({
 
     const newPoints = [...points];
     const newDest = {
-      x: e.clientX + window.scrollX - toolBarWidth - src.x,
+      x: e.clientX + window.scrollX - sideBarWidth - src.x,
       y: e.clientY + window.scrollY - src.y,
     };
     newPoints[draggingIndex] = newDest;

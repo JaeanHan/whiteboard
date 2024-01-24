@@ -3,6 +3,7 @@ package com.jan.diagramcanvas.controller;
 import com.jan.diagramcanvas.models.SvgInfo;
 import com.jan.diagramcanvas.service.SaveService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,6 @@ public class SaveController {
 
     @GetMapping("api/read/{owner}")
     public ResponseEntity<?> read(@PathVariable String owner) {
-        return ResponseEntity.ok(saveService.readTest(owner));
+        return ResponseEntity.ok().body(saveService.readTest(owner));
     }
 }

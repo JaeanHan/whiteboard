@@ -1,4 +1,3 @@
-import axios from "axios";
 import { HttpRequestManager } from "../eventTarget/HttpRequestManager";
 
 export const useSaveManager = () => {
@@ -18,20 +17,6 @@ export const useSaveManager = () => {
       .get(`http://localhost:8080/api/read/${owner}`)
       .then((res) => load(res))
       .catch((e) => console.log("error !!!", e));
-
-    // axios
-    //   .get(`http://localhost:8080/api/read/${owner}`)
-    //   .then((res) => {
-    //     // const loadMap = new Map();
-    //     //
-    //     // for (const [key, value] of Object.entries(res.data)) {
-    //     //   const parse = JSON.parse(res.data[key]);
-    //     //   loadMap.set(key, parse);
-    //     // }
-    //
-    //     load(res.data);
-    //   })
-    //   .catch((e) => console.error("error !!!", e));
   };
 
   return { save, read };

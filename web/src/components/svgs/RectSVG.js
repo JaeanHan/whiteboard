@@ -1,4 +1,5 @@
-import { SvgContainer } from "./SvgContainer";
+import { SvgContainer } from "../SvgContainer";
+import { useState } from "react";
 export const RectSVG = ({
   id,
   handleSelect,
@@ -8,8 +9,15 @@ export const RectSVG = ({
   setAdditionalProps,
 }) => {
   const { src, width, height } = attachment;
-  // const num = id.replace(/[^0-9]/g, "");
+  const [desc, setDesc] = useState(`${id} description`);
   const num = Number(id.charAt(1));
+
+  const onClick = (e) => {
+    e.stopPropagation();
+    const newDesc = prompt("name or description for this block");
+    setDesc(newDesc);
+  };
+
   console.log(id);
   return (
     <SvgContainer
@@ -23,7 +31,12 @@ export const RectSVG = ({
       setAdditionalProps={setAdditionalProps}
     >
       {/*<Rect fill={num % 2 === 0 ? "red" : "green"} />*/}
-      <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={width}
+        height={height}
+        onClick={onClick}
+      >
         <rect
           rx="20"
           ry="20"
@@ -33,7 +46,7 @@ export const RectSVG = ({
           style={{ stroke: "black", strokeWidth: 5 }}
         />
         <text x="60" y="50" fill="black" transform="rotate(-30 90,90)">
-          {id} SVG Test
+          {desc}
         </text>
         Sorry, your browser does not support inline SVG.
       </svg>
