@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { SvgContainer } from "../SvgContainer";
 import { sideBarWidth } from "../SideBar";
-import { ThrottleManager } from "../../eventTarget/ThrottleManager";
+import { ThrottlingDebouncingManager } from "../../eventTarget/ThrottlingDebouncingManager";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 
 export const StarsSVG = ({
@@ -50,7 +50,7 @@ export const StarsSVG = ({
     }
     e.stopPropagation();
 
-    const TM = ThrottleManager.getInstance();
+    const TM = ThrottlingDebouncingManager.getInstance();
     if (TM.getEventThrottling(TM.moveStarEvent)) return;
 
     const newPoints = [...points];

@@ -3,10 +3,12 @@ import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutableProps
 import { WindowManager } from "../eventTarget/WindowManager";
 
 export const useSvgStore = () => {
-  const [store, setStore] = useState(new Map());
+  const WM = WindowManager.getInstance();
+  const [store, setStore] = useState(
+    new Map().set(WM.getSelectedVirtualWindow(), new Map()),
+  );
   const [liveStore, setLiveStore] = useState([]);
   const [isInit, setIsInit] = useState(true);
-  const WM = WindowManager.getInstance();
 
   const load = (loadData) => {
     if (!isInit) return;
@@ -20,7 +22,7 @@ export const useSvgStore = () => {
       const svgType = key.substring(0, 1);
       const id = parseInt(key.substring(1));
 
-      SIM.safeSetId(svgType, id);
+      SIM.safeSetIdOnLoad(svgType, id);
       loadMap.set(key, parse);
     }
 
@@ -29,32 +31,48 @@ export const useSvgStore = () => {
   };
 
   const addSvgOnStore = (id, posInfo) => {
-    const currentWindow = WM.getCurrentWindow();
+    const currentWindow = WM.getSelectedVirtualWindow();
     const props = {
       ...posInfo,
       display: true,
-      window: currentWindow,
     };
-    setStore((prev) => new Map([...prev, [id, props]]));
+
+    setStore((prev) => {
+      const currentWindowMap = prev.get(currentWindow);
+      currentWindowMap.set(id, props);
+      return new Map([...prev, currentWindowMap]);
+    });
   };
 
   const updateSvgOnStore = (id, display) => {
-    const props = { ...store.get(id), display: display };
+    const currentWindow = WM.getSelectedVirtualWindow();
+    const props = { ...store.get(currentWindow).get(id), display: display };
 
-    setStore((prev) => new Map(prev).set(id, props));
+    setStore((prev) => {
+      const currentWindowMap = prev.get(currentWindow);
+      currentWindowMap.set(id, props);
+      return new Map([...prev, currentWindowMap]);
+    });
   };
 
   const setAdditionalProps = (id, handleObj) => {
-    const props = { ...store.get(id), ...handleObj };
+    const currentWindow = WM.getSelectedVirtualWindow();
+    const props = { ...store.get(currentWindow).get(id), ...handleObj };
 
-    setStore((prev) => new Map(prev).set(id, props));
+    setStore((prev) => {
+      const currentWindowMap = prev.get(currentWindow);
+      currentWindowMap.set(id, props);
+      return new Map([...prev, currentWindowMap]);
+    });
   };
 
   useEffect(() => {
     const updatedLiveSvg = [];
-    const currentWindow = WM.getCurrentWindow();
+    const currentWindow = WM.getSelectedVirtualWindow();
+    const currentSvgMap = store.get(currentWindow);
+    console.log("wtf", currentWindow, currentSvgMap, store);
 
-    for (const [key, value] of store) {
+    for (const [key, value] of currentSvgMap) {
       // if (value.display && value.window === currentWindow) {
       if (value.display) {
         const viewProps = {
@@ -66,7 +84,7 @@ export const useSvgStore = () => {
     }
     console.log("svgStore", updatedLiveSvg);
 
-    const timer = () => setTimeout(() => setLiveStore(updatedLiveSvg), 6);
+    const timer = () => setTimeout(() => setLiveStore(updatedLiveSvg), 5);
     const name = timer();
 
     return () => clearTimeout(name);

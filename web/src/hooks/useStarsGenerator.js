@@ -35,7 +35,7 @@ export const useStarsGenerator = (
 
   const handleTimeout = () => {
     if (points.length === 0) return;
-    const key = svgTypeEnum.stars + generateNextId();
+    const key = generateNextId(svgTypeEnum.stars);
 
     const xArray = points.map((point) => point.x);
     const yArray = points.map((point) => point.y);

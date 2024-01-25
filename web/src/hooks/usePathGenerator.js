@@ -20,14 +20,11 @@ export const usePathGenerator = (addSvgOnStore) => {
 
   useEffect(() => {
     if (pointSet.size === 0) {
-      initMinMaxMap();
-      return;
-    }
-
-    if (pointSet.size === 1) {
       if (pid === "") {
-        setPid(svgTypeEnum.path + generateNextId());
+        setPid(generateNextId(svgTypeEnum.path));
+        initMinMaxMap();
       }
+      return;
     }
 
     if (!isDrawing) {
@@ -97,6 +94,7 @@ export const usePathGenerator = (addSvgOnStore) => {
   };
 
   const initMinMaxMap = () => {
+    console.log("init map");
     setMinMaxMap(() => {
       const mapInit = new Map();
 

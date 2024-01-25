@@ -4,7 +4,7 @@ import { SideBar } from "./components/SideBar";
 import { eventNameEnum } from "./utils/enums";
 import { useState } from "react";
 import { GroupEventManager } from "./eventTarget/GroupEventManager";
-import { ThrottleManager } from "./eventTarget/ThrottleManager";
+import { ThrottlingDebouncingManager } from "./eventTarget/ThrottlingDebouncingManager";
 import { Banner } from "./components/Banner";
 
 function App() {
@@ -15,21 +15,27 @@ function App() {
       GroupEventManager.getInstance().setGroupingState(isGrouping);
     },
   );
-  ThrottleManager.getInstance()
-    .addEventListener(ThrottleManager.dragEvent, (e) => {
+  ThrottlingDebouncingManager.getInstance()
+    .addEventListener(ThrottlingDebouncingManager.dragEvent, (e) => {
       const { eventName, isThrottling } = e.detail;
-      ThrottleManager.getInstance().setEventMap(eventName, isThrottling);
+      ThrottlingDebouncingManager.getInstance().setEventMap(
+        eventName,
+        isThrottling,
+      );
     })
-    .addEventListener(ThrottleManager.scrollEvent, (e) => {
+    .addEventListener(ThrottlingDebouncingManager.scrollEvent, (e) => {
       const { eventName, isThrottling } = e.detail;
-      ThrottleManager.getInstance().setEventMap(eventName, isThrottling);
+      ThrottlingDebouncingManager.getInstance().setEventMap(
+        eventName,
+        isThrottling,
+      );
     });
 
   const [currentEvent, setCurrentEvent] = useState(eventNameEnum.none);
 
   return (
     <div className="App">
-      <Banner setCurrentEvent={setCurrentEvent} />
+      <Banner />
       <SideBar setCurrentEvent={setCurrentEvent} />
       <Canvas currentEvent={currentEvent} setCurrentEvent={setCurrentEvent} />
     </div>

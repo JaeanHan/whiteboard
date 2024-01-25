@@ -13,12 +13,17 @@ export const RectSVG = ({
   const num = Number(id.charAt(1));
 
   const onClick = (e) => {
+    if (e.ctrlKey) return;
+
     e.stopPropagation();
-    const newDesc = prompt("name or description for this block");
-    setDesc(newDesc);
+
+    if (e.shiftKey) {
+      const newDesc = prompt("name or description for this block");
+      setDesc(newDesc);
+    }
   };
 
-  console.log(id);
+  // console.log(id);
   return (
     <SvgContainer
       id={id}
@@ -30,7 +35,6 @@ export const RectSVG = ({
       widthHeight={{ width: width, height: height }}
       setAdditionalProps={setAdditionalProps}
     >
-      {/*<Rect fill={num % 2 === 0 ? "red" : "green"} />*/}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width={width}

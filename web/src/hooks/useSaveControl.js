@@ -1,6 +1,6 @@
 import { HttpRequestManager } from "../eventTarget/HttpRequestManager";
 
-export const useSaveManager = () => {
+export const useSaveControl = () => {
   const httpRequest = HttpRequestManager.getInstance();
 
   const save = (id, store) => {

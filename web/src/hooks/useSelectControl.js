@@ -11,7 +11,7 @@ import {
 } from "../eventTarget/GroupEventManager";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 
-export const useSelectManager = () => {
+export const useSelectControl = () => {
   const [svgGroup, setSvgGroup] = useState(new Map());
   const [diffAndFlagMap, setDiffAndFlagMap] = useState(new Map());
   const [SMState, setSMState] = useState(SMStateEnum.none);
@@ -256,8 +256,8 @@ export const useSelectManager = () => {
     setDiffPosOnAll,
     onDrag,
     onDrop,
-    selectBoxSize,
     handleSelectBox: {
+      selectBoxSize,
       initClientSelectBoxSize,
       setClientSelectBoxSize,
       finClientSelectBoxSize,

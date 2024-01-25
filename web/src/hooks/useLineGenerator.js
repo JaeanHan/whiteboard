@@ -13,7 +13,7 @@ export const useLineGenerator = (
 
   useEffect(() => {
     if (points.length > 1) {
-      const key = svgTypeEnum.line + generateNextId();
+      const key = generateNextId(svgTypeEnum.line);
       const src = points[0];
       const dest = points[1];
       const width = Math.sqrt(
@@ -28,7 +28,6 @@ export const useLineGenerator = (
         height,
       };
 
-      // setPosMap((prev) => new Map(prev).set(key, fixPos));
       addSvgOnStore(key, attachment);
       setCurrentEvent(eventNameEnum.none);
       setPoints([]);

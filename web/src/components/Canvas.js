@@ -1,20 +1,21 @@
-import { useSelectManager } from "../hooks/useSelectManager";
+import { useSelectControl } from "../hooks/useSelectControl";
 import { useEffect, useState } from "react";
 import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../utils/enums";
 import { sideBarWidth } from "./SideBar";
 import { useLineGenerator } from "../hooks/useLineGenerator";
 import { MousePoint } from "./MousePoint";
 import { usePathGenerator } from "../hooks/usePathGenerator";
-import { SelectBox } from "./SelectBox";
 import { useSvgStore } from "../hooks/useSvgStore";
-import { ThrottleManager } from "../eventTarget/ThrottleManager";
+import { ThrottlingDebouncingManager } from "../eventTarget/ThrottlingDebouncingManager";
 import { render } from "../utils/canvasTools";
 import { useStarsGenerator } from "../hooks/useStarsGenerator";
-import { useSaveManager } from "../hooks/useSaveManager";
+import { useSaveControl } from "../hooks/useSaveControl";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 import { bannerHeight } from "./Banner";
 import { WindowManager } from "../eventTarget/WindowManager";
-
+import { MultiSelectLayer } from "./MultiSelectLayer";
+import { GroupEventManager } from "../eventTarget/GroupEventManager";
+import { SelectBox } from "./SelectBox";
 const owner = "jaean";
 
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
@@ -25,18 +26,13 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     liveStore,
     load,
   } = useSvgStore();
-  const {
-    handleSelect,
-    setDiffPosOnAll,
-    onDrag,
-    onDrop,
-    selectBoxSize,
-    handleSelectBox,
-  } = useSelectManager();
+  const { handleSelect, setDiffPosOnAll, onDrag, onDrop, handleSelectBox } =
+    useSelectControl();
   const {
     initClientSelectBoxSize,
     setClientSelectBoxSize,
     finClientSelectBoxSize,
+    selectBoxSize,
   } = handleSelectBox;
   const generateNextId =
     SvgIdAndMutablePropsManager.getInstance().generateNextId;
@@ -44,11 +40,13 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   const [tempPos, setTempPos] = useState(new Map());
   const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
   const [canvasSize, setCanvasSize] = useState({
-    width: window.innerWidth - sideBarWidth,
-    height: window.innerHeight - bannerHeight,
+    // width: window.innerWidth - sideBarWidth,
+    // height: window.innerHeight - bannerHeight,
+    width: window.innerWidth,
+    height: window.innerHeight,
   });
 
-  const TM = ThrottleManager.getInstance();
+  const TM = ThrottlingDebouncingManager.getInstance();
   const WM = WindowManager.getInstance();
 
   const { addPoint, quit } = useLineGenerator(
@@ -65,7 +63,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
 
-  const { save, read } = useSaveManager();
+  const { save, read } = useSaveControl();
 
   const onScroll = (e) => {
     e.preventDefault();
@@ -161,7 +159,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       return;
     }
 
-    const TM = ThrottleManager.getInstance();
+    const TM = ThrottlingDebouncingManager.getInstance();
 
     if (TM.getEventThrottling(TM.dragEvent)) {
       return;
@@ -201,7 +199,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     };
 
     if (currentEvent === eventNameEnum.addRect) {
-      const key = svgTypeEnum.rect + generateNextId();
+      const key = generateNextId(svgTypeEnum.rect);
       const attachment = {
         src: {
           x: fixPos.x - 75,
@@ -217,7 +215,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
 
     if (currentEvent === eventNameEnum.addText) {
-      const key = svgTypeEnum.text + generateNextId();
+      const key = generateNextId(svgTypeEnum.text);
       const attachment = {
         src: {
           x: fixPos.x - 100,
@@ -314,9 +312,6 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
-      // onTouchStart={onMouseDown}
-      // onTouchMove={onMouseMove}
-      // onTouchEnd={onMouseUp}
     >
       {selectBoxSize.src.x !== selectBoxSize.dest.x && (
         <SelectBox selectClientBox={selectBoxSize} />

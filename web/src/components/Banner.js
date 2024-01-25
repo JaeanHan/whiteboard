@@ -4,30 +4,68 @@ import { WindowManager } from "../eventTarget/WindowManager";
 
 export const bannerHeight = 25;
 
-export const Banner = ({ setCurrentEvent }) => {
-  const [windows, setWindows] = useState(["Linear Algebra"]);
-  const [selectedWindow, setSelectedWindow] = useState(0);
+export const Banner = () => {
   const WM = WindowManager.getInstance();
 
+  console.log("asdas");
+
+  const [windows, setWindows] = useState([WM.getSelectedVirtualWindow()]);
+  const [selectedWindow, setSelectedWindow] = useState(0);
+  const [hoveringIndex, setHoveringIndex] = useState(null);
+  const [hoveringClose, setHoveringClose] = useState(false);
+
   const addWindow = () => {
-    const name = prompt("name");
+    const name =
+      prompt("new windows require unique name") ||
+      WM.getUnnamedWindowNameOnAdd();
+
+    WM.addWindow(name);
 
     setWindows((prev) => [...prev, name]);
     setSelectedWindow(windows.length);
-
-    WM.addWindow(name);
-    WM.setSelectedWindowIndex(windows.length);
-
-    // setCurrentEvent(eventNameEnum.windowChange);
   };
 
   const selectWindow = (e, index) => {
     e.preventDefault();
     e.stopPropagation();
+    const currentName = windows[index];
+
+    if (e.ctrlKey) {
+      const newName = prompt("unique name required for new windows");
+
+      if (newName.trim().length > 0) {
+        WM.changeWindowVirtualName(currentName, index, newName);
+        setWindows(WM.getVirtualWindows());
+      }
+
+      return;
+    }
+
+    WM.setSelectedWindow(currentName, index);
 
     setSelectedWindow(index);
-    WM.setSelectedWindowIndex(index);
-    // setCurrentEvent(eventNameEnum.windowChange);
+  };
+
+  const onMouseEnter = (e, index) => {
+    e.preventDefault();
+    setHoveringIndex(index);
+  };
+
+  const onMouseLeave = (e) => {
+    e.preventDefault();
+    setHoveringIndex(null);
+  };
+
+  const onMouseEnterClose = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setHoveringClose(true);
+  };
+
+  const onMouseLeaveClose = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setHoveringClose(false);
   };
 
   return (
@@ -57,13 +95,16 @@ export const Banner = ({ setCurrentEvent }) => {
         }}
       >
         {windows.map((el, index) => (
-          <button
+          <div
             key={index}
             style={{
               width: 200,
               height: "100%",
-              cursor: "pointer",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
               borderBottom: "none",
+              color: "black",
               backgroundColor:
                 selectedWindow === index ? "white" : "whitesmoke",
               borderTop:
@@ -75,10 +116,47 @@ export const Banner = ({ setCurrentEvent }) => {
               borderTopLeftRadius: selectedWindow === index ? 5 : 0,
               borderTopRightRadius: selectedWindow === index ? 5 : 0,
             }}
+            onMouseLeave={onMouseLeave}
+            onMouseEnter={(e) => onMouseEnter(e, index)}
             onClick={(e) => selectWindow(e, index)}
           >
-            {el}
-          </button>
+            <div
+              style={{
+                display: "flex",
+                lineHeight: "100%",
+                width: "max-content",
+                paddingRight: 10,
+                paddingLeft: 10,
+                height: "80%",
+                borderRadius: 5,
+                backgroundColor:
+                  selectedWindow !== index && hoveringIndex === index
+                    ? "silver"
+                    : "transparent",
+              }}
+              onMouseEnter={onMouseEnterClose}
+              onMouseLeave={onMouseLeaveClose}
+            >
+              {el}
+              {hoveringIndex === index && (
+                <div
+                  style={{
+                    opacity: 0.5,
+                    borderRadius: 6,
+                    width: 13,
+                    height: 13,
+                    marginLeft: 15,
+                    border: "1px solid gray",
+                    textAlign: "center",
+                    lineHeight: 0.75,
+                    cursor: "default",
+                  }}
+                >
+                  x
+                </div>
+              )}
+            </div>
+          </div>
         ))}
       </div>
       <button

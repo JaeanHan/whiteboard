@@ -1,12 +1,12 @@
 export class SvgIdAndMutablePropsManager {
   static instance = null;
-  idMap = null;
+  maxIdMap = null;
   textMap = null;
   startsSizeMap = null;
   sorted = false;
 
   constructor() {
-    this.idMap = new Map();
+    this.maxIdMap = new Map();
     this.textMap = new Map();
     this.startsSizeMap = new Map();
   }
@@ -19,15 +19,15 @@ export class SvgIdAndMutablePropsManager {
   };
 
   generateNextId = (svgType) => {
-    const currentId = this.idMap.get(svgType) || 0;
+    const currentId = this.maxIdMap.get(svgType) || 0;
     const nextId = currentId + 1;
-    this.idMap.set(svgType, nextId);
-    return nextId;
+    this.maxIdMap.set(svgType, nextId);
+    return svgType + nextId;
   };
 
-  safeSetId = (svgType, id) => {
-    const currentId = this.idMap.get(svgType) || 0;
-    this.idMap.set(svgType, Math.max(currentId, id));
+  safeSetIdOnLoad = (svgType, id) => {
+    const currentId = this.maxIdMap.get(svgType) || 0;
+    this.maxIdMap.set(svgType, Math.max(currentId, id));
   };
 
   // removeId = (sId) => {
