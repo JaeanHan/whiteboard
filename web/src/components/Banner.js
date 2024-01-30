@@ -1,18 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { sideBarWidth } from "./SideBar";
 import { WindowManager } from "../eventTarget/WindowManager";
+import { eventNameEnum } from "../utils/enums";
 
-export const bannerHeight = 25;
+export const bannerHeight = 30;
 
-export const Banner = () => {
+export const Banner = ({ setCurrentEvent }) => {
   const WM = WindowManager.getInstance();
 
-  console.log("asdas");
-
   const [windows, setWindows] = useState([WM.getSelectedVirtualWindow()]);
-  const [selectedWindow, setSelectedWindow] = useState(0);
   const [hoveringIndex, setHoveringIndex] = useState(null);
-  const [hoveringClose, setHoveringClose] = useState(false);
+  const selectedWindow = WM.getSelectedVirtualWindow();
+  WM.setBannerWindowHandler(setWindows);
+  // const barWidth = window.innerWidth - sideBarWidth;
 
   const addWindow = () => {
     const name =
@@ -22,7 +22,14 @@ export const Banner = () => {
     WM.addWindow(name);
 
     setWindows((prev) => [...prev, name]);
-    setSelectedWindow(windows.length);
+    // setSelectedWindow(windows.length);
+    setCurrentEvent(eventNameEnum.windowChange);
+  };
+
+  const deleteWindow = (e, index) => {
+    e.stopPropagation();
+    WM.deleteWindow(windows[index], index);
+    setCurrentEvent(eventNameEnum.windowChange);
   };
 
   const selectWindow = (e, index) => {
@@ -43,29 +50,24 @@ export const Banner = () => {
 
     WM.setSelectedWindow(currentName, index);
 
-    setSelectedWindow(index);
+    // setSelectedWindow(index);
+    setCurrentEvent(eventNameEnum.windowChange);
   };
 
   const onMouseEnter = (e, index) => {
-    e.preventDefault();
     setHoveringIndex(index);
   };
 
   const onMouseLeave = (e) => {
-    e.preventDefault();
-    setHoveringIndex(null);
+    setHoveringIndex(-1);
   };
 
   const onMouseEnterClose = (e) => {
-    e.preventDefault();
     e.stopPropagation();
-    setHoveringClose(true);
   };
 
   const onMouseLeaveClose = (e) => {
-    e.preventDefault();
     e.stopPropagation();
-    setHoveringClose(false);
   };
 
   return (
@@ -98,22 +100,30 @@ export const Banner = () => {
           <div
             key={index}
             style={{
-              width: 200,
+              // width: 200,
+              // width: Math.min(180, barWidth / windows.length),
               height: "100%",
               display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              // justifyContent: "center",
+              // alignItems: "center",
               borderBottom: "none",
               color: "black",
               backgroundColor:
-                selectedWindow === index ? "white" : "whitesmoke",
+                selectedWindow === windows[index] ? "white" : "whitesmoke",
               borderTop:
-                selectedWindow === index ? "lightgray 1px solid" : "none",
+                selectedWindow === windows[index]
+                  ? "lightgray 1px solid"
+                  : "none",
               borderLeft:
-                selectedWindow === index ? "lightgray 1px solid" : "none",
+                selectedWindow === windows[index]
+                  ? "lightgray 1px solid"
+                  : "none",
               borderRight:
-                selectedWindow === index ? "lightgray 1px solid" : "none",
-              borderTopLeftRadius: selectedWindow === index ? 5 : 0,
+                selectedWindow === windows[index]
+                  ? "lightgray 1px solid"
+                  : "none",
+              borderTopLeftRadius:
+                selectedWindow === windows[index] || index === 0 ? 5 : 0,
               borderTopRightRadius: selectedWindow === index ? 5 : 0,
             }}
             onMouseLeave={onMouseLeave}
@@ -124,37 +134,56 @@ export const Banner = () => {
               style={{
                 display: "flex",
                 lineHeight: "100%",
+                overflowX: "hidden",
+                cursor: "default",
+                // width: "min(calc(max-content), 100px)",
                 width: "max-content",
                 paddingRight: 10,
                 paddingLeft: 10,
                 height: "80%",
                 borderRadius: 5,
                 backgroundColor:
-                  selectedWindow !== index && hoveringIndex === index
+                  selectedWindow !== windows[index] && hoveringIndex === index
                     ? "silver"
                     : "transparent",
+                textAlign: "start",
+                textIndent: 10,
               }}
               onMouseEnter={onMouseEnterClose}
               onMouseLeave={onMouseLeaveClose}
             >
-              {el}
-              {hoveringIndex === index && (
-                <div
-                  style={{
-                    opacity: 0.5,
-                    borderRadius: 6,
-                    width: 13,
-                    height: 13,
-                    marginLeft: 15,
-                    border: "1px solid gray",
-                    textAlign: "center",
-                    lineHeight: 0.75,
-                    cursor: "default",
-                  }}
-                >
-                  x
-                </div>
-              )}
+              <div
+                style={{
+                  // width: Math.min(145, 'max-content'),
+                  width: "min(max-content, 100px)",
+                  // textOverflow: "ellipsis",
+                  textOverflow: "clip",
+                  overflowX: "hidden",
+                }}
+              >
+                {el}
+              </div>
+              <div
+                style={{
+                  visibility:
+                    hoveringIndex === index && selectedWindow !== windows[index]
+                      ? "visible"
+                      : "hidden",
+                  opacity: 0.5,
+                  borderRadius: 6,
+                  width: 13,
+                  height: 13,
+                  marginLeft: 15,
+                  border: "1px solid gray",
+                  textAlign: "center",
+                  lineHeight: 0.75,
+                  zIndex: 15,
+                  cursor: "default",
+                }}
+                onClick={(e) => deleteWindow(e, index)}
+              >
+                x
+              </div>
             </div>
           </div>
         ))}

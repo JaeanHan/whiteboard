@@ -13,8 +13,6 @@ import { useSaveControl } from "../hooks/useSaveControl";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 import { bannerHeight } from "./Banner";
 import { WindowManager } from "../eventTarget/WindowManager";
-import { MultiSelectLayer } from "./MultiSelectLayer";
-import { GroupEventManager } from "../eventTarget/GroupEventManager";
 import { SelectBox } from "./SelectBox";
 const owner = "jaean";
 
@@ -24,6 +22,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     updateSvgOnStore,
     setAdditionalProps,
     liveStore,
+    onWindowChange,
     load,
   } = useSvgStore();
   const { handleSelect, setDiffPosOnAll, onDrag, onDrop, handleSelectBox } =
@@ -63,7 +62,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
 
-  const { save, read } = useSaveControl();
+  const { saveCurrent, getWindows } = useSaveControl();
 
   const onScroll = (e) => {
     e.preventDefault();
@@ -263,17 +262,17 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
 
     if (currentEvent === eventNameEnum.windowChange) {
-      console.log("window change");
+      onWindowChange();
       setCurrentEvent(eventNameEnum.none);
     }
 
     if (currentEvent === eventNameEnum.save) {
-      save(owner, liveStore);
+      saveCurrent(owner, liveStore);
       setCurrentEvent(eventNameEnum.none);
     }
 
     if (currentEvent === eventNameEnum.read) {
-      read(owner, load);
+      getWindows(owner, load);
       setCurrentEvent(eventNameEnum.none);
     }
 

@@ -8,17 +8,17 @@ export class WindowManager {
   unnamedWindow;
   selectedWindow;
 
-  windowActualVirtualMap = null;
+  windowRealVirtualNameMap = null;
   nonUniqueNameIndexMap = null;
+  bannerWindowHandler = () => {};
 
   constructor() {
-    this.windowActualVirtualMap = new Map();
+    this.windowRealVirtualNameMap = new Map();
     this.nonUniqueNameIndexMap = new Map();
 
     this.windowSize = [0, 0];
     this.unnamedWindow = "Welcome";
-    this.selectedWindow = `${this.unnamedWindow} 1`;
-    this.windowActualVirtualMap.set(this.selectedWindow, this.selectedWindow);
+    this.init();
   }
 
   static getInstance = () => {
@@ -28,64 +28,89 @@ export class WindowManager {
     return WindowManager.instance;
   };
 
-  addWindow = (windowName) => {
-    if (this.windowActualVirtualMap.has(windowName)) {
+  init = () => {
+    console.log("wm init!");
+    this.selectedWindow = `${this.unnamedWindow} 1`;
+    this.windowRealVirtualNameMap.set(this.selectedWindow, this.selectedWindow);
+  };
+
+  addWindow = (givenName) => {
+    const windowName = givenName.trim();
+
+    if (this.windowRealVirtualNameMap.has(windowName)) {
       let i = 2;
 
       while (1) {
         const newTempName = windowName + i;
-        if (!this.windowActualVirtualMap.has(newTempName)) break;
+        if (!this.windowRealVirtualNameMap.has(newTempName)) break;
         i++;
       }
 
       const realName = windowName + i;
       const nameAndViewIndexMapping =
-        windowName + this.windowActualVirtualMap.size;
+        windowName + this.windowRealVirtualNameMap.size;
+
+      console.log("???", nameAndViewIndexMapping, realName);
 
       this.nonUniqueNameIndexMap.set(nameAndViewIndexMapping, realName);
 
-      this.windowActualVirtualMap.set(realName, windowName);
+      this.windowRealVirtualNameMap.set(realName, windowName);
       this.selectedWindow = realName;
 
       return;
     }
 
-    this.windowActualVirtualMap.set(windowName, windowName);
+    this.windowRealVirtualNameMap.set(windowName, windowName);
     this.selectedWindow = windowName;
   };
 
-  getRealName = (currentName, viewIndex) => {
-    const nameAndViewIndexMapping = currentName + viewIndex;
+  deleteWindow = (virtualName, viewIndex) => {
+    const realName = this.getRealName(virtualName, viewIndex);
+
+    this.windowRealVirtualNameMap.delete(realName);
+    // this.nonUniqueNameIndexMap.delete(realName);
+
+    console.log("delete", virtualName, "at", viewIndex);
+    console.log(this.windowRealVirtualNameMap);
+  };
+
+  getRealName = (virtualName, viewIndex) => {
+    const nameAndViewIndexMapping = virtualName + viewIndex;
     return (
-      this.nonUniqueNameIndexMap.get(nameAndViewIndexMapping) ?? currentName
+      this.nonUniqueNameIndexMap.get(nameAndViewIndexMapping) ?? virtualName
     );
   };
 
   getVirtualName = (realName) => {
-    return this.windowActualVirtualMap.get(realName);
+    return this.windowRealVirtualNameMap.get(realName);
   };
 
-  setSelectedWindow = (currentName, viewIndex) => {
-    const realName = this.getRealName(currentName, viewIndex);
+  setSelectedWindow = (virtualName, viewIndex) => {
+    const realName = this.getRealName(virtualName, viewIndex);
 
     console.log("on select real name", realName);
     this.selectedWindow = realName;
+  };
+
+  getSelectedWindow = () => {
+    // return btoa(this.selectedWindow);
+    return this.selectedWindow;
   };
 
   getSelectedVirtualWindow = () => {
     return this.getVirtualName(this.selectedWindow);
   };
 
-  changeWindowVirtualName = (currentName, viewIndex, newName) => {
-    const realName = this.getRealName(currentName, viewIndex);
+  changeWindowVirtualName = (virtualName, viewIndex, newName) => {
+    const realName = this.getRealName(virtualName, viewIndex);
 
-    this.windowActualVirtualMap.set(realName, newName);
+    this.windowRealVirtualNameMap.set(realName, newName);
   };
 
   getVirtualWindows = () => {
     const virtualWindows = [];
 
-    for (const [key, value] of this.windowActualVirtualMap) {
+    for (const [key, value] of this.windowRealVirtualNameMap) {
       virtualWindows.push(value);
     }
 
@@ -93,7 +118,15 @@ export class WindowManager {
   };
 
   getUnnamedWindowNameOnAdd = () =>
-    `${this.unnamedWindow} ${this.windowActualVirtualMap.length + 1}`;
+    `${this.unnamedWindow} ${this.windowRealVirtualNameMap.size + 1}`;
+
+  setBannerWindowHandler = (handler) => (this.bannerWindowHandler = handler);
+  bannerAddOnLoad = (newWindow) => {
+    if (this.windowRealVirtualNameMap.has(newWindow)) return;
+
+    this.bannerWindowHandler((prev) => [...prev, newWindow]);
+    this.windowRealVirtualNameMap.set(newWindow, newWindow);
+  };
 
   setWindowSize = (array) => (this.windowSize = array);
 

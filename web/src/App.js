@@ -35,7 +35,7 @@ function App() {
 
   return (
     <div className="App">
-      <Banner />
+      <Banner setCurrentEvent={setCurrentEvent} />
       <SideBar setCurrentEvent={setCurrentEvent} />
       <Canvas currentEvent={currentEvent} setCurrentEvent={setCurrentEvent} />
     </div>

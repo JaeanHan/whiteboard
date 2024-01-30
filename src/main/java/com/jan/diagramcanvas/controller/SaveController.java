@@ -14,11 +14,11 @@ import java.util.List;
 public class SaveController {
     private final SaveService saveService;
 
-    @PostMapping("api/save/{owner}")
-    public Long save(@RequestBody List<SvgInfo> list, @PathVariable String owner) throws Exception {
+    @PostMapping("api/save/{owner}/{window}")
+    public Long save(@RequestBody List<SvgInfo> list, @PathVariable String owner, @PathVariable String window) throws Exception {
         Long inserted = 0L;
 
-        inserted += saveService.saveTest(owner, list);
+        inserted += saveService.saveTest(owner, window, list);
 
         System.out.println(owner + inserted);
 
