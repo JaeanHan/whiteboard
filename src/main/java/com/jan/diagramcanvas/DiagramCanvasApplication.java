@@ -67,7 +67,8 @@ public class DiagramCanvasApplication {
 					chain.doFilter(request, response);
 
 					res.setHeader("Access-Control-Allow-Origin", req.getHeader("origin"));
-					res.setHeader("Access-Control-Allow-Methods", "*");
+					// 이거 왜 *로 하면 안되지
+					res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE");
 					res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Test");
 					res.setHeader("Access-Control-Max-Age", "3600");
 

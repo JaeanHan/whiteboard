@@ -72,20 +72,9 @@ export class HttpRequestManager {
       this.setHttpRequestActions(hr);
       this.setCredentials(hr);
 
-      console.log("hr", hr);
+      // console.log("hr", hr);
 
       hr.onload = () => {
-        const responseHeader = hr
-          .getAllResponseHeaders()
-          .split("\r\n")
-          .reduce((result, current) => {
-            let [name, value] = current.split(": ");
-            result[name] = value;
-            return result;
-          }, {});
-
-        console.log("rh", responseHeader);
-
         if (hr.status === 200) {
           const contentType = hr.getResponseHeader(this.contentType);
 
@@ -139,14 +128,49 @@ export class HttpRequestManager {
       hr.send(requestBody);
     });
   };
-}
 
-class HttpRequestWithSignal extends XMLHttpRequest {
-  signal = null;
-  constructor() {
-    super();
-  }
+  delete = (url, timeout = 5000, lock = true) => {
+    if (lock) {
+      if (this.setLockExtendDurationIfLocked(url)) {
+        return new Promise((resolve, reject = () => {}) => {
+          reject("req already sent");
+        });
+      }
+    }
 
-  setSignal = (signal) => (this.signal = signal);
-  send = () => super.send();
+    return new Promise((resolve, reject) => {
+      const hr = new XMLHttpRequest();
+
+      hr.open("DELETE", url, true);
+      this.setHttpRequestActions(hr);
+      this.setCredentials(hr);
+
+      hr.onload = () => {
+        if (hr.status === 200) {
+          const responseHeader = hr
+            .getAllResponseHeaders()
+            .split("\r\n")
+            .reduce((result, current) => {
+              let [name, value] = current.split(": ");
+              result[name] = value;
+              return result;
+            }, {});
+
+          console.log("rh", responseHeader);
+          const contentType = hr.getResponseHeader(this.contentType);
+
+          // console.log("res", contentType, hr.response);
+
+          // if (contentType.includes(this.text)) {
+          resolve(hr.response);
+          return;
+          // }
+        }
+
+        reject(hr.status);
+      };
+
+      hr.send();
+    });
+  };
 }

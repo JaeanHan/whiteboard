@@ -32,7 +32,8 @@ export const SvgContainer = ({
       stopOnDrop,
       setDragStateGroup,
     });
-  }, [src]);
+    // console.log("prop src updated", id, src);
+  }, [setObjPos]);
 
   const getObjInfo = () => {
     return { objPos, objSize };
@@ -42,6 +43,13 @@ export const SvgContainer = ({
   };
   const stopOnDrop = (isGrouping, finnishFlag) => {
     if (!isGrouping || finnishFlag) {
+      setAdditionalProps(id, {
+        getObjInfo,
+        moveOnDrag,
+        stopOnDrop,
+        setDragStateGroup,
+      });
+      console.log("prop src updated", id, src);
       setDragState(dragStateEnum.none);
     }
   };
@@ -184,14 +192,6 @@ export const SvgContainer = ({
             lineHeight: 0.75,
             overflow: "visible",
             borderRadius: 2,
-            // "&::before": {
-            //   position: "absolute",
-            //   left: -objSize.width + 45,
-            //   top: 1,
-            //   width: objSize.width - 45,
-            //   height: 2,
-            //   backgroundColor: "black",
-            // },
           }}
         >
           <div
@@ -233,7 +233,9 @@ export const SvgContainer = ({
               border: "1px solid gray",
             }}
             onMouseDown={stopPropagation}
-            onMouseUp={() => deleteSvgById(id)}
+            onMouseUp={() => {
+              deleteSvgById(id);
+            }}
           >
             x
           </div>

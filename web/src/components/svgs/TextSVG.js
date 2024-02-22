@@ -1,5 +1,5 @@
 import { SvgContainer } from "../SvgContainer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 
 const fontStyle = {
@@ -17,15 +17,22 @@ export const TextSVG = ({
   deleteSvgById,
   setAdditionalProps,
 }) => {
-  const { src, width, height } = attachment;
+  const { src, width, height, comment } = attachment;
   //test1test2test3;'Leckerli One', cursive.red
-  const [text, setText] = useState("test1test2test3");
+  const [text, setText] = useState(comment || "test1test2test3");
   const [widthHeight, setWidthHeight] = useState({
     width: width,
     height: height,
   });
   const [isHovered, setHovered] = useState(false);
+  const [lockFocused, setLockFocused] = useState(false);
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
+
+  useEffect(() => {
+    if (comment) {
+      setWidthHeight(calculateTextSize(comment));
+    }
+  }, [setWidthHeight]);
 
   const convertTextToLines = (text) => {
     let yOffset = 0;
@@ -63,36 +70,36 @@ export const TextSVG = ({
 
     const textSpilt = text.split("\n") ?? [];
 
-    const longestText = textSpilt?.reduce(
-      (longest, currentLine) =>
-        currentLine.length > longest.length ? currentLine : longest,
-      "",
-    );
-
     context.font = `${fontStyle.fontSize}px ${fontStyle.fontFamily}`;
-    const metrics = context.measureText("Q");
+
+    const lengths = [];
+
+    for (const text of textSpilt) {
+      lengths.push(context.measureText(text).width);
+    }
 
     // const margins = 11;
     // const calcHeight =
     //   metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + margins;
 
     return {
-      width: metrics.width * longestText.length,
+      width: Math.max(...lengths),
       height: Math.max(height, textSpilt.length * 31),
       // height: Math.max(height, textSpilt.length * fontStyle.fontSize),
     };
   };
 
   const onTextChange = (e) => {
-    if (e.target.value === "") {
-      deleteSvgById(id);
-      SIMP.setTextMap(id, undefined);
-      return;
-    }
-
+    setLockFocused(true);
     setText(e.target.value);
-    setWidthHeight(calculateTextSize(e.target.value));
-    SIMP.setTextMap(id, e.target.value);
+    const widthHeight = calculateTextSize(e.target.value);
+    setWidthHeight(widthHeight);
+    SIMP.setCommentMap(id, e.target.value);
+    // SIMP.setSizeMap();
+
+    if (!lockFocused) {
+      setTimeout(() => setLockFocused(false), 1000);
+    }
   };
 
   const onMouseEnter = (e) => {
@@ -101,14 +108,15 @@ export const TextSVG = ({
   };
 
   const onMouseLeave = () => {
+    if (lockFocused) return;
     setHovered(false);
   };
 
-  const onMouseMove = (e) => {
-    if (e.button === 1) {
-      console.log("draging");
-    }
-  };
+  // const onMouseMove = (e) => {
+  //   if (e.button === 1) {
+  //     console.log("draging");
+  //   }
+  // };
 
   const stopPropagation = (e) => {
     e.stopPropagation();
@@ -148,8 +156,8 @@ export const TextSVG = ({
               autoFocus={true}
               value={text}
               onChange={onTextChange}
-              onMouseMove={onMouseMove}
               onKeyDown={stopPropagation}
+              // onMouseMove={onMouseMove}
               // onMouseDown={stopPropagation}
             />
           </foreignObject>

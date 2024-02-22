@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 import { WindowManager } from "../eventTarget/WindowManager";
+import { svgTypeEnum } from "../utils/enums";
 
 export const useSvgStore = () => {
   const WM = WindowManager.getInstance();
@@ -9,29 +10,42 @@ export const useSvgStore = () => {
   );
   const [liveStore, setLiveStore] = useState([]);
   const [refreshLiveStore, setRefreshLiveStore] = useState(false);
+  const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
   const load = (loadData) => {
-    const SIM = SvgIdAndMutablePropsManager.getInstance();
     const WM = WindowManager.getInstance();
+    SIMP.resetUpdateFlagMap();
     const loadMap = new Map();
 
     for (const [key, value] of Object.entries(loadData)) {
-      console.log("window", key);
+      // console.log("window", key);
 
-      const replaceUnderBarWindow = key.replace("_", " ");
+      const underBarReplacedWindow = key.replace("_", " ");
       const windowMap = new Map();
 
       for (const [id, props] of Object.entries(value)) {
         const parse = JSON.parse(props);
+
+        parse.display = true;
+
         windowMap.set(id, parse);
         const svgType = id.substring(0, 1);
         const num = parseInt(id.substring(1));
 
-        SIM.safeSetIdOnLoad(svgType, num);
+        SIMP.safeSetIdOnLoad(svgType, num);
+        SIMP.setIdSrcMap(id, parse?.src, true);
+
+        if (
+          id.startsWith(svgTypeEnum.text) ||
+          id.startsWith(svgTypeEnum.rect)
+        ) {
+          SIMP.setCommentMap(id, parse?.comment, true);
+          // console.log("simp set", id, parse?.comment);
+        }
       }
 
-      WM.bannerAddOnLoad(replaceUnderBarWindow);
-      loadMap.set(replaceUnderBarWindow, windowMap);
+      WM.bannerAddOnLoad(underBarReplacedWindow);
+      loadMap.set(underBarReplacedWindow, windowMap);
     }
 
     console.log("load map", loadMap);
@@ -52,9 +66,11 @@ export const useSvgStore = () => {
     });
   };
 
-  const updateSvgOnStore = (id, display) => {
+  const hideSvgOnStore = (id, display) => {
     const currentWindow = WM.getSelectedVirtualWindow();
     const props = { ...store.get(currentWindow).get(id), display: display };
+
+    console.log("hide", id);
 
     setStore((prev) => {
       const currentWindowMap = prev.get(currentWindow);
@@ -89,20 +105,26 @@ export const useSvgStore = () => {
     setRefreshLiveStore((prev) => !prev);
   };
 
+  const cleanUpStore = () => {
+    // setLiveStore([]);
+    setStore(new Map());
+  };
+
   useEffect(() => {
     const updatedLiveSvg = [];
     const currentWindow = WM.getSelectedVirtualWindow();
     const currentSvgMap = store.get(currentWindow);
 
-    console.log("useEffect", currentWindow, store);
+    console.log("[useSvgStore] useEffect", currentWindow, store);
 
     for (const [key, value] of currentSvgMap) {
       // if (value.display && value.window === currentWindow) {
       if (value.display) {
         const viewProps = {
           id: key,
-          attachment: value,
+          attachment: { ...value, src: SIMP.getSrcById(key) ?? value.src },
         };
+
         updatedLiveSvg.push(viewProps);
       }
     }
@@ -116,10 +138,12 @@ export const useSvgStore = () => {
 
   return {
     addSvgOnStore,
-    updateSvgOnStore,
+    hideSvgOnStore,
     setAdditionalProps,
     liveStore,
+    store: store.get(WindowManager.getInstance().getSelectedVirtualWindow()),
     onWindowChange,
     load,
+    cleanUpStore,
   };
 };

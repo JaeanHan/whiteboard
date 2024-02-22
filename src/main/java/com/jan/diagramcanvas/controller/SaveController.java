@@ -20,9 +20,21 @@ public class SaveController {
 
         inserted += saveService.saveTest(owner, window, list);
 
-        System.out.println(owner + inserted);
+        System.out.println(owner + " inserted : " + inserted);
 
         return inserted;
+    }
+
+    @DeleteMapping("api/save/{owner}/{window}")
+    public Long delete(@PathVariable String owner, @PathVariable String window, @RequestParam String ids) throws Exception {
+        Long deleted = 0L;
+
+        System.out.println(owner + " " + window);
+        System.out.println(ids);
+
+        deleted = saveService.deleteFields(owner, window, ids);
+
+        return deleted;
     }
 
     @GetMapping("api/read/{owner}")

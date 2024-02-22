@@ -33,7 +33,25 @@ public class SaveService {
             hash.put(hashKey, id, attachment);
         }
 
-        return hash.size(hashKey);
+//        return hash.size(hashKey);
+        return (long) list.size();
+    }
+
+    public Long deleteFields(String owner, String window, String ids) throws Exception {
+        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
+
+        final String hashKey = generateHashKey(owner, window);
+        long deleted = 0L;
+
+        String[] idArray = ids.split("\\+");
+
+        System.out.println("delete :");
+        for (String id : idArray) {
+            System.out.println(id);
+            deleted += hash.delete(hashKey, id);
+        }
+
+        return deleted;
     }
 
     public Map<String, Map<Object, Object>> readTest(String owner) {

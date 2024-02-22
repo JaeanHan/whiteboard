@@ -1,5 +1,6 @@
 import { SvgContainer } from "../SvgContainer";
 import { useState } from "react";
+import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 export const RectSVG = ({
   id,
   handleSelect,
@@ -8,8 +9,8 @@ export const RectSVG = ({
   deleteSvgById,
   setAdditionalProps,
 }) => {
-  const { src, width, height } = attachment;
-  const [desc, setDesc] = useState(`${id} description`);
+  const { src, width, height, comment } = attachment;
+  const [desc, setDesc] = useState(comment || `${id} description`);
   const num = Number(id.charAt(1));
 
   const onClick = (e) => {
@@ -18,12 +19,14 @@ export const RectSVG = ({
     e.stopPropagation();
 
     if (e.shiftKey) {
+      const SIMP = SvgIdAndMutablePropsManager.getInstance();
       const newDesc = prompt("name or description for this block");
+      SIMP.setCommentMap(id, newDesc);
       setDesc(newDesc);
     }
   };
 
-  // console.log(id);
+  // console.log(id, comment);
   return (
     <SvgContainer
       id={id}

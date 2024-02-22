@@ -10,8 +10,11 @@ import {
   GroupKeyMapKey,
 } from "../eventTarget/GroupEventManager";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
+import { WindowManager } from "../eventTarget/WindowManager";
 
-export const useSelectControl = () => {
+export const useSelectControl = (
+  cleanUpStore = () => console.log("cleanup empty"),
+) => {
   const [svgGroup, setSvgGroup] = useState(new Map());
   const [diffAndFlagMap, setDiffAndFlagMap] = useState(new Map());
   const [SMState, setSMState] = useState(SMStateEnum.none);
@@ -39,7 +42,15 @@ export const useSelectControl = () => {
     };
 
     const onKeyDown = (e) => {
-      if (e.key === "F5" || e.key === "F12") return;
+      if (e.key === "F5" || e.key === "F12") {
+        WindowManager.getInstance().init();
+
+        if (e.key === "F5") {
+          // cleanUpStore();
+        }
+
+        return;
+      }
 
       e.preventDefault();
       e.stopPropagation();
@@ -101,15 +112,20 @@ export const useSelectControl = () => {
       const fixPos = calcPosOnDrag(flag, dragPos, diffDistance);
 
       moveOnDrag(fixPos);
+      SIMP.setIdSrcMap(key, fixPos);
     }
   };
 
-  const onDrop = () => {
+  const onDrop = (dropPos) => {
     if (svgGroup.size > 0 && SMState === SMStateEnum.drag) {
       svgGroup.forEach((value, key) => {
         const stopOnDrop = value.stopOnDrop;
+        // const getObjInfo = value.getObjInfo;
+        const finnishFlag = true;
+        // const { diffDistance, flag } = diffAndFlagMap.get(key);
+        // const fixPos = calcPosOnDrag(flag, dropPos, diffDistance);
 
-        stopOnDrop(isGrouping, true);
+        stopOnDrop(isGrouping, finnishFlag);
       });
       removeAllSvg();
       setSMState(SMStateEnum.none);
@@ -197,6 +213,7 @@ export const useSelectControl = () => {
 
   const getObjBounding = (objSrc, width, height, key) => {
     const startSize = SIMP.getSizeById(key);
+    console.log("key", key);
     return {
       left: objSrc.x,
       top: objSrc.y,

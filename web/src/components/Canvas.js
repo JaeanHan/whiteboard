@@ -19,13 +19,16 @@ const owner = "jaean";
 export const Canvas = ({ currentEvent, setCurrentEvent }) => {
   const {
     addSvgOnStore,
-    updateSvgOnStore,
+    hideSvgOnStore,
     setAdditionalProps,
     liveStore,
+    store,
     onWindowChange,
     load,
+    // cleanUpStore,
   } = useSvgStore();
   const { handleSelect, setDiffPosOnAll, onDrag, onDrop, handleSelectBox } =
+    // useSelectControl(cleanUpStore);
     useSelectControl();
   const {
     initClientSelectBoxSize,
@@ -62,7 +65,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
 
-  const { saveCurrent, getWindows } = useSaveControl();
+  const { saveCurrentWindow, getWindows } = useSaveControl();
 
   const onScroll = (e) => {
     e.preventDefault();
@@ -109,7 +112,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     if (currentEvent === eventNameEnum.none && id && id === "root") {
       const fixPos = {
         x: e.clientX - sideBarWidth + window.scrollX,
-        y: e.clientY + window.scrollY,
+        y: e.clientY + window.scrollY - bannerHeight,
       };
 
       if (initClientSelectBoxSize(fixPos)) {
@@ -120,7 +123,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
     setDiffPosOnAll({
       x: e.clientX + window.scrollX,
-      y: e.clientY + window.scrollY,
+      y: e.clientY + window.scrollY - bannerHeight,
     });
   };
 
@@ -130,7 +133,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     if (cursorMode === cursorModeEnum.write) {
       const fixPos = {
         x: e.clientX - sideBarWidth + window.scrollX,
-        y: e.clientY + window.scrollY,
+        y: e.clientY + window.scrollY - bannerHeight,
       };
       addPointOnSet(fixPos);
       return;
@@ -139,7 +142,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     if (currentEvent === eventNameEnum.multiSelect) {
       const fixPos = {
         x: e.clientX - sideBarWidth + window.scrollX,
-        y: e.clientY + window.scrollY,
+        y: e.clientY + window.scrollY - bannerHeight,
       };
       setClientSelectBoxSize(fixPos);
       return;
@@ -169,7 +172,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     if (currentEvent === eventNameEnum.none) {
       const calcPos = {
         x: e.clientX + window.scrollX,
-        y: e.clientY + window.scrollY,
+        y: e.clientY + window.scrollY - bannerHeight,
       };
       onDrag(calcPos);
     }
@@ -194,7 +197,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
     const fixPos = {
       x: e.clientX - sideBarWidth + window.scrollX,
-      y: e.clientY + window.scrollY,
+      y: e.clientY + window.scrollY - bannerHeight,
     };
 
     if (currentEvent === eventNameEnum.addRect) {
@@ -226,6 +229,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
 
       addSvgOnStore(key, attachment);
       setCurrentEvent(eventNameEnum.none);
+      return;
     }
 
     if (currentEvent === eventNameEnum.addLine) {
@@ -237,15 +241,18 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     if (currentEvent === eventNameEnum.addStars) {
       setTempPos((prev) => new Map(prev).set(fixPos.x, fixPos));
       addStar(fixPos);
+      return;
     }
 
     if (!e.ctrlKey) {
-      onDrop();
+      onDrop(fixPos);
     }
   };
 
   const deleteSvgById = (id) => {
-    updateSvgOnStore(id, false);
+    // setTimeout(() => {
+    hideSvgOnStore(id, false);
+    // }, 1000);
   };
 
   useEffect(() => {
@@ -267,7 +274,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
     }
 
     if (currentEvent === eventNameEnum.save) {
-      saveCurrent(owner, liveStore);
+      // saveCurrent(owner, liveStore);
+      saveCurrentWindow(owner, store);
+
       setCurrentEvent(eventNameEnum.none);
     }
 
