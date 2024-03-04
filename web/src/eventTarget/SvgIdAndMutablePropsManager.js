@@ -2,7 +2,7 @@ export class SvgIdAndMutablePropsManager {
   static instance = null;
   maxIdMap = null;
   commentMap = null;
-  startsSizeMap = null;
+  starsPosMap = null;
   srcMap = null;
   updateFlagMap = null;
 
@@ -11,7 +11,7 @@ export class SvgIdAndMutablePropsManager {
   constructor() {
     this.maxIdMap = new Map();
     this.commentMap = new Map();
-    this.startsSizeMap = new Map();
+    this.starsPosMap = new Map();
     this.srcMap = new Map();
     this.updateFlagMap = new Map();
   }
@@ -44,26 +44,29 @@ export class SvgIdAndMutablePropsManager {
   //   this.ids = this.ids.filter((id) => id !== sId);
   // };
 
-  setSizeMap = (id, widthHeight) => {
-    this.startsSizeMap.set(id, widthHeight);
-    // this.setIdUpdateFlagMap(id);
+  setStarsPosMapOnLoad = (id, stars) => {
+    this.starsPosMap.set(id, stars);
   };
-  getSizeById = (id) => this.startsSizeMap.get(id);
+  setStarsPosMap = (id, stars) => {
+    this.starsPosMap.set(id, stars);
+    this.setIdUpdateFlagMap(id);
+  };
+  getStarsPosById = (id) => this.starsPosMap.get(id);
 
-  setCommentMap = (id, text, onLoad = false) => {
+  setCommentMapOnLoad = (id, text) => {
     this.commentMap.set(id, text);
-
-    if (onLoad) return;
-
+  };
+  setCommentMap = (id, text) => {
+    this.commentMap.set(id, text);
     this.setIdUpdateFlagMap(id);
   };
   getCommentById = (id) => this.commentMap.get(id);
 
-  setIdSrcMap = (id, src, onLoad = false) => {
+  setIdSrcMapOnLoad = (id, src) => {
     this.srcMap.set(id, src);
-
-    if (onLoad) return;
-
+  };
+  setIdSrcMap = (id, src) => {
+    this.srcMap.set(id, src);
     this.setIdUpdateFlagMap(id);
   };
   getSrcById = (id) => this.srcMap.get(id);

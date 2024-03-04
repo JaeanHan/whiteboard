@@ -33,14 +33,15 @@ export const useSvgStore = () => {
         const num = parseInt(id.substring(1));
 
         SIMP.safeSetIdOnLoad(svgType, num);
-        SIMP.setIdSrcMap(id, parse?.src, true);
+        SIMP.setIdSrcMapOnLoad(id, parse?.src);
 
         if (
           id.startsWith(svgTypeEnum.text) ||
           id.startsWith(svgTypeEnum.rect)
         ) {
-          SIMP.setCommentMap(id, parse?.comment, true);
-          // console.log("simp set", id, parse?.comment);
+          SIMP.setCommentMapOnLoad(id, parse?.comment);
+        } else if (id.startsWith(svgTypeEnum.stars)) {
+          SIMP.setStarsPosMapOnLoad(id, parse?.stars);
         }
       }
 
@@ -65,6 +66,8 @@ export const useSvgStore = () => {
       return new Map([...prev, currentWindowMap]);
     });
   };
+
+  const updateSvgAttachmentOnStore = (id, attachment) => {};
 
   const hideSvgOnStore = (id, display) => {
     const currentWindow = WM.getSelectedVirtualWindow();

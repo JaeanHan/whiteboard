@@ -78,7 +78,8 @@ export const Banner = ({ setCurrentEvent }) => {
         width: "100%",
         height: bannerHeight,
         // background: "linear-gradient(90deg, dodgerblue 10%, #fffde4 100%)",
-        background: "linear-gradient(90deg, whitesmoke 20%, #fffde4 100%)",
+        // background: "linear-gradient(90deg, whitesmoke 20%, #fffde4 100%)",
+        background: "linear-gradient(90deg, #F6F8FB 60%, #E1E9F2 100%)",
         display: "flex",
         justifyContent: "start",
         alignItems: "flex-end",
@@ -125,7 +126,7 @@ export const Banner = ({ setCurrentEvent }) => {
                   : "none",
               borderTopLeftRadius:
                 selectedWindow === windows[index] || index === 0 ? 5 : 0,
-              borderTopRightRadius: selectedWindow === index ? 5 : 0,
+              borderTopRightRadius: selectedWindow === windows[index] ? 5 : 0,
             }}
             onMouseLeave={onMouseLeave}
             onMouseEnter={(e) => onMouseEnter(e, index)}

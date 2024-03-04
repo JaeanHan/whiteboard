@@ -18,7 +18,8 @@ export const useSaveControl = () => {
       if (!SIMP.getUpdateFlagById(key)) {
         continue;
       }
-      console.log("???", key, SIMP.getUpdateFlagById(key));
+
+      console.log("???", key, SIMP.getUpdateFlagById(key), value);
 
       if (!value.display) {
         deleteSvgIdArray.push(key);
@@ -35,6 +36,8 @@ export const useSaveControl = () => {
         key.startsWith(svgTypeEnum.rect)
       ) {
         svgInfo.attachment.comment = SIMP.getCommentById(key);
+      } else if (key.startsWith(svgTypeEnum.stars)) {
+        svgInfo.attachment.stars = SIMP.getStarsPosById(key);
       }
 
       if (SIMP.getSrcById(key)) {

@@ -51,8 +51,40 @@ export const RectSVG = ({
           height="150"
           fill={num % 2 === 0 ? "red" : "green"}
           style={{ stroke: "black", strokeWidth: 5 }}
-        />
-        <text x="60" y="50" fill="black" transform="rotate(-30 90,90)">
+        >
+          <animate
+            attributeName="height"
+            from="10"
+            to="150"
+            dur="1s"
+            fill="freeze"
+          />
+          <animate
+            attributeName="width"
+            from="10"
+            to="150"
+            dur="1s"
+            fill="freeze"
+          />
+          <animate
+            attributeName="x"
+            attributeType="XML"
+            from="75"
+            to="0"
+            dur="1s"
+            fill="freeze"
+          />
+          <animate
+            attributeName="y"
+            attributeType="XML"
+            from="75"
+            to="0"
+            dur="1s"
+            fill="freeze"
+          />
+        </rect>
+        {/*<text x="60" y="50" fill="black" transform="rotate(-30 90,90)">*/}
+        <text x="75" y="75" fill="black">
           {desc}
         </text>
         Sorry, your browser does not support inline SVG.

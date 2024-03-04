@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SMStateEnum } from "../utils/enums";
+import { SMStateEnum, svgTypeEnum } from "../utils/enums";
 import {
   calcPosOnDrag,
   generateDiffAndFlag,
@@ -212,13 +212,29 @@ export const useSelectControl = (
   };
 
   const getObjBounding = (objSrc, width, height, key) => {
-    const startSize = SIMP.getSizeById(key);
-    console.log("key", key);
+    if (key.startsWith(svgTypeEnum.stars)) {
+      const starsPos = SIMP.getStarsPosById(key);
+      // 변경할 수 있게 할지 미정
+      const starRadius = 5;
+
+      const xArray = starsPos.map((point) => point.x);
+      const yArray = starsPos.map((point) => point.y);
+      const width = Math.max(...xArray) + starRadius;
+      const height = Math.max(...yArray) + starRadius;
+
+      return {
+        left: objSrc.x,
+        top: objSrc.y,
+        right: objSrc.x + width,
+        bottom: objSrc.y + height,
+      };
+    }
+
     return {
       left: objSrc.x,
       top: objSrc.y,
-      right: objSrc.x + (width ?? startSize.width),
-      bottom: objSrc.y + (height ?? startSize.height),
+      right: objSrc.x + width,
+      bottom: objSrc.y + height,
     };
   };
 
