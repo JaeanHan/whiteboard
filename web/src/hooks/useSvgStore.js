@@ -115,7 +115,7 @@ export const useSvgStore = () => {
     const currentWindow = WM.getSelectedVirtualWindow();
     const currentSvgMap = store.get(currentWindow);
 
-    console.log("[useSvgStore] useEffect", currentWindow, store);
+    // console.log("[useSvgStore] useEffect", currentWindow, store);
 
     for (const [key, value] of currentSvgMap) {
       // if (value.display && value.window === currentWindow) {
@@ -123,12 +123,13 @@ export const useSvgStore = () => {
         const viewProps = {
           id: key,
           attachment: { ...value, src: SIMP.getSrcById(key) ?? value.src },
+          // attachment: { ...value },
         };
 
         updatedLiveSvg.push(viewProps);
       }
     }
-    console.log("svgStore", updatedLiveSvg);
+    // console.log("svgStore", updatedLiveSvg);
 
     const timer = () => setTimeout(() => setLiveStore(updatedLiveSvg), 5);
     const name = timer();

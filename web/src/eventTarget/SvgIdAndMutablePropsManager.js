@@ -29,7 +29,7 @@ export class SvgIdAndMutablePropsManager {
     this.maxIdMap.set(svgType, nextId);
 
     const svgId = svgType + nextId;
-    console.log("on nextId", svgId);
+    // console.log("on nextId", svgId);
     this.setIdUpdateFlagMap(svgId);
 
     return svgId;
@@ -46,7 +46,7 @@ export class SvgIdAndMutablePropsManager {
 
   setSizeMap = (id, widthHeight) => {
     this.startsSizeMap.set(id, widthHeight);
-    this.setIdUpdateFlagMap(id);
+    // this.setIdUpdateFlagMap(id);
   };
   getSizeById = (id) => this.startsSizeMap.get(id);
 
@@ -54,8 +54,6 @@ export class SvgIdAndMutablePropsManager {
     this.commentMap.set(id, text);
 
     if (onLoad) return;
-
-    console.log("on comment change");
 
     this.setIdUpdateFlagMap(id);
   };
@@ -66,15 +64,12 @@ export class SvgIdAndMutablePropsManager {
 
     if (onLoad) return;
 
-    console.log("this?");
-
     this.setIdUpdateFlagMap(id);
   };
   getSrcById = (id) => this.srcMap.get(id);
 
   setIdUpdateFlagMap = (id) => {
     this.updateFlagMap.set(id, true);
-    console.log(id, this.updateFlagMap, "wtf");
   };
   getUpdateFlagById = (id) => this.updateFlagMap.get(id);
   resetUpdateFlagMap = () => (this.updateFlagMap = new Map());

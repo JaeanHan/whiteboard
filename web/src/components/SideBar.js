@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { eventNameEnum } from "../utils/enums";
 import { HttpRequestManager } from "../eventTarget/HttpRequestManager";
 
 export const sideBarWidth = 250;
 
 export const SideBar = ({ setCurrentEvent }) => {
+  const divRef = useRef();
   const [comment, setComment] = useState("");
   const [mode, setMode] = useState("Default");
   const httpRequest = HttpRequestManager.getInstance();
@@ -61,9 +62,13 @@ export const SideBar = ({ setCurrentEvent }) => {
     setMode("Default");
   };
 
+  const SaveAll = (e) => {
+    console.log("save all");
+  };
+
   const LoadSaved = (e) => {
     e.preventDefault();
-    setCurrentEvent(eventNameEnum.read);
+    setCurrentEvent(eventNameEnum.load);
     setMode("Default");
   };
 
@@ -84,7 +89,7 @@ export const SideBar = ({ setCurrentEvent }) => {
 
   const cursor = useMemo(() => [Default, Pencil, Eraser], [mode]);
   const temp = useMemo(
-    () => [Document, Save, LoadSaved, Rect, Text, Line, StarSign],
+    () => [Document, Save, SaveAll, Rect, Text, Line, StarSign],
     [Document],
   );
 
@@ -94,14 +99,18 @@ export const SideBar = ({ setCurrentEvent }) => {
         width: sideBarWidth,
         minWidth: sideBarWidth,
         height: window.innerHeight,
-        backgroundColor: "dodgerblue",
+        // backgroundColor: "dodgerblue",
+        background: "linear-gradient(200deg, whitesmoke 10%, #fffde4 100%)",
+        // backgroundColor: "whitesmoke",
         display: "flex",
         flexDirection: "column",
         position: "fixed",
         zIndex: 10,
       }}
     >
-      spring : {comment}
+      <div ref={divRef} style={{ cursor: "pointer" }}>
+        spring : {comment}
+      </div>
       <br />
       cursor mode ↓
       <div style={{ flexDirection: "row" }}>
@@ -115,10 +124,12 @@ export const SideBar = ({ setCurrentEvent }) => {
                 setMode(el.name);
               }}
               style={{
-                backgroundColor: "dodgerblue",
+                // backgroundColor: "dodgerblue",
+                backgroundColor: "whitesmoke",
                 border: "none",
                 cursor: "pointer",
-                color: mode === el.name ? "white" : "black",
+                // color: mode === el.name ? "white" : "black",
+                color: mode === el.name ? "black" : "dodgerblue",
               }}
             >
               {el.name}
@@ -134,7 +145,8 @@ export const SideBar = ({ setCurrentEvent }) => {
             style={{
               marginTop: "15px",
               backgroundColor: "transparent",
-              color: "white",
+              // color: "white",
+              color: "gray",
               border: "none",
               cursor: "pointer",
               textDecoration: "underline",

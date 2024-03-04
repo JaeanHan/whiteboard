@@ -33,7 +33,18 @@ export const SvgContainer = ({
       setDragStateGroup,
     });
     // console.log("prop src updated", id, src);
-  }, [setObjPos]);
+  }, [src]);
+
+  // useEffect(() => {
+  //   setObjPos(src);
+  //   setAdditionalProps(id, {
+  //     getObjInfo,
+  //     moveOnDrag,
+  //     stopOnDrop,
+  //     setDragStateGroup,
+  //   });
+  //   console.log("prop src updated", id, src);
+  // }, [setObjPos]);
 
   const getObjInfo = () => {
     return { objPos, objSize };

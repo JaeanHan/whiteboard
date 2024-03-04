@@ -14,9 +14,8 @@ import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutableProps
 import { bannerHeight } from "./Banner";
 import { WindowManager } from "../eventTarget/WindowManager";
 import { SelectBox } from "./SelectBox";
-const owner = "jaean";
 
-export const Canvas = ({ currentEvent, setCurrentEvent }) => {
+export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const {
     addSvgOnStore,
     hideSvgOnStore,
@@ -280,7 +279,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent }) => {
       setCurrentEvent(eventNameEnum.none);
     }
 
-    if (currentEvent === eventNameEnum.read) {
+    if (currentEvent === eventNameEnum.load) {
       getWindows(owner, load);
       setCurrentEvent(eventNameEnum.none);
     }

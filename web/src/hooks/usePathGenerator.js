@@ -15,8 +15,8 @@ export const usePathGenerator = (addSvgOnStore) => {
   const [minMaxMap, setMinMaxMap] = useState(new Map());
   const [thickness, setThickness] = useState(3);
   const [pid, setPid] = useState("");
-  const generateNextId =
-    SvgIdAndMutablePropsManager.getInstance().generateNextId;
+  const SIMP = SvgIdAndMutablePropsManager.getInstance();
+  const generateNextId = SIMP.generateNextId;
 
   useEffect(() => {
     if (pointSet.size === 0) {
@@ -50,6 +50,8 @@ export const usePathGenerator = (addSvgOnStore) => {
       x: minMaxMap.get(MMMKey.minX) - thickness / 2,
       y: minMaxMap.get(MMMKey.minY) - thickness / 2,
     };
+    SIMP.setIdSrcMap(key, src);
+
     const width = minMaxMap.get(MMMKey.maxX) - src.x;
     const height = minMaxMap.get(MMMKey.maxY) - src.y;
 

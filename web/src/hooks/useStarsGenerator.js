@@ -26,7 +26,6 @@ export const useStarsGenerator = (
       );
 
     const name = timer();
-    console.log("test");
 
     return () => {
       clearTimeout(name);

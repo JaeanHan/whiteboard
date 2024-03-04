@@ -88,7 +88,27 @@ export const StarsSVG = ({
         y2={points[i + 1].y}
         stroke="black"
         strokeWidth="2"
-      />,
+      >
+        <animate
+          attributeName="x2"
+          from={points[i].x}
+          to={points[i + 1].x}
+          // values={`0;${points[i + 1].x}`}
+          dur="1s"
+          fill="freeze"
+          repeatCount="1"
+        />
+        <animate
+          attributeName="y2"
+          from={points[i].y}
+          to={points[i + 1].y}
+          // values={`0;${points[i + 1].y}`}
+          dur="1s"
+          fill="freeze"
+          repeatCount="1"
+        />
+        {/*<animate attributeName="y2" from="50" to="100" begin="1s" dur="2s" />*/}
+      </line>,
     );
   }
 

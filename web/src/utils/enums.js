@@ -33,7 +33,7 @@ export const eventNameEnum = {
   addPath: "addPath",
   addStars: "addStars",
   save: "save",
-  read: "read",
+  load: "read",
   windowChange: "windowChange",
 };
 

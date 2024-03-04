@@ -2,7 +2,7 @@ import "./App.css";
 import { Canvas } from "./components/Canvas";
 import { SideBar } from "./components/SideBar";
 import { eventNameEnum } from "./utils/enums";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GroupEventManager } from "./eventTarget/GroupEventManager";
 import { ThrottlingDebouncingManager } from "./eventTarget/ThrottlingDebouncingManager";
 import { Banner } from "./components/Banner";
@@ -32,12 +32,22 @@ function App() {
     });
 
   const [currentEvent, setCurrentEvent] = useState(eventNameEnum.none);
+  const [user, setUser] = useState("jaean");
+  // const [user, setUser] = useState("test");
+
+  useEffect(() => {
+    setCurrentEvent(eventNameEnum.load);
+  }, [setUser]);
 
   return (
     <div className="App">
       <Banner setCurrentEvent={setCurrentEvent} />
       <SideBar setCurrentEvent={setCurrentEvent} />
-      <Canvas currentEvent={currentEvent} setCurrentEvent={setCurrentEvent} />
+      <Canvas
+        currentEvent={currentEvent}
+        setCurrentEvent={setCurrentEvent}
+        owner={user}
+      />
     </div>
   );
 }
