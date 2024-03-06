@@ -35,6 +35,8 @@ export class WindowManager {
   };
 
   addWindow = (givenName) => {
+    if (!givenName) return;
+
     const windowName = givenName.trim();
 
     if (this.windowRealVirtualNameMap.has(windowName)) {

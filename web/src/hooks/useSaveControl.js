@@ -36,6 +36,13 @@ export const useSaveControl = () => {
         key.startsWith(svgTypeEnum.rect)
       ) {
         svgInfo.attachment.comment = SIMP.getCommentById(key);
+
+        if (
+          svgInfo.attachment.comment?.trim()?.length === 0 &&
+          key.startsWith(svgTypeEnum.text)
+        ) {
+          continue;
+        }
       } else if (key.startsWith(svgTypeEnum.stars)) {
         svgInfo.attachment.stars = SIMP.getStarsPosById(key);
       }
@@ -51,15 +58,17 @@ export const useSaveControl = () => {
 
     console.log("[useSaveControl]", svgInfoArray, deleteSvgIdArray);
 
-    httpRequest
-      .post(
-        `http://localhost:8080/api/save/${ownerId}/${windowNameWhiteSpaceReplaced}`,
-        svgInfoArray,
-      )
-      .then((r) => {
-        console.log("success add cnt", r);
-      })
-      .catch((e) => console.error("error !!!", e));
+    if (svgInfoArray.length > 0) {
+      httpRequest
+        .post(
+          `http://localhost:8080/api/save/${ownerId}/${windowNameWhiteSpaceReplaced}`,
+          svgInfoArray,
+        )
+        .then((r) => {
+          console.log("success add cnt", r);
+        })
+        .catch((e) => console.error("error !!!", e));
+    }
 
     if (deleteSvgIdArray.length > 0) {
       const ids = deleteSvgIdArray.join("+");

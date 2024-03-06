@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +30,8 @@ public class SaveService {
             hash.put(hashKey, id, attachment);
         }
 
+        System.out.println("current size : " + list.size());
+
 //        return hash.size(hashKey);
         return (long) list.size();
     }
@@ -43,9 +42,12 @@ public class SaveService {
         final String hashKey = generateHashKey(owner, window);
         long deleted = 0L;
 
-        String[] idArray = ids.split("\\+");
+//        String[] idArray = ids.split("\\+");
+        String[] idArray = ids.split(" ");
 
-        System.out.println("delete :");
+        System.out.println("owner and window : " + hashKey);
+        System.out.println("delete count :" + idArray.length);
+
         for (String id : idArray) {
             System.out.println(id);
             deleted += hash.delete(hashKey, id);

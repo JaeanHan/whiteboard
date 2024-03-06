@@ -15,9 +15,13 @@ export const Banner = ({ setCurrentEvent }) => {
   // const barWidth = window.innerWidth - sideBarWidth;
 
   const addWindow = () => {
-    const name =
-      prompt("new windows require unique name") ||
-      WM.getUnnamedWindowNameOnAdd();
+    const tempName = prompt("enter a new name for window");
+
+    if (tempName === null) return;
+
+    const name = tempName || WM.getUnnamedWindowNameOnAdd();
+
+    console.log("name", name);
 
     WM.addWindow(name);
 
@@ -38,7 +42,7 @@ export const Banner = ({ setCurrentEvent }) => {
     const currentName = windows[index];
 
     if (e.ctrlKey) {
-      const newName = prompt("unique name required for new windows");
+      const newName = prompt("enter a new name for window");
 
       if (newName.trim().length > 0) {
         WM.changeWindowVirtualName(currentName, index, newName);
@@ -52,6 +56,7 @@ export const Banner = ({ setCurrentEvent }) => {
 
     // setSelectedWindow(index);
     setCurrentEvent(eventNameEnum.windowChange);
+    setHoveringIndex(-1);
   };
 
   const onMouseEnter = (e, index) => {
@@ -202,6 +207,7 @@ export const Banner = ({ setCurrentEvent }) => {
           // borderLeft: "lightgray 1px solid",
         }}
         onClick={addWindow}
+        onMouseEnter={() => setHoveringIndex(-1)}
       >
         +
       </button>

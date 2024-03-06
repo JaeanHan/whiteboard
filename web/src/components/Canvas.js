@@ -66,6 +66,8 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
 
   const { saveCurrentWindow, getWindows } = useSaveControl();
 
+  const deleteSvgById = (id) => hideSvgOnStore(id, false);
+
   const onScroll = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -99,6 +101,14 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
       TM.setEventMap(TM.scrollEvent, false);
     }, 150);
   };
+
+  useEffect(() => {
+    window.addEventListener("scroll", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [canvasSize]);
 
   const onMouseDown = (e) => {
     if (cursorMode === cursorModeEnum.write) {
@@ -248,14 +258,8 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     }
   };
 
-  const deleteSvgById = (id) => {
-    // setTimeout(() => {
-    hideSvgOnStore(id, false);
-    // }, 1000);
-  };
-
   useEffect(() => {
-    console.log("use effect", currentEvent);
+    console.log("use effect", currentEvent, cursorMode);
 
     if (currentEvent === eventNameEnum.addPath) {
       setCursorMode(cursorModeEnum.write);
@@ -284,16 +288,33 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
       setCurrentEvent(eventNameEnum.none);
     }
 
+    // if (cursorMode )
     setCursorMode(cursorModeEnum.default);
   }, [currentEvent]);
 
-  useEffect(() => {
-    window.addEventListener("scroll", onScroll);
+  const onTouchStart = (e) => {
+    if (cursorMode === cursorModeEnum.write) {
+      setIsDrawing(true);
+    }
+  };
 
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, [canvasSize]);
+  const onTouchMove = (e) => {
+    if (cursorMode === cursorModeEnum.write) {
+      const clientX = e.touches[0].clientX;
+      const clientY = e.touches[0].clientY;
+      const fixPos = {
+        x: clientX - sideBarWidth + window.scrollX,
+        y: clientY + window.scrollY - bannerHeight,
+      };
+      addPointOnSet(fixPos);
+    }
+  };
+
+  const onTouchEnd = (e) => {
+    if (cursorMode === cursorModeEnum.write) {
+      setIsDrawing(false);
+    }
+  };
 
   return (
     <div
@@ -315,10 +336,14 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
               : currentEvent === eventNameEnum.none
                 ? "default"
                 : "pointer",
+        touchAction: "none",
       }}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       {selectBoxSize.src.x !== selectBoxSize.dest.x && (
         <SelectBox selectClientBox={selectBoxSize} />

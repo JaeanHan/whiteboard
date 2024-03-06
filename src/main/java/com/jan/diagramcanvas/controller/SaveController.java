@@ -16,25 +16,12 @@ public class SaveController {
 
     @PostMapping("api/save/{owner}/{window}")
     public Long save(@RequestBody List<SvgInfo> list, @PathVariable String owner, @PathVariable String window) throws Exception {
-        Long inserted = 0L;
-
-        inserted += saveService.saveTest(owner, window, list);
-
-        System.out.println(owner + " inserted : " + inserted);
-
-        return inserted;
+        return saveService.saveTest(owner, window, list);
     }
 
     @DeleteMapping("api/save/{owner}/{window}")
     public Long delete(@PathVariable String owner, @PathVariable String window, @RequestParam String ids) throws Exception {
-        Long deleted = 0L;
-
-        System.out.println(owner + " " + window);
-        System.out.println(ids);
-
-        deleted = saveService.deleteFields(owner, window, ids);
-
-        return deleted;
+        return saveService.deleteFields(owner, window, ids);
     }
 
     @GetMapping("api/read/{owner}")

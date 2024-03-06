@@ -4,7 +4,7 @@ import { HttpRequestManager } from "../eventTarget/HttpRequestManager";
 
 export const sideBarWidth = 250;
 
-export const SideBar = ({ setCurrentEvent }) => {
+export const SideBar = ({ currentEvent, setCurrentEvent }) => {
   const divRef = useRef();
   const [comment, setComment] = useState("");
   const [mode, setMode] = useState("Default");
@@ -20,6 +20,12 @@ export const SideBar = ({ setCurrentEvent }) => {
       })
       .catch((err) => console.log(err));
   }, [setComment]);
+
+  useEffect(() => {
+    if (currentEvent === eventNameEnum.windowChange) {
+      setMode("Default");
+    }
+  }, [currentEvent]);
 
   const Document = () => {
     alert("clicked");

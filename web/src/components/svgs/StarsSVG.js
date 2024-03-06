@@ -51,22 +51,22 @@ export const StarsSVG = ({
           stroke="black"
           strokeWidth="2"
         >
-          <animate
-            attributeName="x2"
-            from={points[i].x}
-            to={points[i + 1].x}
-            dur="1s"
-            fill="freeze"
-            repeatCount="1"
-          />
-          <animate
-            attributeName="y2"
-            from={points[i].y}
-            to={points[i + 1].y}
-            dur="1s"
-            fill="freeze"
-            repeatCount="1"
-          />
+          {/*<animate*/}
+          {/*  attributeName="x2"*/}
+          {/*  from={points[i].x}*/}
+          {/*  to={points[i + 1].x}*/}
+          {/*  dur="1s"*/}
+          {/*  fill="freeze"*/}
+          {/*  repeatCount="1"*/}
+          {/*/>*/}
+          {/*<animate*/}
+          {/*  attributeName="y2"*/}
+          {/*  from={points[i].y}*/}
+          {/*  to={points[i + 1].y}*/}
+          {/*  dur="1s"*/}
+          {/*  fill="freeze"*/}
+          {/*  repeatCount="1"*/}
+          {/*/>*/}
         </line>,
       );
     }

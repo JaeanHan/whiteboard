@@ -116,9 +116,9 @@ export const useSvgStore = () => {
   useEffect(() => {
     const updatedLiveSvg = [];
     const currentWindow = WM.getSelectedVirtualWindow();
-    const currentSvgMap = store.get(currentWindow);
+    const currentSvgMap = store.get(currentWindow) ?? new Map();
 
-    // console.log("[useSvgStore] useEffect", currentWindow, store);
+    console.log("[useSvgStore] useEffect", currentWindow, store);
 
     for (const [key, value] of currentSvgMap) {
       // if (value.display && value.window === currentWindow) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { dragStateEnum, svgTypeEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
+import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 
 export const SvgContainer = ({
   children,
@@ -23,6 +24,7 @@ export const SvgContainer = ({
   });
   const [scale, setScale] = useState(1);
   const [dragState, setDragState] = useState(dragStateEnum.none);
+  const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
   useEffect(() => {
     setObjPos(src);
@@ -245,6 +247,7 @@ export const SvgContainer = ({
             }}
             onMouseDown={stopPropagation}
             onMouseUp={() => {
+              SIMP.setIdUpdateFlagMap(id);
               deleteSvgById(id);
             }}
           >
