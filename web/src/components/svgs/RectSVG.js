@@ -26,7 +26,6 @@ export const RectSVG = ({
     }
   };
 
-  // console.log(id, comment);
   return (
     <SvgContainer
       id={id}
@@ -52,27 +51,14 @@ export const RectSVG = ({
           fill={num % 2 === 0 ? "red" : "green"}
           style={{ stroke: "black", strokeWidth: 5 }}
         >
-          <animate
-            attributeName="height"
-            from="10"
-            to="150"
-            dur="1s"
-            fill="freeze"
-          />
-          <animate
-            attributeName="width"
-            from="10"
-            to="150"
-            dur="1s"
-            fill="freeze"
-          />
+          <animate attributeName="height" from="10" to="150" dur="1s" />
+          <animate attributeName="width" from="10" to="150" dur="1s" />
           <animate
             attributeName="x"
             attributeType="XML"
             from="75"
             to="0"
             dur="1s"
-            fill="freeze"
           />
           <animate
             attributeName="y"
@@ -80,7 +66,6 @@ export const RectSVG = ({
             from="75"
             to="0"
             dur="1s"
-            fill="freeze"
           />
         </rect>
         {/*<text x="60" y="50" fill="black" transform="rotate(-30 90,90)">*/}

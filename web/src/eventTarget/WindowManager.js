@@ -105,6 +105,8 @@ export class WindowManager {
 
   changeWindowVirtualName = (virtualName, viewIndex, newName) => {
     const realName = this.getRealName(virtualName, viewIndex);
+    console.log("realName", realName);
+    console.log("newName", newName);
 
     this.windowRealVirtualNameMap.set(realName, newName);
   };
@@ -115,6 +117,8 @@ export class WindowManager {
     for (const [key, value] of this.windowRealVirtualNameMap) {
       virtualWindows.push(value);
     }
+
+    console.log("selected", virtualWindows);
 
     return virtualWindows;
   };

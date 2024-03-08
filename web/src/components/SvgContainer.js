@@ -172,7 +172,7 @@ export const SvgContainer = ({
         width: "max-content",
         height: "max-content",
         position: "absolute",
-        opacity: "0.5",
+        opacity: id.startsWith(svgTypeEnum.image) ? 1 : 0.5,
         transformOrigin: isLine ? "0% 0%" : "50% 50%",
         transform: isLine
           ? `rotate(${degrees}deg) scale(${scale})`

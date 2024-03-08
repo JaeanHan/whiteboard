@@ -14,12 +14,12 @@ export const useSaveControl = () => {
     const svgInfoArray = [];
     const deleteSvgIdArray = [];
 
+    console.log("???", store);
+
     for (const [key, value] of store) {
       if (!SIMP.getUpdateFlagById(key)) {
         continue;
       }
-
-      console.log("???", key, SIMP.getUpdateFlagById(key), value);
 
       if (!value.display) {
         deleteSvgIdArray.push(key);
@@ -54,6 +54,7 @@ export const useSaveControl = () => {
       delete svgInfo.attachment.display;
 
       svgInfoArray.push(svgInfo);
+      SIMP.setIdUpdateFlagMapOff(key);
     }
 
     console.log("[useSaveControl]", svgInfoArray, deleteSvgIdArray);

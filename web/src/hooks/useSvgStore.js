@@ -49,6 +49,10 @@ export const useSvgStore = () => {
       loadMap.set(underBarReplacedWindow, windowMap);
     }
 
+    if (loadMap.size === 0) {
+      loadMap.set(WM.getSelectedVirtualWindow(), new Map());
+    }
+
     console.log("load map", loadMap);
     setStore(loadMap);
   };
@@ -62,6 +66,7 @@ export const useSvgStore = () => {
 
     setStore((prev) => {
       const currentWindowMap = prev.get(currentWindow);
+
       currentWindowMap.set(id, props);
       return new Map([...prev, currentWindowMap]);
     });
@@ -145,7 +150,7 @@ export const useSvgStore = () => {
     hideSvgOnStore,
     setAdditionalProps,
     liveStore,
-    store: store.get(WindowManager.getInstance().getSelectedVirtualWindow()),
+    store: store.get(WM.getSelectedVirtualWindow()),
     onWindowChange,
     load,
     cleanUpStore,

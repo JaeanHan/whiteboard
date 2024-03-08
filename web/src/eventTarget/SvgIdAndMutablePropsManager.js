@@ -72,6 +72,7 @@ export class SvgIdAndMutablePropsManager {
   getSrcById = (id) => this.srcMap.get(id);
 
   setIdUpdateFlagMap = (id) => this.updateFlagMap.set(id, true);
+  setIdUpdateFlagMapOff = (id) => this.updateFlagMap.set(id, false);
   getUpdateFlagById = (id) => this.updateFlagMap.get(id);
   resetUpdateFlagMap = () => (this.updateFlagMap = new Map());
 

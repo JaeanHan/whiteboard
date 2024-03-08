@@ -62,6 +62,12 @@ export const SideBar = ({ currentEvent, setCurrentEvent }) => {
     setMode("Default");
   };
 
+  const ClipboardImage = (e) => {
+    e.preventDefault();
+    setCurrentEvent(eventNameEnum.addImage);
+    setMode("Default");
+  };
+
   const Save = (e) => {
     e.preventDefault();
     setCurrentEvent(eventNameEnum.save);
@@ -69,7 +75,7 @@ export const SideBar = ({ currentEvent, setCurrentEvent }) => {
   };
 
   const SaveAll = (e) => {
-    console.log("save all");
+    alert("yet implemented !!!");
   };
 
   const LoadSaved = (e) => {
@@ -95,7 +101,7 @@ export const SideBar = ({ currentEvent, setCurrentEvent }) => {
 
   const cursor = useMemo(() => [Default, Pencil, Eraser], [mode]);
   const temp = useMemo(
-    () => [Document, Save, SaveAll, Rect, Text, Line, StarSign],
+    () => [Document, Save, SaveAll, Rect, Text, Line, StarSign, ClipboardImage],
     [Document],
   );
 

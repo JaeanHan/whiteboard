@@ -32,6 +32,7 @@ export const eventNameEnum = {
   addText: "addText",
   addPath: "addPath",
   addStars: "addStars",
+  addImage: "addImage",
   save: "save",
   load: "read",
   windowChange: "windowChange",
@@ -43,6 +44,7 @@ export const svgTypeEnum = {
   text: "t",
   path: "p",
   stars: "s",
+  image: "i",
 };
 
 export const groupingStateEnum = {

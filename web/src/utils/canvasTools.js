@@ -4,6 +4,7 @@ import { TextSVG } from "../components/svgs/TextSVG";
 import { LineSVG } from "../components/svgs/LineSVG";
 import { PathSVG } from "../components/svgs/PathSVG";
 import { StarsSVG } from "../components/svgs/StarsSVG";
+import { ImageContainer } from "../components/ImageContainer";
 
 export const render = (
   liveStore,
@@ -73,6 +74,20 @@ export const render = (
     if (key.startsWith(svgTypeEnum.path)) {
       return (
         <PathSVG
+          id={key}
+          key={key}
+          handleSelect={handleSelect}
+          showPos={true}
+          attachment={attachment}
+          deleteSvgById={deleteSvgById}
+          setAdditionalProps={setAdditionalProps}
+        />
+      );
+    }
+
+    if (key.startsWith(svgTypeEnum.image)) {
+      return (
+        <ImageContainer
           id={key}
           key={key}
           handleSelect={handleSelect}

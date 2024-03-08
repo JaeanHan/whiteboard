@@ -14,6 +14,7 @@ import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutableProps
 import { bannerHeight } from "./Banner";
 import { WindowManager } from "../eventTarget/WindowManager";
 import { SelectBox } from "./SelectBox";
+import { useClipImageGenerator } from "../hooks/useClipImageGenerator";
 
 export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const {
@@ -49,6 +50,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
 
   const TM = ThrottlingDebouncingManager.getInstance();
   const WM = WindowManager.getInstance();
+  const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
   const { addPoint, quit } = useLineGenerator(
     addSvgOnStore,
@@ -60,6 +62,11 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     addSvgOnStore,
     setCurrentEvent,
     setTempPos,
+  );
+
+  const { setClipboardImgSrc } = useClipImageGenerator(
+    addSvgOnStore,
+    setCurrentEvent,
   );
 
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
@@ -165,6 +172,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
 
         if (id && id !== "root") {
           deleteSvgById(id);
+          SIMP.setIdUpdateFlagMap(id);
         }
       }
       return;
@@ -241,6 +249,11 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
       return;
     }
 
+    if (currentEvent === eventNameEnum.addImage) {
+      setClipboardImgSrc(fixPos);
+      return;
+    }
+
     if (currentEvent === eventNameEnum.addLine) {
       setTempPos((prev) => new Map(prev).set(fixPos.x, fixPos));
       addPoint(fixPos);
@@ -278,6 +291,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
 
     if (currentEvent === eventNameEnum.save) {
       // saveCurrent(owner, liveStore);
+      console.log("store???", store);
       saveCurrentWindow(owner, store);
 
       setCurrentEvent(eventNameEnum.none);
@@ -288,7 +302,6 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
       setCurrentEvent(eventNameEnum.none);
     }
 
-    // if (cursorMode )
     setCursorMode(cursorModeEnum.default);
   }, [currentEvent]);
 
