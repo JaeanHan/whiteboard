@@ -52,6 +52,9 @@ export const useSelectControl = (
         return;
       }
 
+      if (e.ctrlKey && (e.key === "c" || e.key === "v" || e.key === "z"))
+        return;
+
       e.preventDefault();
       e.stopPropagation();
 
@@ -203,6 +206,8 @@ export const useSelectControl = (
     };
     const width = Math.abs(selectBoxSize.src.x - selectBoxSize.dest.x);
     const height = Math.abs(selectBoxSize.src.y - selectBoxSize.dest.y);
+
+    console.log("width, height", width, height);
     return {
       left: leftTop.x,
       top: leftTop.y,
