@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SMStateEnum, svgTypeEnum } from "../utils/enums";
+import { eventNameEnum, SMStateEnum, svgTypeEnum } from "../utils/enums";
 import {
   calcPosOnDrag,
   generateDiffAndFlag,
@@ -12,9 +12,7 @@ import {
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 import { WindowManager } from "../eventTarget/WindowManager";
 
-export const useSelectControl = (
-  cleanUpStore = () => console.log("cleanup empty"),
-) => {
+export const useSelectControl = (setCurrentEvent) => {
   const [svgGroup, setSvgGroup] = useState(new Map());
   const [diffAndFlagMap, setDiffAndFlagMap] = useState(new Map());
   const [SMState, setSMState] = useState(SMStateEnum.none);
@@ -52,8 +50,28 @@ export const useSelectControl = (
         return;
       }
 
-      if (e.ctrlKey && (e.key === "c" || e.key === "v" || e.key === "z"))
-        return;
+      if (e.ctrlKey) {
+        if (e.key === "c") {
+          console.log("copy not implemented yet");
+          return;
+        }
+
+        if (e.key === "v") {
+          console.log("paste not implemented yet");
+          return;
+        }
+
+        if (e.key === "z") {
+          console.log("undo not implemented yet");
+          return;
+        }
+
+        if (e.key === "s") {
+          e.preventDefault();
+          setCurrentEvent(eventNameEnum.save);
+          return;
+        }
+      }
 
       e.preventDefault();
       e.stopPropagation();

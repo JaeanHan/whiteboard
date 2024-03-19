@@ -1,5 +1,5 @@
 import { SvgContainer } from "../SvgContainer";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 
 const fontStyle = {
@@ -27,6 +27,7 @@ export const TextSVG = ({
   const [isHovered, setHovered] = useState(false);
   const [lockFocused, setLockFocused] = useState(false);
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
+  const textAreaRef = useRef(null);
 
   useEffect(() => {
     if (comment) {
@@ -142,6 +143,7 @@ export const TextSVG = ({
         {isHovered ? (
           <foreignObject width="100%" height="100%">
             <textarea
+              ref={textAreaRef}
               style={{
                 position: "absolute",
                 width: "100%",
@@ -151,7 +153,17 @@ export const TextSVG = ({
                 border: "none",
                 resize: "none",
                 padding: 0,
+                caretColor: "darkred",
                 ...fontStyle,
+              }}
+              onFocus={(e) => {
+                const element = e.target;
+
+                element.focus();
+                element.setSelectionRange(
+                  element.value.length,
+                  element.value.length,
+                );
               }}
               autoFocus={true}
               value={text}
