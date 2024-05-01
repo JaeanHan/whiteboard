@@ -15,6 +15,8 @@ import { bannerHeight } from "./Banner";
 import { WindowManager } from "../eventTarget/WindowManager";
 import { SelectBox } from "./SelectBox";
 import { useClipImageGenerator } from "../hooks/useClipImageGenerator";
+import { ToastMessage } from "./ToastMessage";
+import { MessageQueue } from "../utils/MessageQueue";
 
 export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const {
@@ -25,11 +27,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     store,
     onWindowChange,
     load,
-    // cleanUpStore,
   } = useSvgStore();
   const { handleSelect, setDiffPosOnAll, onDrag, onDrop, handleSelectBox } =
-    // useSelectControl(cleanUpStore);
-    useSelectControl();
+    useSelectControl(setCurrentEvent);
   const {
     initClientSelectBoxSize,
     setClientSelectBoxSize,
@@ -39,6 +39,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const generateNextId =
     SvgIdAndMutablePropsManager.getInstance().generateNextId;
 
+  const [messages, setMessages] = useState([]);
   const [tempPos, setTempPos] = useState(new Map());
   const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
   const [canvasSize, setCanvasSize] = useState({
@@ -51,6 +52,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const TM = ThrottlingDebouncingManager.getInstance();
   const WM = WindowManager.getInstance();
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
+  const MD = MessageQueue.getInstance();
 
   const { addPoint, quit } = useLineGenerator(
     addSvgOnStore,
@@ -74,6 +76,20 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const { saveCurrentWindow, getWindows } = useSaveControl();
 
   const deleteSvgById = (id) => hideSvgOnStore(id, false);
+
+  const showToastMessage = (message) => {
+    MD.push(message);
+    const test = MD.getCurrentQueue();
+    console.log("add", test);
+    setMessages(test);
+
+    setTimeout(() => {
+      const result = MD.popLeft();
+      const test2 = MD.getCurrentQueue();
+      console.log("test2", test2);
+      setMessages(test2);
+    }, 1600);
+  };
 
   const onScroll = (e) => {
     e.preventDefault();
@@ -147,6 +163,18 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     e.preventDefault();
 
     if (cursorMode === cursorModeEnum.write) {
+      const cleanUpTimer = TM.getDebounceTimer(TM.writeCleanUpEvent);
+
+      if (cleanUpTimer) {
+        clearTimeout(cleanUpTimer);
+      }
+
+      const cleanUp = setTimeout(() => {
+        setIsDrawing(false);
+      }, 500);
+
+      TM.setDebounceTimer(TM.writeCleanUpEvent, cleanUp);
+
       const fixPos = {
         x: e.clientX - sideBarWidth + window.scrollX,
         y: e.clientY + window.scrollY - bannerHeight,
@@ -177,8 +205,6 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
       }
       return;
     }
-
-    const TM = ThrottlingDebouncingManager.getInstance();
 
     if (TM.getEventThrottling(TM.dragEvent)) {
       return;
@@ -290,15 +316,14 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     }
 
     if (currentEvent === eventNameEnum.save) {
-      // saveCurrent(owner, liveStore);
-      console.log("store???", store);
       saveCurrentWindow(owner, store);
-
+      showToastMessage("saved");
       setCurrentEvent(eventNameEnum.none);
     }
 
     if (currentEvent === eventNameEnum.load) {
-      getWindows(owner, load);
+      // getWindows(owner, load);
+      showToastMessage("loaded");
       setCurrentEvent(eventNameEnum.none);
     }
 
@@ -361,6 +386,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
       {selectBoxSize.src.x !== selectBoxSize.dest.x && (
         <SelectBox selectClientBox={selectBoxSize} />
       )}
+      {messages.map((value, index) => (
+        <ToastMessage key={index} message={value} />
+      ))}
       {Array.from(tempPos).map((value) => (
         <MousePoint src={value[1]} key={value[0]} />
       ))}

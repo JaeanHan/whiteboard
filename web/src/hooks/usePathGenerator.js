@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { svgTypeEnum } from "../utils/enums";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
+import { ThrottlingDebouncingManager } from "../eventTarget/ThrottlingDebouncingManager";
 
 export const MMMKey = {
   minX: "minX",
@@ -17,6 +18,7 @@ export const usePathGenerator = (addSvgOnStore) => {
   const [pid, setPid] = useState("");
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
   const generateNextId = SIMP.generateNextId;
+  const TM = ThrottlingDebouncingManager.getInstance();
 
   useEffect(() => {
     if (pointSet.size === 0) {

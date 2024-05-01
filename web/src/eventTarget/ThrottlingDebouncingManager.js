@@ -6,6 +6,7 @@ export class ThrottlingDebouncingManager extends EventTarget {
   static scrollEvent = "throttleScroll";
   static moveStarEvent = "throttleMoveStar";
   static multiSelectEvent = "debounceMultiSelect";
+  static writeCleanUpEvent = "writeCleanUpEvent";
   eventThrottleMap = null;
   eventDebounceMap = null;
 

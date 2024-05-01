@@ -3,6 +3,7 @@ export const dragStateEnum = {
   select: "select",
   drag: "drag",
   group: "group",
+  scaling: "scaling",
 };
 
 export const SMStateEnum = {

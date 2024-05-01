@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { dragStateEnum, svgTypeEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
+import { sideBarWidth } from "./SideBar";
+import { bannerHeight } from "./Banner";
 
 export const SvgContainer = ({
   children,
@@ -22,7 +24,8 @@ export const SvgContainer = ({
     width: widthHeight.width,
     height: widthHeight.height,
   });
-  const [scale, setScale] = useState(1);
+  const [buttonArea, setButtonArea] = useState(20);
+  const [scale, setScale] = useState(1.0);
   const [dragState, setDragState] = useState(dragStateEnum.none);
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
@@ -73,11 +76,17 @@ export const SvgContainer = ({
       selectSvg(id, { getObjInfo, moveOnDrag, stopOnDrop });
       setDragState(dragStateEnum.select);
     }
+
+    console.log("11111");
   };
   const onMouseLeave = () => {
     if (dragState === dragStateEnum.group) return;
+    if (dragState === dragStateEnum.scaling) return;
+
     removeSvgFromGroup(id);
     setDragState(dragStateEnum.none);
+
+    console.log("??????");
   };
   const onClick = (e) => {
     e.preventDefault();
@@ -111,52 +120,60 @@ export const SvgContainer = ({
 
   const onMouseUpScaleUp = (e) => {
     e.stopPropagation();
-    setScale((prev) => prev + 0.02);
+    setScale((prev) => prev + 1);
   };
 
   const onMouseUpScaleDown = (e) => {
     e.stopPropagation();
-    setScale((prev) => prev - 0.02);
+    setScale((prev) => prev - 1);
   };
 
   const stopPropagation = (e) => {
     e.stopPropagation();
   };
 
-  // const onMouseMoveScaleButton = (e) => {
-  //   e.stopPropagation();
+  const onMouseEnterScaleButton = (e) => {
+    // console.log("2222");
+  };
+  const onMouseDownScaleButton = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragState(dragStateEnum.scaling);
+    // console.log("scaling");
+    // setDragState(dragStateEnum.scaling);
+  };
+  const onMouseUpScaleButton = (e) => {
+    setDragState(dragStateEnum.none);
+    removeSvgFromGroup(id);
+    console.log("to drag none scale button");
+  };
+  const onMouseMoveScaleButton = (e) => {
+    e.stopPropagation();
 
-  // if (e.buttons === 1) {
-  //   const src = {
-  //     x: objPos.x + objSize.width - 15,
-  //     y: objPos.y + objSize.height - 15,
-  //   };
-  //   const destY = e.clientY + window.scrollY - src.y;
-  //
-  //   const calcScaleOnDrag = (diff) => {
-  //     setScale((prev) => prev + diff);
-  //   };
-  //
-  //   localThrottling(calcScaleOnDrag, id, 10, src.y < destY ? 0.2 : -0.2);
+    if (dragState === dragStateEnum.scaling && e.buttons === 1) {
+      const clientPointing = {
+        width: e.clientX + window.scrollX - sideBarWidth - src.x,
+        height: e.clientY + window.scrollY - bannerHeight - src.y,
+      };
 
-  // const diff = (src.y - destY) / 100;
+      console.log(clientPointing);
 
-  // const btnPos = objPos.y - 15;
-  // const destY = e.clientY + window.scrollY - src.y;
-
-  // setScale((prev) => prev + (btnPos > destY ? 0.02 : -0.02));
-
-  // console.log("distance", diff);
-  // setObjSize((prev) => {
-  //   return {
-  //     width: prev.width + diff,
-  //     height: prev.height + diff,
-  //   };
-  // });
-
-  // console.log(fixPos);
-  // }
-  // };
+      const calcScale = Math.max(
+        clientPointing.height / (objSize.height * scale),
+        clientPointing.width / (objSize.width * scale),
+      );
+      // const calcSize = {
+      //   width: objSize.width * calcScale,
+      //   height: objSize.height * calcScale,
+      // };
+      //
+      // setObjSize(calcSize);
+      //
+      setButtonArea((prev) => prev * calcScale);
+      setScale((prev) => prev * calcScale);
+      // setScale(calcScale);
+    }
+  };
 
   return (
     <div
@@ -265,6 +282,32 @@ export const SvgContainer = ({
           ></div>
         </div>
       )}
+      <div
+        style={{
+          position: "absolute",
+          width: buttonArea,
+          height: buttonArea,
+          left: "100%",
+          top: "100%",
+          backgroundColor: "transparent",
+        }}
+        onMouseDown={onMouseDownScaleButton}
+        onMouseUp={onMouseUpScaleButton}
+        onMouseEnter={onMouseEnterScaleButton}
+        onMouseMove={onMouseMoveScaleButton}
+      >
+        <div
+          style={{
+            position: "absolute",
+            left: `50%`,
+            top: `50%`,
+            width: 10,
+            height: 10,
+            cursor: "nwse-resize",
+            backgroundColor: "lightgray",
+          }}
+        ></div>
+      </div>
       {showPos && (
         <>
           <div
@@ -284,7 +327,6 @@ export const SvgContainer = ({
           </div>
         </>
       )}
-
       {children}
     </div>
   );
