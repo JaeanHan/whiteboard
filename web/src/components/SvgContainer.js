@@ -119,7 +119,7 @@ export const SvgContainer = ({
       style={{
         resize:
           id.startsWith(svgTypeEnum.image) || id.startsWith(svgTypeEnum.rect)
-            ? "both"
+            ? "inline"
             : "none",
         overflow: "hidden",
         cursor: dragState === dragStateEnum.drag ? "grabbing" : "grab",
