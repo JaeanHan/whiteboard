@@ -11,7 +11,7 @@ export const ImageContainer = ({
 }) => {
   const { src, width, height, imgSrc } = attachment;
 
-  // console.log("imgSrc", width, height);
+  console.log("imgSrc", width, height);
 
   return (
     <SvgContainer
@@ -21,10 +21,10 @@ export const ImageContainer = ({
       src={src}
       className={id}
       deleteSvgById={deleteSvgById}
-      // widthHeight={{ width: width, height: height }}
+      widthHeight={{ width: width, height: height }}
       setAdditionalProps={setAdditionalProps}
     >
-      <img alt={"no image src"} src={imgSrc} />
+      <img alt={"no image src"} src={imgSrc} width="100%" height="100%" />
     </SvgContainer>
   );
 };

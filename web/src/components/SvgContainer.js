@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { dragStateEnum, svgTypeEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
-import { sideBarWidth } from "./SideBar";
-import { bannerHeight } from "./Banner";
 
 export const SvgContainer = ({
   children,
@@ -24,7 +22,6 @@ export const SvgContainer = ({
     width: widthHeight.width,
     height: widthHeight.height,
   });
-  const [buttonArea, setButtonArea] = useState(20);
   const [scale, setScale] = useState(1.0);
   const [dragState, setDragState] = useState(dragStateEnum.none);
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
@@ -37,19 +34,8 @@ export const SvgContainer = ({
       stopOnDrop,
       setDragStateGroup,
     });
-    // console.log("prop src updated", id, src);
+    console.log("prop src updated", id, src);
   }, [src]);
-
-  // useEffect(() => {
-  //   setObjPos(src);
-  //   setAdditionalProps(id, {
-  //     getObjInfo,
-  //     moveOnDrag,
-  //     stopOnDrop,
-  //     setDragStateGroup,
-  //   });
-  //   console.log("prop src updated", id, src);
-  // }, [setObjPos]);
 
   const getObjInfo = () => {
     return { objPos, objSize };
@@ -76,17 +62,16 @@ export const SvgContainer = ({
       selectSvg(id, { getObjInfo, moveOnDrag, stopOnDrop });
       setDragState(dragStateEnum.select);
     }
-
-    console.log("11111");
   };
   const onMouseLeave = () => {
-    if (dragState === dragStateEnum.group) return;
-    if (dragState === dragStateEnum.scaling) return;
+    if (
+      dragState === dragStateEnum.group ||
+      dragState === dragStateEnum.scaling
+    )
+      return;
 
     removeSvgFromGroup(id);
     setDragState(dragStateEnum.none);
-
-    console.log("??????");
   };
   const onClick = (e) => {
     e.preventDefault();
@@ -111,6 +96,7 @@ export const SvgContainer = ({
       addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
       setDragState(dragStateEnum.select);
     }
+    console.log(dragState);
   };
 
   // const onMouseMove = (e) => {
@@ -118,61 +104,8 @@ export const SvgContainer = ({
   //   // e.stopPropagation();
   // };
 
-  const onMouseUpScaleUp = (e) => {
-    e.stopPropagation();
-    setScale((prev) => prev + 1);
-  };
-
-  const onMouseUpScaleDown = (e) => {
-    e.stopPropagation();
-    setScale((prev) => prev - 1);
-  };
-
   const stopPropagation = (e) => {
     e.stopPropagation();
-  };
-
-  const onMouseEnterScaleButton = (e) => {
-    // console.log("2222");
-  };
-  const onMouseDownScaleButton = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragState(dragStateEnum.scaling);
-    // console.log("scaling");
-    // setDragState(dragStateEnum.scaling);
-  };
-  const onMouseUpScaleButton = (e) => {
-    setDragState(dragStateEnum.none);
-    removeSvgFromGroup(id);
-    console.log("to drag none scale button");
-  };
-  const onMouseMoveScaleButton = (e) => {
-    e.stopPropagation();
-
-    if (dragState === dragStateEnum.scaling && e.buttons === 1) {
-      const clientPointing = {
-        width: e.clientX + window.scrollX - sideBarWidth - src.x,
-        height: e.clientY + window.scrollY - bannerHeight - src.y,
-      };
-
-      console.log(clientPointing);
-
-      const calcScale = Math.max(
-        clientPointing.height / (objSize.height * scale),
-        clientPointing.width / (objSize.width * scale),
-      );
-      // const calcSize = {
-      //   width: objSize.width * calcScale,
-      //   height: objSize.height * calcScale,
-      // };
-      //
-      // setObjSize(calcSize);
-      //
-      setButtonArea((prev) => prev * calcScale);
-      setScale((prev) => prev * calcScale);
-      // setScale(calcScale);
-    }
   };
 
   return (
@@ -184,7 +117,9 @@ export const SvgContainer = ({
       id={id}
       key={id}
       style={{
-        cursor: "pointer",
+        resize: "both",
+        overflow: "hidden",
+        cursor: dragState === dragStateEnum.drag ? "grabbing" : "grab",
         boxSizing: "border-box",
         width: "max-content",
         height: "max-content",
@@ -210,108 +145,32 @@ export const SvgContainer = ({
         <div
           style={{
             position: "absolute",
-            backgroundColor: "black",
+            backgroundColor: "red",
             color: "black",
-            display: "flex",
-            left: objSize.width,
-            width: 48,
+            left: 0,
+            width: 13,
             justifyContent: "space-around",
             alignItems: "center",
-            height: 16,
+            height: 13,
             textAlign: "center",
             lineHeight: 0.75,
-            overflow: "visible",
-            borderRadius: 2,
+            borderRadius: "50%",
+            // cursor: 'url(CURSOR_URL), auto'
+            cursor: "default",
+          }}
+          onMouseDown={stopPropagation}
+          onMouseUp={() => {
+            SIMP.setIdUpdateFlagMap(id);
+            deleteSvgById(id);
           }}
         >
-          <div
-            style={{
-              borderRadius: "50%",
-              width: 13,
-              height: 13,
-              backgroundColor: "green",
-              cursor: "zoom-in",
-              border: "1px solid gray",
-              textAlign: "center",
-            }}
-            onMouseDown={stopPropagation}
-            onMouseUp={onMouseUpScaleUp}
-          >
-            +
-          </div>
-          <div
-            style={{
-              borderRadius: "50%",
-              width: 13,
-              height: 13,
-              backgroundColor: "yellow",
-              cursor: "zoom-out",
-              border: "1px solid gray",
-            }}
-            onMouseDown={stopPropagation}
-            onMouseUp={onMouseUpScaleDown}
-          >
-            -
-          </div>
-          <div
-            style={{
-              borderRadius: 6,
-              width: 13,
-              height: 13,
-              backgroundColor: "red",
-              cursor: "not-allowed",
-              border: "1px solid gray",
-            }}
-            onMouseDown={stopPropagation}
-            onMouseUp={() => {
-              SIMP.setIdUpdateFlagMap(id);
-              deleteSvgById(id);
-            }}
-          >
-            x
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              left: -objSize.width,
-              top: 1,
-              width: objSize.width,
-              height: 2,
-              backgroundColor: "black",
-            }}
-          ></div>
+          x
         </div>
       )}
-      <div
-        style={{
-          position: "absolute",
-          width: buttonArea,
-          height: buttonArea,
-          left: "100%",
-          top: "100%",
-          backgroundColor: "transparent",
-        }}
-        onMouseDown={onMouseDownScaleButton}
-        onMouseUp={onMouseUpScaleButton}
-        onMouseEnter={onMouseEnterScaleButton}
-        onMouseMove={onMouseMoveScaleButton}
-      >
-        <div
-          style={{
-            position: "absolute",
-            left: `50%`,
-            top: `50%`,
-            width: 10,
-            height: 10,
-            cursor: "nwse-resize",
-            backgroundColor: "lightgray",
-          }}
-        ></div>
-      </div>
       {showPos && (
         <>
           <div
-            style={{ position: "absolute", color: "black", top: -35, left: 10 }}
+            style={{ position: "absolute", color: "black", top: 15, left: 10 }}
           >
             x:{objPos.x}px
           </div>
@@ -319,7 +178,7 @@ export const SvgContainer = ({
             style={{
               position: "absolute",
               color: "black",
-              top: -20,
+              top: 25,
               left: 10,
             }}
           >
