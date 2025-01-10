@@ -3,6 +3,7 @@ name: Every 10 Minutes schedule
 on:
   schedule:
     - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 jobs:
   ten_minutes_schedule_job:
