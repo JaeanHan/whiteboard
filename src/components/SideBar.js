@@ -1,25 +1,24 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { eventNameEnum } from "../utils/enums";
-import { HttpRequestManager } from "../eventTarget/HttpRequestManager";
 
 export const sideBarWidth = 250;
 
 export const SideBar = ({ currentEvent, setCurrentEvent }) => {
-  const divRef = useRef();
-  const [comment, setComment] = useState("");
+  // const divRef = useRef();
+  // const [comment, setComment] = useState("");
   const [mode, setMode] = useState("Default");
-  const httpRequest = HttpRequestManager.getInstance();
+  // const httpRequest = HttpRequestManager.getInstance();
 
   // test
-  useEffect(() => {
-    httpRequest
-      // axios
-      .get("api/test")
-      .then((res) => {
-        setComment(res);
-      })
-      .catch((err) => console.log(err));
-  }, [setComment]);
+  // useEffect(() => {
+  //   httpRequest
+  //     // axios
+  //     .get("api/test")
+  //     .then((res) => {
+  //       setComment(res);
+  //     })
+  //     .catch((err) => console.log(err));
+  // }, [setComment]);
 
   useEffect(() => {
     if (currentEvent === eventNameEnum.windowChange) {
@@ -121,9 +120,9 @@ export const SideBar = ({ currentEvent, setCurrentEvent }) => {
         zIndex: 10,
       }}
     >
-      <div ref={divRef} style={{ cursor: "pointer" }}>
-        spring : {comment}
-      </div>
+      {/*<div ref={divRef} style={{ cursor: "pointer" }}>*/}
+      {/*  spring : {comment}*/}
+      {/*</div>*/}
       <br />
       cursor mode ↓
       <div style={{ flexDirection: "row" }}>
