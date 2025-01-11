@@ -57,33 +57,35 @@ export const useSaveControl = () => {
       SIMP.setIdUpdateFlagMapOff(key);
     }
 
-    console.log("[useSaveControl]", svgInfoArray, deleteSvgIdArray);
+    // console.log("[useSaveControl]", svgInfoArray, deleteSvgIdArray);
+    //
+    // localStorage.setItem('saved', JSON.stringify(svgInfoArray));
 
-    if (svgInfoArray.length > 0) {
-      httpRequest
-        .post(
-          `http://localhost:8080/api/save/${ownerId}/${windowNameWhiteSpaceReplaced}`,
-          svgInfoArray,
-        )
-        .then((r) => {
-          console.log("success add cnt", r);
-        })
-        .catch((e) => console.error("error !!!", e));
-    }
-
-    if (deleteSvgIdArray.length > 0) {
-      const ids = deleteSvgIdArray.join("+");
-      console.log("delete ids", ids);
-
-      httpRequest
-        .delete(
-          `http://localhost:8080/api/save/${ownerId}/${windowNameWhiteSpaceReplaced}?ids=${ids}`,
-        )
-        .then((r) => {
-          console.log("success delete cnt", r);
-        })
-        .catch((e) => console.error("error !!!", e));
-    }
+    // if (svgInfoArray.length > 0) {
+    //   httpRequest
+    //     .post(
+    //       `http://localhost:8080/api/save/${ownerId}/${windowNameWhiteSpaceReplaced}`,
+    //       svgInfoArray,
+    //     )
+    //     .then((r) => {
+    //       console.log("success add cnt", r);
+    //     })
+    //     .catch((e) => console.error("error !!!", e));
+    // }
+    //
+    // if (deleteSvgIdArray.length > 0) {
+    //   const ids = deleteSvgIdArray.join("+");
+    //   console.log("delete ids", ids);
+    //
+    //   httpRequest
+    //     .delete(
+    //       `http://localhost:8080/api/save/${ownerId}/${windowNameWhiteSpaceReplaced}?ids=${ids}`,
+    //     )
+    //     .then((r) => {
+    //       console.log("success delete cnt", r);
+    //     })
+    //     .catch((e) => console.error("error !!!", e));
+    // }
   };
 
   const getWindows = (owner, load) => {

@@ -323,7 +323,10 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
 
     if (currentEvent === eventNameEnum.load) {
       // getWindows(owner, load);
-      showToastMessage("loaded");
+      // const savedStr = localStorage.getItem('saved');
+      // console.log(savedStr)
+      // load(JSON.parse(savedStr));
+      showToastMessage("hello!");
       setCurrentEvent(eventNameEnum.none);
     }
 
