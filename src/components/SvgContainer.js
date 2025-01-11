@@ -117,10 +117,10 @@ export const SvgContainer = ({
       id={id}
       key={id}
       style={{
-        resize:
-          id.startsWith(svgTypeEnum.image) || id.startsWith(svgTypeEnum.rect)
-            ? "inline"
-            : "none",
+        // resize:
+        //   id.startsWith(svgTypeEnum.image) || id.startsWith(svgTypeEnum.rect)
+        //     ? "inline"
+        //     : "none",
         overflow: "hidden",
         cursor: dragState === dragStateEnum.drag ? "grabbing" : "grab",
         boxSizing: "border-box",
@@ -132,7 +132,7 @@ export const SvgContainer = ({
         transform: isLine
           ? `rotate(${degrees}deg) scale(${scale})`
           : `scale(${scale})`,
-        border:
+        outline:
           dragState === dragStateEnum.group
             ? "dotted black"
             : dragState === dragStateEnum.select
