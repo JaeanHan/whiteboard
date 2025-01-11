@@ -1,8 +1,5 @@
-# diagram-canvas
-
-
-draw diagram, graph, and ect.
-![temporary_image](./assets/20240304.gif)
-### 2024-03-04
-
-
+# Getting Started with Create React App
+```
+yarn install
+yarn start
+```
