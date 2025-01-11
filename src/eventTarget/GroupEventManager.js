@@ -30,7 +30,7 @@ export class GroupEventManager extends EventTarget {
     if (!this.registeredEventMap.has(type)) {
       super.addEventListener(type, handler);
       this.registeredEventMap.set(type, handler);
-      console.log("registered event", type);
+      // console.log("registered event", type);
     }
   };
 
@@ -49,7 +49,7 @@ export class GroupEventManager extends EventTarget {
   goFaster = () => {
     if (this.keyMoveSpeed <= this.speedLimit) {
       this.keyMoveSpeed += 1;
-      console.log("gem", this.keyMoveSpeed);
+      // console.log("gem", this.keyMoveSpeed);
     }
   };
   settleDown = () => {

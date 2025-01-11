@@ -1,5 +1,5 @@
 import { useSelectControl } from "../hooks/useSelectControl";
-import { useEffect, useState } from "react";
+import {forwardRef, useEffect, useRef, useState} from "react";
 import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../utils/enums";
 import { sideBarWidth } from "./SideBar";
 import { useLineGenerator } from "../hooks/useLineGenerator";
@@ -17,8 +17,10 @@ import { SelectBox } from "./SelectBox";
 import { useClipImageGenerator } from "../hooks/useClipImageGenerator";
 import { ToastMessage } from "./ToastMessage";
 import { MessageQueue } from "../utils/MessageQueue";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
-export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
+export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvasSize, setCanvasSize }, ref) => {
   const {
     addSvgOnStore,
     hideSvgOnStore,
@@ -29,7 +31,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     load,
   } = useSvgStore();
   const { handleSelect, setDiffPosOnAll, onDrag, onDrop, handleSelectBox } =
-    useSelectControl(setCurrentEvent);
+      useSelectControl(setCurrentEvent);
   const {
     initClientSelectBoxSize,
     setClientSelectBoxSize,
@@ -37,17 +39,12 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     selectBoxSize,
   } = handleSelectBox;
   const generateNextId =
-    SvgIdAndMutablePropsManager.getInstance().generateNextId;
+      SvgIdAndMutablePropsManager.getInstance().generateNextId;
 
   const [messages, setMessages] = useState([]);
   const [tempPos, setTempPos] = useState(new Map());
   const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
-  const [canvasSize, setCanvasSize] = useState({
-    // width: window.innerWidth - sideBarWidth,
-    // height: window.innerHeight - bannerHeight,
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+
 
   const TM = ThrottlingDebouncingManager.getInstance();
   const WM = WindowManager.getInstance();
@@ -55,20 +52,20 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const MD = MessageQueue.getInstance();
 
   const { addPoint, quit } = useLineGenerator(
-    addSvgOnStore,
-    setCurrentEvent,
-    setTempPos,
+      addSvgOnStore,
+      setCurrentEvent,
+      setTempPos,
   );
 
   const { addStar } = useStarsGenerator(
-    addSvgOnStore,
-    setCurrentEvent,
-    setTempPos,
+      addSvgOnStore,
+      setCurrentEvent,
+      setTempPos,
   );
 
   const { setClipboardImgSrc } = useClipImageGenerator(
-    addSvgOnStore,
-    setCurrentEvent,
+      addSvgOnStore,
+      setCurrentEvent,
   );
 
   const { addPointOnSet, setIsDrawing } = usePathGenerator(addSvgOnStore);
@@ -80,13 +77,13 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   const showToastMessage = (message) => {
     MD.push(message);
     const test = MD.getCurrentQueue();
-    console.log("add", test);
+    // console.log("add", test);
     setMessages(test);
 
     setTimeout(() => {
       const result = MD.popLeft();
       const test2 = MD.getCurrentQueue();
-      console.log("test2", test2);
+      // console.log("test2", test2);
       setMessages(test2);
     }, 1600);
   };
@@ -111,9 +108,9 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
       setCanvasSize((prev) => {
         const windowSize = {
           width:
-            canvasX - (hiddenX + clientX) <= 50 ? canvasX + 100 : prev.width,
+              canvasX - (hiddenX + clientX) <= 50 ? canvasX + 100 : prev.width,
           height:
-            canvasY - (hiddenY + clientY) <= 50 ? canvasY + 100 : prev.height,
+              canvasY - (hiddenY + clientY) <= 50 ? canvasY + 100 : prev.height,
         };
 
         WM.setWindowSize(windowSize);
@@ -298,7 +295,7 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
   };
 
   useEffect(() => {
-    console.log("use effect", currentEvent, cursorMode);
+    // console.log("use effect", currentEvent, cursorMode);
 
     if (currentEvent === eventNameEnum.addPath) {
       setCursorMode(cursorModeEnum.write);
@@ -357,45 +354,47 @@ export const Canvas = ({ currentEvent, setCurrentEvent, owner }) => {
     }
   };
 
+
   return (
-    <div
-      id="canvas"
-      style={{
-        position: "relative",
-        backgroundColor: "white",
-        width: canvasSize.width,
-        height: canvasSize.height,
-        marginLeft: sideBarWidth,
-        marginTop: bannerHeight,
-        scrollBehavior: "smooth",
-        border: "none",
-        cursor:
-          currentEvent === eventNameEnum.write
-            ? "crosshair"
-            : currentEvent === eventNameEnum.erase
-              ? "wait"
-              : currentEvent === eventNameEnum.none
-                ? "default"
-                : "pointer",
-        touchAction: "none",
-      }}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      onMouseMove={onMouseMove}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      {selectBoxSize.src.x !== selectBoxSize.dest.x && (
-        <SelectBox selectClientBox={selectBoxSize} />
-      )}
-      {messages.map((value, index) => (
-        <ToastMessage key={index} message={value} />
-      ))}
-      {Array.from(tempPos).map((value) => (
-        <MousePoint src={value[1]} key={value[0]} />
-      ))}
-      {render(liveStore, handleSelect, deleteSvgById, setAdditionalProps)}
-    </div>
+      <div
+          id="canvas"
+          ref={ref}
+          style={{
+            position: "relative",
+            backgroundColor: "white",
+            width: canvasSize.width,
+            height: canvasSize.height,
+            marginLeft: sideBarWidth,
+            marginTop: bannerHeight,
+            scrollBehavior: "smooth",
+            border: "none",
+            cursor:
+                currentEvent === eventNameEnum.write
+                    ? "crosshair"
+                    : currentEvent === eventNameEnum.erase
+                        ? "wait"
+                        : currentEvent === eventNameEnum.none
+                            ? "default"
+                            : "pointer",
+            touchAction: "none",
+          }}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          onMouseMove={onMouseMove}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+      >
+        {selectBoxSize.src.x !== selectBoxSize.dest.x && (
+            <SelectBox selectClientBox={selectBoxSize} />
+        )}
+        {messages.map((value, index) => (
+            <ToastMessage key={index} message={value} />
+        ))}
+        {Array.from(tempPos).map((value) => (
+            <MousePoint src={value[1]} key={value[0]} />
+        ))}
+        {render(liveStore, handleSelect, deleteSvgById, setAdditionalProps)}
+      </div>
   );
-};
+});

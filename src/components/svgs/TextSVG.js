@@ -7,6 +7,7 @@ const fontStyle = {
   fontSize: 30,
   fill: "black",
   lineHeight: 1,
+  whiteSpace: 'pre-line'
 };
 
 export const TextSVG = ({
@@ -19,7 +20,7 @@ export const TextSVG = ({
 }) => {
   const { src, width, height, comment } = attachment;
   //test1test2test3;'Leckerli One', cursive.red
-  const [text, setText] = useState(comment || "test1test2test3");
+  const [text, setText] = useState(comment || "enter the text here");
   const [widthHeight, setWidthHeight] = useState({
     width: width,
     height: height,

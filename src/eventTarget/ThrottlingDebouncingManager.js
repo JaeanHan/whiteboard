@@ -30,7 +30,7 @@ export class ThrottlingDebouncingManager extends EventTarget {
     if (!this.eventThrottleMap.has(type)) {
       super.addEventListener(type, handler);
       this.eventThrottleMap.set(type, handler);
-      console.log("registered event", type);
+      // console.log("registered event", type);
     }
     return this;
   };

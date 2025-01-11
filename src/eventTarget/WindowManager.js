@@ -29,7 +29,7 @@ export class WindowManager {
   };
 
   init = () => {
-    console.log("wm init!");
+    // console.log("wm init!");
     this.selectedWindow = `${this.unnamedWindow} 1`;
     this.windowRealVirtualNameMap.set(this.selectedWindow, this.selectedWindow);
   };
@@ -52,7 +52,7 @@ export class WindowManager {
       const nameAndViewIndexMapping =
         windowName + this.windowRealVirtualNameMap.size;
 
-      console.log("???", nameAndViewIndexMapping, realName);
+      // console.log("???", nameAndViewIndexMapping, realName);
 
       this.nonUniqueNameIndexMap.set(nameAndViewIndexMapping, realName);
 
@@ -72,7 +72,7 @@ export class WindowManager {
     this.windowRealVirtualNameMap.delete(realName);
     // this.nonUniqueNameIndexMap.delete(realName);
 
-    console.log("delete", virtualName, "at", viewIndex);
+    // console.log("delete", virtualName, "at", viewIndex);
     console.log(this.windowRealVirtualNameMap);
   };
 

@@ -36,7 +36,7 @@ export const SvgContainer = ({
       stopOnDrop,
       setDragStateGroup,
     });
-    console.log("prop src updated", id, src);
+    // console.log("prop src updated", id, src);
   }, [src]);
 
   const getObjInfo = () => {
@@ -57,7 +57,7 @@ export const SvgContainer = ({
         stopOnDrop,
         setDragStateGroup,
       });
-      console.log("prop src updated", id, src);
+      // console.log("prop src updated", id, src);
       setDragState(dragStateEnum.none);
     }
   };
@@ -84,7 +84,7 @@ export const SvgContainer = ({
     e.stopPropagation();
 
     if (e.ctrlKey && dragState === dragStateEnum.group) {
-      console.log("remove", id);
+      // console.log("remove", id);
       removeSvgFromGroup(id);
       setDragState(dragStateEnum.none);
       return;
@@ -102,7 +102,7 @@ export const SvgContainer = ({
       addSvgToGroup(id, { getObjInfo, moveOnDrag, stopOnDrop });
       setDragState(dragStateEnum.select);
     }
-    console.log(dragState);
+    // console.log(dragState);
   };
 
   // const onMouseMove = (e) => {

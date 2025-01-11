@@ -21,7 +21,7 @@ export const Banner = ({ setCurrentEvent }) => {
 
     const name = tempName || WM.getUnnamedWindowNameOnAdd();
 
-    console.log("name", name);
+    // console.log("name", name);
 
     WM.addWindow(name);
 
