@@ -31,7 +31,7 @@ function App() {
       );
     });
 
-  const [currentEvent, setCurrentEvent] = useState(eventNameEnum.none);
+  const [currentEvent, setCurrentEvent] = useState(() => eventNameEnum.none);
   // const [user, setUser] = useState("jaean");
   const [user, setUser] = useState("study");
 
