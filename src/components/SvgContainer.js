@@ -3,6 +3,8 @@ import { dragStateEnum, svgTypeEnum } from "../utils/enums";
 import { GroupEventManager } from "../eventTarget/GroupEventManager";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 
+const scale = 1;
+
 export const SvgContainer = ({
   children,
   id,
@@ -18,11 +20,11 @@ export const SvgContainer = ({
 }) => {
   const { selectSvg, addSvgToGroup, removeSvgFromGroup } = handleSelect;
   const [objPos, setObjPos] = useState({ x: src.x, y: src.y });
-  const [objSize, setObjSize] = useState({
-    width: widthHeight.width,
-    height: widthHeight.height,
-  });
-  const [scale, setScale] = useState(1.0);
+  // const [objSize, setObjSize] = useState({
+  //   width: widthHeight.width,
+  //   height: widthHeight.height,
+  // });
+  // const [scale, setScale] = useState(1.0);
   const [dragState, setDragState] = useState(dragStateEnum.none);
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
@@ -38,7 +40,11 @@ export const SvgContainer = ({
   }, [src]);
 
   const getObjInfo = () => {
-    return { objPos, objSize };
+    const objSize = {
+      width: widthHeight.width,
+      height: widthHeight.height,
+    };
+    return { objPos, objSize};
   };
   const moveOnDrag = (dragPos) => {
     setObjPos(dragPos);
@@ -116,12 +122,12 @@ export const SvgContainer = ({
       onClick={onClick}
       id={id}
       key={id}
+      className={
+          dragState === dragStateEnum.select && id.startsWith(svgTypeEnum.image) ? 'editor-image' : ''
+      }
       style={{
-        // resize:
-        //   id.startsWith(svgTypeEnum.image) || id.startsWith(svgTypeEnum.rect)
-        //     ? "inline"
-        //     : "none",
-        overflow: "hidden",
+        // overflow: id.startsWith(svgTypeEnum.image) ? 'visible' :"hidden",
+        overflow: 'visible',
         cursor: dragState === dragStateEnum.drag ? "grabbing" : "grab",
         boxSizing: "border-box",
         width: "max-content",
@@ -136,9 +142,11 @@ export const SvgContainer = ({
           dragState === dragStateEnum.group
             ? "dotted black"
             : dragState === dragStateEnum.select
-              ? id.startsWith(svgTypeEnum.text)
-                ? "none"
-                : "dashed "
+              ? id.startsWith(svgTypeEnum.image)
+                ? 'rgb(60, 132, 244) solid'
+                : id.startsWith(svgTypeEnum.text)
+                  ? "none"
+                  : "dashed "
               : "none",
         top: objPos.y,
         left: objPos.x,
@@ -158,7 +166,6 @@ export const SvgContainer = ({
             textAlign: "center",
             lineHeight: 0.75,
             borderRadius: "50%",
-            // cursor: 'url(CURSOR_URL), auto'
             cursor: "default",
           }}
           onMouseDown={stopPropagation}
