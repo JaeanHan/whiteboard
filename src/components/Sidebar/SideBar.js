@@ -129,9 +129,20 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
   };
 
   const cursor = useMemo(() => [Default, Pencil, Eraser], [mode]);
+
   const temp = useMemo(
-      () => [Document, Save, SaveAll, Rect, Text, Line, StarSign, ClipboardImage, PDF],
-      [Document],
+      () => [
+        { name: "Document", handler: Document },
+        { name: "Save", handler: Save },
+        { name: "Save All", handler: SaveAll },
+        { name: "Rect", handler: Rect },
+        { name: "Text", handler: Text },
+        { name: "Line", handler: Line },
+        { name: "Star Sign", handler: StarSign },
+        { name: "Clipboard Image", handler: ClipboardImage },
+        { name: "PDF", handler: PDF },
+      ],
+      [Document]
   );
 
 
@@ -190,15 +201,15 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
             Elements :
           </div>
         <ul style={{display: 'grid', paddingLeft: '50px', marginTop: '0'}}>
-        {temp.map((el, index) => {
+        {temp.map((t, index) => {
+          const {name, handler} = t;
           return (
               <button
-                  id={el.name}
-                  key={el.name}
+                  key={name}
                   className={styles.features}
-                  onClick={el}
+                  onClick={handler}
               >
-                {index < 3 ? "" : "generate"} {el.name}
+                {index < 3 ? "" : "generate"} {name}
               </button>
           );
         })}
