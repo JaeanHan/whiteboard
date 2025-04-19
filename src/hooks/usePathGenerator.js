@@ -1,28 +1,28 @@
-import { useEffect, useState } from "react";
-import { svgTypeEnum } from "../utils/enums";
-import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
-import { ThrottlingDebouncingManager } from "../eventTarget/ThrottlingDebouncingManager";
+import { useEffect, useState } from 'react';
+import { svgTypeEnum } from '../utils/enums';
+import { SvgIdAndMutablePropsManager } from '../eventTarget/SvgIdAndMutablePropsManager';
+import { ThrottlingDebouncingManager } from '../eventTarget/ThrottlingDebouncingManager';
 
 export const MMMKey = {
-  minX: "minX",
-  minY: "minY",
-  maxX: "maxX",
-  maxY: "maxY",
+  minX: 'minX',
+  minY: 'minY',
+  maxX: 'maxX',
+  maxY: 'maxY',
 };
 
-export const usePathGenerator = (addSvgOnStore) => {
+export const usePathGenerator = addSvgOnStore => {
   const [pointSet, setPointSet] = useState(new Set());
   const [isDrawing, setIsDrawing] = useState(false);
   const [minMaxMap, setMinMaxMap] = useState(new Map());
   const [thickness, setThickness] = useState(3);
-  const [pid, setPid] = useState("");
+  const [pid, setPid] = useState('');
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
   const generateNextId = SIMP.generateNextId;
   const TM = ThrottlingDebouncingManager.getInstance();
 
   useEffect(() => {
     if (pointSet.size === 0) {
-      if (isDrawing && pid === "") {
+      if (isDrawing && pid === '') {
         setPid(generateNextId(svgTypeEnum.path));
         initMinMaxMap();
       }
@@ -31,7 +31,7 @@ export const usePathGenerator = (addSvgOnStore) => {
 
     if (!isDrawing) {
       setPointSet(new Set());
-      setPid("");
+      setPid('');
       return;
     }
 
@@ -69,11 +69,11 @@ export const usePathGenerator = (addSvgOnStore) => {
     // }
   }, [pointSet, isDrawing]);
 
-  const addPointOnSet = (point) => {
+  const addPointOnSet = point => {
     if (isDrawing) {
       const pointString = JSON.stringify(point);
       pointSet.add(pointString);
-      setPointSet((prev) => new Set([...prev, pointString]));
+      setPointSet(prev => new Set([...prev, pointString]));
 
       setMinMaxMap(() => {
         const mapUpdate = new Map();
@@ -89,9 +89,9 @@ export const usePathGenerator = (addSvgOnStore) => {
     }
   };
 
-  const deletePoint = (point) => {
+  const deletePoint = point => {
     const pointString = JSON.stringify(point);
-    setPointSet((prev) => {
+    setPointSet(prev => {
       prev.delete(pointString);
       return new Set([...prev]);
     });
