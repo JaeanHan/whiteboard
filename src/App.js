@@ -36,8 +36,6 @@ function App() {
   const [user, setUser] = useState("study");
   const canvasRef = useRef(null);
     const [canvasSize, setCanvasSize] = useState({
-        // width: window.innerWidth - sideBarWidth,
-        // height: window.innerHeight - bannerHeight,
         width: window.innerWidth,
         height: window.innerHeight,
     });

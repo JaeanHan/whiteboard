@@ -80,15 +80,18 @@ export const Tabs = ({ setCurrentEvent }) => {
       style={{
         position: "fixed",
         zIndex: 10,
-        width: "100%",
+        width: "calc(100% - 18px)",
         height: bannerHeight,
+          borderCollapse: 'collapse',
         // background: "linear-gradient(90deg, dodgerblue 10%, #fffde4 100%)",
         // background: "linear-gradient(90deg, whitesmoke 20%, #fffde4 100%)",
         background: "linear-gradient(90deg, #F6F8FB 60%, #E1E9F2 100%)",
         display: "flex",
         justifyContent: "start",
+        borderBottom: '1px solid lightgrey',
         alignItems: "flex-end",
-        paddingLeft: sideBarWidth,
+        paddingLeft: 'calc(250px)',
+        borderRight: '1px solid lightgrey'
         // opacity: window.scrollY > bannerHeight ? 0.5 : 1,
         // filter: "blur(1px)",
       }}

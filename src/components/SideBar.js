@@ -145,8 +145,8 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
             // backgroundColor: "whitesmoke",
             display: "flex",
             flexDirection: "column",
-            position: "fixed",
-            zIndex: 10,
+            // position: "fixed",
+            zIndex: 990,
           }}
       >
         {/*<div ref={divRef} style={{ cursor: "pointer" }}>*/}
