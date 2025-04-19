@@ -54,10 +54,9 @@ export const TextSVG = ({
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
   const textAreaRef = useRef(null);
 
-  console.log(widthHeight)
   useEffect(() => {
     if (comment) {
-      console.log('?', comment)
+      // console.log('?', comment)
       setWidthHeight(calculateTextSize(comment));
     }
   }, [setWidthHeight]);

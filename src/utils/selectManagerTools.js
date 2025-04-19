@@ -172,7 +172,7 @@ export const calcPosOnDrag = (flag, dragPos, diffDistance) => {
     };
   }
 
-  console.log("something not handled !!!", flag, dragPos, diffDistance);
+  console.error("something not handled", flag, dragPos, diffDistance);
   return { x: 0, y: 0 };
 };
 

@@ -53,7 +53,7 @@ export const useSvgStore = () => {
       loadMap.set(WM.getSelectedVirtualWindow(), new Map());
     }
 
-    console.log("load map", loadMap);
+    // console.log("load map", loadMap);
     setStore(loadMap);
   };
 
@@ -78,7 +78,7 @@ export const useSvgStore = () => {
     const currentWindow = WM.getSelectedVirtualWindow();
     const props = { ...store.get(currentWindow).get(id), display: display };
 
-    console.log("hide", id);
+    // console.log("hide", id);
 
     setStore((prev) => {
       const currentWindowMap = prev.get(currentWindow);
@@ -104,7 +104,7 @@ export const useSvgStore = () => {
 
     if (!currentSvgMap) {
       setStore((prev) => new Map(prev).set(currentWindow, new Map()));
-      console.log(currentWindow, "added");
+      // console.log(currentWindow, "added");
 
       return;
     }
@@ -123,7 +123,7 @@ export const useSvgStore = () => {
     const currentWindow = WM.getSelectedVirtualWindow();
     const currentSvgMap = store.get(currentWindow) ?? new Map();
 
-    console.log("[useSvgStore] useEffect", currentWindow, store);
+    // console.log("[useSvgStore] useEffect", currentWindow, store);
 
     for (const [key, value] of currentSvgMap) {
       // if (value.display && value.window === currentWindow) {

@@ -98,7 +98,7 @@ export const usePathGenerator = (addSvgOnStore) => {
   };
 
   const initMinMaxMap = () => {
-    console.log("init map");
+    // console.log("init map");
     setMinMaxMap(() => {
       const mapInit = new Map();
 

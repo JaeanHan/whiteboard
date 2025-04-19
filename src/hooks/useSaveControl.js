@@ -14,7 +14,7 @@ export const useSaveControl = () => {
     const svgInfoArray = [];
     const deleteSvgIdArray = [];
 
-    console.log("???", store);
+    // console.log("???", store);
 
     for (const [key, value] of store) {
       if (!SIMP.getUpdateFlagById(key)) {

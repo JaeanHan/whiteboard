@@ -64,7 +64,7 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
   };
 
   const SaveAll = (e) => {
-    alert("yet implemented !!!");
+    alert("yet implemented");
   };
 
   const LoadSaved = (e) => {

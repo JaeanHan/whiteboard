@@ -177,7 +177,7 @@ export const StarsSVG = ({
             r={starRadius}
             fill={draggingIndex === index ? "red" : "blue"}
             onMouseDown={(e) => onDragStart(index)}
-            onMouseUp={() => console.log("index ===", index)}
+            // onMouseUp={() => console.log("index ===", index)}
             style={{ cursor: "all-scroll" }}
           />
         ))}
