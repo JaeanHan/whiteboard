@@ -19,7 +19,7 @@ export const render = (
       return (
         <RectSVG
           id={key}
-          key={key}
+          key={`${key}-${attachment.src.x}-${attachment.src.y}`}
           handleSelect={handleSelect}
           showPos={true}
           attachment={attachment}
@@ -33,7 +33,7 @@ export const render = (
       return (
         <TextSVG
           id={key}
-          key={key}
+          key={`${key}-${attachment.src.x}-${attachment.src.y}`}
           handleSelect={handleSelect}
           showPos={true}
           attachment={attachment}
@@ -47,7 +47,7 @@ export const render = (
       return (
         <LineSVG
           id={key}
-          key={key}
+          key={`${key}-${attachment.src.x}-${attachment.src.y}`}
           handleSelect={handleSelect}
           showPos={true}
           attachment={attachment}
@@ -61,7 +61,7 @@ export const render = (
       return (
         <StarsSVG
           id={key}
-          key={key}
+          key={`${key}-${attachment.src.x}-${attachment.src.y}`}
           handleSelect={handleSelect}
           showPos={true}
           attachment={attachment}
@@ -75,7 +75,7 @@ export const render = (
       return (
         <PathSVG
           id={key}
-          key={key}
+          key={`${key}-${attachment.src.x}-${attachment.src.y}`}
           handleSelect={handleSelect}
           showPos={true}
           attachment={attachment}
@@ -89,7 +89,7 @@ export const render = (
       return (
         <ImageContainer
           id={key}
-          key={key}
+          key={`${key}-${attachment.src.x}-${attachment.src.y}`}
           handleSelect={handleSelect}
           showPos={true}
           attachment={attachment}

@@ -10,6 +10,8 @@
 }
 
 .canvas {
+    /*--width: 110%;*/
+    /*--height: 110%;*/
     position: relative;
     background-color: white;
     scroll-behavior: smooth;
@@ -17,7 +19,20 @@
 
     background-image: radial-gradient(#9CA3AF 1px, #ffffff 1px);
     background-size: 72px 72px;
-    width: 100%;
-    height: 100%;
+    /*width: var(--width);*/
+    /*height: var(--height);*/
     image-rendering: pixelated;
+}
+
+.cursorCrosshair {
+    cursor: crosshair;
+}
+.cursorWait {
+    cursor: wait;
+}
+.cursorDefault {
+    cursor: default;
+}
+.cursorPointer {
+    cursor: pointer;
 }

@@ -1,5 +1,5 @@
 import { useSelectControl } from "../../hooks/useSelectControl";
-import {forwardRef, useEffect, useRef, useState} from "react";
+import {forwardRef, useCallback, useEffect, useRef, useState} from "react";
 import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../../utils/enums";
 import { sideBarWidth } from "../SideBar";
 import { useLineGenerator } from "../../hooks/useLineGenerator";
@@ -20,6 +20,12 @@ import { MessageQueue } from "../../utils/MessageQueue";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import styles from "./canvas.module.css"
+
+
+const TM = ThrottlingDebouncingManager.getInstance();
+const WM = WindowManager.getInstance();
+const SIMP = SvgIdAndMutablePropsManager.getInstance();
+const MD = MessageQueue.getInstance();
 
 export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvasSize, setCanvasSize }, ref) => {
   const {
@@ -49,11 +55,6 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
   const canvasWrapRef = useRef(null);
   const lastScroll = useRef({ top: 0, left: 0 });
 
-  const TM = ThrottlingDebouncingManager.getInstance();
-  const WM = WindowManager.getInstance();
-  const SIMP = SvgIdAndMutablePropsManager.getInstance();
-  const MD = MessageQueue.getInstance();
-
   const { addPoint, quit } = useLineGenerator(
       addSvgOnStore,
       setCurrentEvent,
@@ -80,7 +81,6 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
   const showToastMessage = (message) => {
     MD.push(message);
     const test = MD.getCurrentQueue();
-    // console.log("add", test);
     setMessages(test);
 
     setTimeout(() => {
@@ -114,6 +114,12 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
           height: isHorizontal && yScrollDividen >= lastScroll.current.top ? prev.height + 100 : prev.height,
         };
 
+        // const el = ref.currrent;
+        // if (el) {
+        //   el.style.setProperty('--width', windowSize.width);
+        //   el.style.setProperty('--height', windowSize.height)
+        // }
+
         lastScroll.current = {
           left: Math.max(xScrollDividen, lastScroll.current.left),
           top: Math.max(yScrollDividen, lastScroll.current.top)
@@ -136,7 +142,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     };
   }, [canvasSize]);
 
-  const onMouseDown = (e) => {
+  const onMouseDown = useCallback((e) => {
     if (cursorMode === cursorModeEnum.write) {
       setIsDrawing(true);
       return;
@@ -160,9 +166,9 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
       x: e.clientX + window.scrollX,
       y: e.clientY + window.scrollY - bannerHeight,
     });
-  };
+  }, [cursorMode, setIsDrawing, initClientSelectBoxSize, setCurrentEvent, setDiffPosOnAll]);
 
-  const onMouseMove = (e) => {
+  const onMouseMove = useCallback((e) => {
     e.preventDefault();
 
     if (cursorMode === cursorModeEnum.write) {
@@ -226,9 +232,9 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     setTimeout(() => {
       TM.setEventMap(TM.dragEvent, false);
     }, 10);
-  };
+  }, [currentEvent, cursorMode, addPointOnSet, setClientSelectBoxSize, deleteSvgById, setClientSelectBoxSize, deleteSvgById, onDrag]);
 
-  const onMouseUp = (e) => {
+  const onMouseUp = useCallback((e) => {
     if (cursorMode === cursorModeEnum.write) {
       setIsDrawing(false);
       return;
@@ -298,11 +304,9 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     if (!e.ctrlKey) {
       onDrop(fixPos);
     }
-  };
+  }, [cursorMode, currentEvent, setCurrentEvent, setIsDrawing, finClientSelectBoxSize, generateNextId, addSvgOnStore, setClipboardImgSrc, setTempPos, addPoint, addStar, onDrop]);
 
   useEffect(() => {
-    // console.log("use effect", currentEvent, cursorMode);
-
     if (currentEvent === eventNameEnum.addPath) {
       setCursorMode(cursorModeEnum.write);
       return;
@@ -336,57 +340,30 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     setCursorMode(cursorModeEnum.default);
   }, [currentEvent]);
 
-  const onTouchStart = (e) => {
-    if (cursorMode === cursorModeEnum.write) {
-      setIsDrawing(true);
-    }
-  };
-
-  const onTouchMove = (e) => {
-    if (cursorMode === cursorModeEnum.write) {
-      const clientX = e.touches[0].clientX;
-      const clientY = e.touches[0].clientY;
-      const fixPos = {
-        x: clientX - sideBarWidth + window.scrollX,
-        y: clientY + window.scrollY - bannerHeight,
-      };
-      addPointOnSet(fixPos);
-    }
-  };
-
-  const onTouchEnd = (e) => {
-    if (cursorMode === cursorModeEnum.write) {
-      setIsDrawing(false);
-    }
-  };
-
-
   return (
       <div ref={canvasWrapRef} className={styles.canvasWrap}>
         <div
             id="canvas"
-            className={styles.canvas}
+            className={`${styles.canvas} ${
+                currentEvent === eventNameEnum.write
+                    ? styles.cursorCrosshair
+                    : currentEvent === eventNameEnum.erase
+                        ? styles.cursorWait
+                        : currentEvent === eventNameEnum.none
+                            ? styles.cursorDefault
+                            : styles.cursorPointer
+            }`}
             ref={ref}
             style={{
               width: canvasSize.width,
               height: canvasSize.height,
-
-              marginTop: bannerHeight,
-              cursor:
-                  currentEvent === eventNameEnum.write
-                      ? "crosshair"
-                      : currentEvent === eventNameEnum.erase
-                          ? "wait"
-                          : currentEvent === eventNameEnum.none
-                              ? "default"
-                              : "pointer",
             }}
             onMouseDown={onMouseDown}
             onMouseUp={onMouseUp}
             onMouseMove={onMouseMove}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
+            // onTouchStart={onTouchStart}
+            // onTouchMove={onTouchMove}
+            // onTouchEnd={onTouchEnd}
         >
           {selectBoxSize.src.x !== selectBoxSize.dest.x && (
               <SelectBox selectClientBox={selectBoxSize} />
