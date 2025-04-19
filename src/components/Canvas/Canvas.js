@@ -1,7 +1,7 @@
 import { useSelectControl } from "../../hooks/useSelectControl";
 import {forwardRef, useCallback, useEffect, useRef, useState} from "react";
 import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../../utils/enums";
-import { sideBarWidth } from "../SideBar";
+import { sideBarWidth } from "../Sidebar/SideBar";
 import { useLineGenerator } from "../../hooks/useLineGenerator";
 import { MousePoint } from "../MousePoint";
 import { usePathGenerator } from "../../hooks/usePathGenerator";

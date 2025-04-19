@@ -28,7 +28,7 @@
     cursor: crosshair;
 }
 .cursorWait {
-    cursor: wait;
+    cursor: pointer;
 }
 .cursorDefault {
     cursor: default;

@@ -1,7 +1,9 @@
 import {forwardRef, useEffect, useMemo, useState} from "react";
-import { eventNameEnum } from "../utils/enums";
+import { eventNameEnum } from "../../utils/enums";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+
+import styles from "./sidebar.module.css"
 
 export const sideBarWidth = 250;
 
@@ -139,67 +141,68 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
             width: sideBarWidth,
             minWidth: sideBarWidth,
             height: window.innerHeight,
-            // backgroundColor: "dodgerblue",
-            // background: "linear-gradient(200deg, whitesmoke 10%, #fffde4 100%)",
             background: "linear-gradient(200deg, #F6F8FB 60%, #E1E9F2 100%)",
-            // backgroundColor: "whitesmoke",
             display: "flex",
             flexDirection: "column",
-            // position: "fixed",
-            zIndex: 990,
+            zIndex: 99,
           }}
       >
-        {/*<div ref={divRef} style={{ cursor: "pointer" }}>*/}
-        {/*  spring : {comment}*/}
-        {/*</div>*/}
         <br />
-        cursor mode ↓
-        <div style={{ flexDirection: "row" }}>
-          {cursor.map((el, index) => {
-            return (
-                <button
-                    id={el.name}
-                    key={el.name}
-                    onClick={(e) => {
-                      el(e);
-                      setMode(el.name);
-                    }}
-                    style={{
-                      // backgroundColor: "dodgerblue",
-                      backgroundColor: "whitesmoke",
-                      border: "none",
-                      cursor: "pointer",
-                      // color: mode === el.name ? "white" : "black",
-                      color: mode === el.name ? "black" : "dodgerblue",
-                    }}
-                >
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          justifyItems: 'start',
+          paddingLeft: '40px'
+        }}>
+          <span>
+            Cursor :
+          </span>
+          <select
+              value={mode}
+              onChange={(e) => {
+                const selectedName = e.target.value;
+                const selectedHandler = cursor.find((el) => el.name === selectedName);
+                if (selectedHandler) {
+                  selectedHandler(e);
+                  setMode(selectedName);
+                }
+              }}
+              style={{
+                backgroundColor: "whitesmoke",
+                border: "none",
+                color: "dodgerblue",
+                padding: "6px 12px",
+                fontSize: "14px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                display: 'inline-block'
+              }}
+          >
+            {cursor.map((el) => (
+                <option key={el.name} value={el.name}>
                   {el.name}
-                </button>
-            );
-          })}
+                </option>
+            ))}
+          </select>
         </div>
+        <hr />
+        <ul style={{display: 'grid'}}>
+          <div style={{justifySelf: 'start'}}>
+            Elements :
+          </div>
         {temp.map((el, index) => {
           return (
               <button
                   id={el.name}
                   key={el.name}
-                  style={{
-                    marginTop: "15px",
-                    backgroundColor: "transparent",
-                    // color: "white",
-                    color: "gray",
-                    border: "none",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                    fontSize: 19,
-                  }}
+                  className={styles.features}
                   onClick={el}
               >
                 {index < 3 ? "" : "generate"} {el.name}
               </button>
           );
         })}
-
+        </ul>
       </div>
   );
 });
