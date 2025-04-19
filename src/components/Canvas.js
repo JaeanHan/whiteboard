@@ -366,6 +366,8 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
             height: canvasSize.height,
             marginLeft: sideBarWidth,
             marginTop: bannerHeight,
+            borderLeft: 'lightgray 1px solid',
+            borderTop: 'lightgray 1px solid',
             scrollBehavior: "smooth",
             border: "none",
             cursor:

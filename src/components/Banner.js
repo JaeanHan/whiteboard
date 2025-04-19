@@ -113,6 +113,10 @@ export const Banner = ({ setCurrentEvent }) => {
               display: "flex",
               // justifyContent: "center",
               // alignItems: "center",
+
+                zIndex: 10,
+                transform: 'translateY(1px)',
+                alignItems: 'end',
               borderBottom: "none",
               color: "black",
               backgroundColor:
