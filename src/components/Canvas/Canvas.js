@@ -103,30 +103,26 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
       const scrollX = canvasWrapRef.current.scrollLeft;
       const scrollY = canvasWrapRef.current.scrollTop;
 
-      const isVertical = scrollX !== lastScroll.current.left;
-      const isHorizontal = scrollY !== lastScroll.current.top;
-      setCanvasSize((prev) => {
-        const xScrollModular = Math.round(scrollX / 100)
-        const yScrollModular = Math.round(scrollY / 100)
+      const xScrollDividen = Math.round(scrollX / 100)
+      const yScrollDividen = Math.round(scrollY / 30)
+      const isVertical = xScrollDividen !== lastScroll.current.left;
+      const isHorizontal = yScrollDividen !== lastScroll.current.top;
 
+      setCanvasSize((prev) => {
         const windowSize = {
-          width: isVertical && scrollX / 100 > lastScroll.current.left  ? prev.width + 100 : prev.width,
-          height: isHorizontal && scrollY / 100 > lastScroll.current.top ? prev.height + 100 : prev.height,
+          width: isVertical && xScrollDividen >= lastScroll.current.left  ? prev.width + 100 : prev.width,
+          height: isHorizontal && yScrollDividen >= lastScroll.current.top ? prev.height + 100 : prev.height,
         };
 
         lastScroll.current = {
-          left: xScrollModular,
-          top: yScrollModular
+          left: Math.max(xScrollDividen, lastScroll.current.left),
+          top: Math.max(yScrollDividen, lastScroll.current.top)
         }
 
         WM.setWindowSize(windowSize);
 
         return windowSize;
       });
-      lastScroll.current = {
-        left: scrollX,
-        top: scrollY,
-      }
 
       TM.setEventMap(TM.scrollEvent, false);
     }, 150);
