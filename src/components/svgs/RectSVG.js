@@ -13,8 +13,6 @@ export const RectSVG = ({
   const [desc, setDesc] = useState(comment || `${id} description`);
   const num = Number(id.charAt(1));
 
-  console.log('?')
-
   const onClick = (e) => {
     if (e.ctrlKey) return;
 
