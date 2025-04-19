@@ -277,7 +277,6 @@ export const Canvas = forwardRef(
 
         addSvgOnStore(key, attachment);
         setCurrentEvent(eventNameEnum.none);
-        console.log('wtf');
         return;
       }
 
