@@ -20,6 +20,7 @@ export const SvgContainer = memo(({
   deleteSvgById,
   widthHeight = { width: 150, height: 150 },
   setAdditionalProps,
+  shouldUpdate=false,
   updateWidthHeightOnStore = (a) => {},
 }) => {
   const { selectSvg, addSvgToGroup, removeSvgFromGroup } = handleSelect;
@@ -196,6 +197,9 @@ export const SvgContainer = memo(({
     </div>
   );
 }, (prev, next) => {
+  if (prev.id.startsWith(svgTypeEnum.text)) {
+    return false;
+  }
   return (
       prev.id === next.id &&
       prev.src?.x === next.src?.x &&

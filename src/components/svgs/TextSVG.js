@@ -133,6 +133,7 @@ export const TextSVG = ({
       deleteSvgById={deleteSvgById}
       widthHeight={widthHeight}
       setAdditionalProps={setAdditionalProps}
+      shouldUpdate={true}
     >
       <svg
         width={widthHeight.width}
