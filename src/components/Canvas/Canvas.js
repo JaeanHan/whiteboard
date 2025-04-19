@@ -46,6 +46,8 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
   const [tempPos, setTempPos] = useState(new Map());
   const [cursorMode, setCursorMode] = useState(cursorModeEnum.default);
 
+  const canvasWrapRef = useRef(null);
+  const lastScroll = useRef({ top: 0, left: 0 });
 
   const TM = ThrottlingDebouncingManager.getInstance();
   const WM = WindowManager.getInstance();
@@ -98,36 +100,43 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     TM.setEventMap(TM.scrollEvent, true);
 
     setTimeout(() => {
-      const canvasX = canvasSize.width;
-      const hiddenX = window.scrollX;
-      const clientX = window.innerWidth;
+      const scrollX = canvasWrapRef.current.scrollLeft;
+      const scrollY = canvasWrapRef.current.scrollTop;
 
-      const canvasY = canvasSize.height;
-      const hiddenY = window.scrollY;
-      const clientY = window.innerHeight;
-
+      const isVertical = scrollX !== lastScroll.current.left;
+      const isHorizontal = scrollY !== lastScroll.current.top;
       setCanvasSize((prev) => {
+        const xScrollModular = Math.round(scrollX / 100)
+        const yScrollModular = Math.round(scrollY / 100)
+
         const windowSize = {
-          width:
-              canvasX - (hiddenX + clientX) <= 50 ? canvasX + 100 : prev.width,
-          height:
-              canvasY - (hiddenY + clientY) <= 50 ? canvasY + 100 : prev.height,
+          width: isVertical && scrollX / 100 > lastScroll.current.left  ? prev.width + 100 : prev.width,
+          height: isHorizontal && scrollY / 100 > lastScroll.current.top ? prev.height + 100 : prev.height,
         };
+
+        lastScroll.current = {
+          left: xScrollModular,
+          top: yScrollModular
+        }
 
         WM.setWindowSize(windowSize);
 
         return windowSize;
       });
+      lastScroll.current = {
+        left: scrollX,
+        top: scrollY,
+      }
 
       TM.setEventMap(TM.scrollEvent, false);
     }, 150);
   };
 
   useEffect(() => {
-    window.addEventListener("scroll", onScroll);
+    canvasWrapRef.current.addEventListener("scroll", onScroll);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      canvasWrapRef.current.removeEventListener("scroll", onScroll);
     };
   }, [canvasSize]);
 
@@ -357,41 +366,43 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
 
 
   return (
-      <div
-          id="canvas"
-          className={styles.canvas}
-          ref={ref}
-          style={{
-            width: canvasSize.width,
-            height: canvasSize.height,
-            marginLeft: sideBarWidth,
-            marginTop: bannerHeight,
-            cursor:
-                currentEvent === eventNameEnum.write
-                    ? "crosshair"
-                    : currentEvent === eventNameEnum.erase
-                        ? "wait"
-                        : currentEvent === eventNameEnum.none
-                            ? "default"
-                            : "pointer",
-          }}
-          onMouseDown={onMouseDown}
-          onMouseUp={onMouseUp}
-          onMouseMove={onMouseMove}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-      >
-        {selectBoxSize.src.x !== selectBoxSize.dest.x && (
-            <SelectBox selectClientBox={selectBoxSize} />
-        )}
-        {messages.map((value, index) => (
-            <ToastMessage key={index} message={value} />
-        ))}
-        {Array.from(tempPos).map((value) => (
-            <MousePoint src={value[1]} key={value[0]} />
-        ))}
-        {render(liveStore, handleSelect, deleteSvgById, setAdditionalProps)}
+      <div ref={canvasWrapRef} className={styles.canvasWrap}>
+        <div
+            id="canvas"
+            className={styles.canvas}
+            ref={ref}
+            style={{
+              width: canvasSize.width,
+              height: canvasSize.height,
+
+              marginTop: bannerHeight,
+              cursor:
+                  currentEvent === eventNameEnum.write
+                      ? "crosshair"
+                      : currentEvent === eventNameEnum.erase
+                          ? "wait"
+                          : currentEvent === eventNameEnum.none
+                              ? "default"
+                              : "pointer",
+            }}
+            onMouseDown={onMouseDown}
+            onMouseUp={onMouseUp}
+            onMouseMove={onMouseMove}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+        >
+          {selectBoxSize.src.x !== selectBoxSize.dest.x && (
+              <SelectBox selectClientBox={selectBoxSize} />
+          )}
+          {messages.map((value, index) => (
+              <ToastMessage key={index} message={value} />
+          ))}
+          {Array.from(tempPos).map((value) => (
+              <MousePoint src={value[1]} key={value[0]} />
+          ))}
+          {render(liveStore, handleSelect, deleteSvgById, setAdditionalProps)}
+        </div>
       </div>
   );
 });
