@@ -17,7 +17,7 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
   }, [currentEvent]);
 
   const Document = () => {
-    alert("clicked");
+    alert("documentation not available for the moment");
     setMode("Default");
   };
 
@@ -128,7 +128,12 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
     pdf.save("my-note-pdf.pdf");
   };
 
-  const cursor = useMemo(() => [Default, Pencil, Eraser], [mode]);
+  const cursor = useMemo(() => [
+    { name: "Pointer", handler: Default},
+    { name: 'Pencil', handler: Pencil },
+    { name: 'Eraser', handler: Eraser },
+
+  ], [mode]);
 
   const temp = useMemo(
       () => [
