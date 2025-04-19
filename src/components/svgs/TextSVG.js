@@ -10,6 +10,30 @@ const fontStyle = {
   whiteSpace: 'pre-line'
 };
 
+
+const calculateTextSize = (text = "", height=80) => {
+  const canvas =
+      calculateTextSize.canvas ||
+      (calculateTextSize.canvas = document.createElement("canvas"));
+  const context = canvas.getContext("2d");
+
+  const textSpilt = text.split("\n") ?? [];
+
+  context.font = `${fontStyle.fontSize}px ${fontStyle.fontFamily}`;
+
+  const lengths = [];
+
+  for (const text of textSpilt) {
+    lengths.push(context.measureText(text).width);
+  }
+
+  return {
+    width: Math.max(...lengths),
+    height: Math.max(height, textSpilt.length * 31),
+  };
+};
+
+
 export const TextSVG = ({
   id,
   handleSelect,
@@ -20,7 +44,7 @@ export const TextSVG = ({
 }) => {
   const { src, width, height, comment } = attachment;
   //test1test2test3;'Leckerli One', cursive.red
-  const [text, setText] = useState(comment || "enter the text here");
+  const [text, setText] = useState(comment || "enter text here");
   const [widthHeight, setWidthHeight] = useState({
     width: width,
     height: height,
@@ -30,8 +54,10 @@ export const TextSVG = ({
   const SIMP = SvgIdAndMutablePropsManager.getInstance();
   const textAreaRef = useRef(null);
 
+  console.log(widthHeight)
   useEffect(() => {
     if (comment) {
+      console.log('?', comment)
       setWidthHeight(calculateTextSize(comment));
     }
   }, [setWidthHeight]);
@@ -62,33 +88,6 @@ export const TextSVG = ({
         </tspan>
       );
     });
-  };
-
-  const calculateTextSize = (text = "") => {
-    const canvas =
-      calculateTextSize.canvas ||
-      (calculateTextSize.canvas = document.createElement("canvas"));
-    const context = canvas.getContext("2d");
-
-    const textSpilt = text.split("\n") ?? [];
-
-    context.font = `${fontStyle.fontSize}px ${fontStyle.fontFamily}`;
-
-    const lengths = [];
-
-    for (const text of textSpilt) {
-      lengths.push(context.measureText(text).width);
-    }
-
-    // const margins = 11;
-    // const calcHeight =
-    //   metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + margins;
-
-    return {
-      width: Math.max(...lengths),
-      height: Math.max(height, textSpilt.length * 31),
-      // height: Math.max(height, textSpilt.length * fontStyle.fontSize),
-    };
   };
 
   const onTextChange = (e) => {
