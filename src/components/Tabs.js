@@ -5,7 +5,7 @@ import { eventNameEnum } from "../utils/enums";
 
 export const bannerHeight = 30;
 
-export const Banner = ({ setCurrentEvent }) => {
+export const Tabs = ({ setCurrentEvent }) => {
   const WM = WindowManager.getInstance();
 
   const [windows, setWindows] = useState([WM.getSelectedVirtualWindow()]);

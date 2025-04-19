@@ -1,11 +1,11 @@
 import "./App.css";
-import { Canvas } from "./components/Canvas";
+import { Canvas } from "./components/Canvas/Canvas";
 import { SideBar } from "./components/SideBar";
 import { eventNameEnum } from "./utils/enums";
 import {useEffect, useRef, useState} from "react";
 import { GroupEventManager } from "./eventTarget/GroupEventManager";
 import { ThrottlingDebouncingManager } from "./eventTarget/ThrottlingDebouncingManager";
-import { Banner } from "./components/Banner";
+import { Tabs } from "./components/Tabs";
 
 function App() {
   GroupEventManager.getInstance().addEventListener(
@@ -48,8 +48,8 @@ function App() {
 
   return (
     <div className="App">
-      <Banner setCurrentEvent={setCurrentEvent} />
       <SideBar currentEvent={currentEvent} setCurrentEvent={setCurrentEvent} ref={canvasRef} canvasSize={canvasSize} />
+      <Tabs setCurrentEvent={setCurrentEvent} />
       <Canvas
         currentEvent={currentEvent}
         setCurrentEvent={setCurrentEvent}

@@ -1,24 +1,25 @@
-import { useSelectControl } from "../hooks/useSelectControl";
+import { useSelectControl } from "../../hooks/useSelectControl";
 import {forwardRef, useEffect, useRef, useState} from "react";
-import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../utils/enums";
-import { sideBarWidth } from "./SideBar";
-import { useLineGenerator } from "../hooks/useLineGenerator";
-import { MousePoint } from "./MousePoint";
-import { usePathGenerator } from "../hooks/usePathGenerator";
-import { useSvgStore } from "../hooks/useSvgStore";
-import { ThrottlingDebouncingManager } from "../eventTarget/ThrottlingDebouncingManager";
-import { render } from "../utils/canvasTools";
-import { useStarsGenerator } from "../hooks/useStarsGenerator";
-import { useSaveControl } from "../hooks/useSaveControl";
-import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
-import { bannerHeight } from "./Banner";
-import { WindowManager } from "../eventTarget/WindowManager";
-import { SelectBox } from "./SelectBox";
-import { useClipImageGenerator } from "../hooks/useClipImageGenerator";
-import { ToastMessage } from "./ToastMessage";
-import { MessageQueue } from "../utils/MessageQueue";
+import { cursorModeEnum, eventNameEnum, svgTypeEnum } from "../../utils/enums";
+import { sideBarWidth } from "../SideBar";
+import { useLineGenerator } from "../../hooks/useLineGenerator";
+import { MousePoint } from "../MousePoint";
+import { usePathGenerator } from "../../hooks/usePathGenerator";
+import { useSvgStore } from "../../hooks/useSvgStore";
+import { ThrottlingDebouncingManager } from "../../eventTarget/ThrottlingDebouncingManager";
+import { render } from "../../utils/canvasTools";
+import { useStarsGenerator } from "../../hooks/useStarsGenerator";
+import { useSaveControl } from "../../hooks/useSaveControl";
+import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
+import { bannerHeight } from "../Tabs";
+import { WindowManager } from "../../eventTarget/WindowManager";
+import { SelectBox } from "../SelectBox";
+import { useClipImageGenerator } from "../../hooks/useClipImageGenerator";
+import { ToastMessage } from "../ToastMessage";
+import { MessageQueue } from "../../utils/MessageQueue";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import styles from "./canvas.module.css"
 
 export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvasSize, setCanvasSize }, ref) => {
   const {
@@ -358,18 +359,13 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
   return (
       <div
           id="canvas"
+          className={styles.canvas}
           ref={ref}
           style={{
-            position: "relative",
-            backgroundColor: "white",
             width: canvasSize.width,
             height: canvasSize.height,
             marginLeft: sideBarWidth,
             marginTop: bannerHeight,
-            borderLeft: 'lightgray 1px solid',
-            borderTop: 'lightgray 1px solid',
-            scrollBehavior: "smooth",
-            border: "none",
             cursor:
                 currentEvent === eventNameEnum.write
                     ? "crosshair"
@@ -378,7 +374,6 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
                         : currentEvent === eventNameEnum.none
                             ? "default"
                             : "pointer",
-            touchAction: "none",
           }}
           onMouseDown={onMouseDown}
           onMouseUp={onMouseUp}

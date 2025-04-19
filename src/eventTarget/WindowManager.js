@@ -1,5 +1,5 @@
 import { sideBarWidth } from "../components/SideBar";
-import { bannerHeight } from "../components/Banner";
+import { bannerHeight } from "../components/Tabs";
 
 export class WindowManager {
   static instance = null;
