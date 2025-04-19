@@ -186,10 +186,10 @@ export const SideBar = forwardRef(({ currentEvent, setCurrentEvent, onClickPdf, 
           </select>
         </div>
         <hr />
-        <ul style={{display: 'grid'}}>
-          <div style={{justifySelf: 'start'}}>
+          <div className={styles.title}>
             Elements :
           </div>
+        <ul style={{display: 'grid', paddingLeft: '50px', marginTop: '0'}}>
         {temp.map((el, index) => {
           return (
               <button

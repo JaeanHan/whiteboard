@@ -1,3 +1,9 @@
+.title {
+    text-align: start;
+    width: 100%;
+    padding-left: 40px;
+}
+
 .features {
     margin-top: 15px;
     background-color: transparent;
@@ -9,6 +15,7 @@
     text-align: start;
     padding-left: 1em;
     text-indent: -1em;
+
 }
 
 .features:hover {
