@@ -333,7 +333,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
       // const savedStr = localStorage.getItem('saved');
       // console.log(savedStr)
       // load(JSON.parse(savedStr));
-      showToastMessage("hello!");
+      showToastMessage("hi there :)");
       setCurrentEvent(eventNameEnum.none);
     }
 
