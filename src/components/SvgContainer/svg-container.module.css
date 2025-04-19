@@ -1,0 +1,12 @@
+.container {
+    overflow: visible;
+    box-sizing: border-box;
+    width: max-content;
+    height: max-content;
+    position: absolute;
+    cursor: grab;
+}
+
+.grabbing {
+    cursor: grabbing;
+}

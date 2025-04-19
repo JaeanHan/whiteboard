@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import {memo, useEffect, useState} from "react";
 import { dragStateEnum, svgTypeEnum } from "../../utils/enums";
 import { GroupEventManager } from "../../eventTarget/GroupEventManager";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 
+import styles from "./svg-container.module.css";
+
+
 const scale = 1;
 const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
-export const SvgContainer = ({
+export const SvgContainer = memo(({
   children,
   id,
   handleSelect,
@@ -123,16 +126,9 @@ export const SvgContainer = ({
       id={id}
       key={id}
       className={
-          dragState === dragStateEnum.select && id.startsWith(svgTypeEnum.image) ? 'editor-image' : ''
+          `${styles.container} ${dragState === dragStateEnum.select && id.startsWith(svgTypeEnum.image) ? 'editor-image' : ''} ${dragState === dragStateEnum.drag && styles.grabbing}`
       }
       style={{
-        // overflow: id.startsWith(svgTypeEnum.image) ? 'visible' :"hidden",
-        overflow: 'visible',
-        cursor: dragState === dragStateEnum.drag ? "grabbing" : "grab",
-        boxSizing: "border-box",
-        width: "max-content",
-        height: "max-content",
-        position: "absolute",
         opacity: id.startsWith(svgTypeEnum.image) ? 1 : 0.5,
         transformOrigin: isLine ? "0% 0%" : "50% 50%",
         transform: isLine
@@ -199,4 +195,10 @@ export const SvgContainer = ({
       {children}
     </div>
   );
-};
+}, (prev, next) => {
+  return (
+      prev.id === next.id &&
+      prev.src?.x === next.src?.x &&
+      prev.src?.y === next.src?.y
+  );
+})
