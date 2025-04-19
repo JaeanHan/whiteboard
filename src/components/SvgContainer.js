@@ -4,6 +4,7 @@ import { GroupEventManager } from "../eventTarget/GroupEventManager";
 import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
 
 const scale = 1;
+const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
 export const SvgContainer = ({
   children,
@@ -26,7 +27,6 @@ export const SvgContainer = ({
   // });
   // const [scale, setScale] = useState(1.0);
   const [dragState, setDragState] = useState(dragStateEnum.none);
-  const SIMP = SvgIdAndMutablePropsManager.getInstance();
 
   useEffect(() => {
     setObjPos(src);

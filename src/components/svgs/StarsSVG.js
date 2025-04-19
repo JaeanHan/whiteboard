@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SvgContainer } from "../SvgContainer";
-import { sideBarWidth } from "../SideBar";
+import { sideBarWidth } from "../Sidebar/SideBar";
 import { ThrottlingDebouncingManager } from "../../eventTarget/ThrottlingDebouncingManager";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 

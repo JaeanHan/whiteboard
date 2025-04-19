@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MessageQueue } from "../utils/MessageQueue";
-import { sideBarWidth } from "./SideBar";
+import { sideBarWidth } from "./Sidebar/SideBar";
 
 export const ToastMessage = ({ message }) => {
   const MD = MessageQueue.getInstance();

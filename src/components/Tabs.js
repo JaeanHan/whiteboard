@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { sideBarWidth } from "./SideBar";
+import { sideBarWidth } from "./Sidebar/SideBar";
 import { WindowManager } from "../eventTarget/WindowManager";
 import { eventNameEnum } from "../utils/enums";
 

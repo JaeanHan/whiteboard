@@ -1,6 +1,6 @@
 import "./App.css";
 import { Canvas } from "./components/Canvas/Canvas";
-import { SideBar } from "./components/SideBar";
+import { SideBar } from "./components/Sidebar/SideBar";
 import { eventNameEnum } from "./utils/enums";
 import {useEffect, useRef, useState} from "react";
 import { GroupEventManager } from "./eventTarget/GroupEventManager";

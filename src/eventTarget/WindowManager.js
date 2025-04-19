@@ -1,4 +1,4 @@
-import { sideBarWidth } from "../components/SideBar";
+import { sideBarWidth } from "../components/Sidebar/SideBar";
 import { bannerHeight } from "../components/Tabs";
 
 export class WindowManager {
