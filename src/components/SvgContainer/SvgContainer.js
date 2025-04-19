@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { dragStateEnum, svgTypeEnum } from "../utils/enums";
-import { GroupEventManager } from "../eventTarget/GroupEventManager";
-import { SvgIdAndMutablePropsManager } from "../eventTarget/SvgIdAndMutablePropsManager";
+import { dragStateEnum, svgTypeEnum } from "../../utils/enums";
+import { GroupEventManager } from "../../eventTarget/GroupEventManager";
+import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 
 const scale = 1;
 const SIMP = SvgIdAndMutablePropsManager.getInstance();
@@ -180,7 +180,7 @@ export const SvgContainer = ({
       {showPos && (
         <>
           <div
-            style={{ position: "absolute", color: "black", top: 15, left: 10 }}
+            style={{ position: "absolute", color: "black", top: -20, left: 0 }}
           >
             x:{objPos.x}px
           </div>
@@ -188,8 +188,8 @@ export const SvgContainer = ({
             style={{
               position: "absolute",
               color: "black",
-              top: 25,
-              left: 10,
+              top: -10,
+              left: 0,
             }}
           >
             y:{objPos.y}px

@@ -1,4 +1,4 @@
-import { SvgContainer } from "./SvgContainer";
+import { SvgContainer } from "./SvgContainer/SvgContainer";
 import { useRef, useState} from "react";
 import {ImageResizer} from "./ImageResizer";
 

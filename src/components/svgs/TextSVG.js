@@ -1,4 +1,4 @@
-import { SvgContainer } from "../SvgContainer";
+import { SvgContainer } from "../SvgContainer/SvgContainer";
 import { useEffect, useRef, useState } from "react";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 

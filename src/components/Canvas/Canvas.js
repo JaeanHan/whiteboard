@@ -11,7 +11,6 @@ import { render } from "../../utils/canvasTools";
 import { useStarsGenerator } from "../../hooks/useStarsGenerator";
 import { useSaveControl } from "../../hooks/useSaveControl";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
-import { bannerHeight } from "../Tabs";
 import { WindowManager } from "../../eventTarget/WindowManager";
 import { SelectBox } from "../SelectBox";
 import { useClipImageGenerator } from "../../hooks/useClipImageGenerator";
@@ -153,7 +152,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     if (currentEvent === eventNameEnum.none && id && id === "root") {
       const fixPos = {
         x: e.clientX - sideBarWidth + window.scrollX,
-        y: e.clientY + window.scrollY - bannerHeight,
+        y: e.clientY + window.scrollY,
       };
 
       if (initClientSelectBoxSize(fixPos)) {
@@ -164,7 +163,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
 
     setDiffPosOnAll({
       x: e.clientX + window.scrollX,
-      y: e.clientY + window.scrollY - bannerHeight,
+      y: e.clientY + window.scrollY,
     });
   }, [cursorMode, setIsDrawing, initClientSelectBoxSize, setCurrentEvent, setDiffPosOnAll]);
 
@@ -186,7 +185,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
 
       const fixPos = {
         x: e.clientX - sideBarWidth + window.scrollX,
-        y: e.clientY + window.scrollY - bannerHeight,
+        y: e.clientY + window.scrollY,
       };
       addPointOnSet(fixPos);
       return;
@@ -195,7 +194,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     if (currentEvent === eventNameEnum.multiSelect) {
       const fixPos = {
         x: e.clientX - sideBarWidth + window.scrollX,
-        y: e.clientY + window.scrollY - bannerHeight,
+        y: e.clientY + window.scrollY,
       };
       setClientSelectBoxSize(fixPos);
       return;
@@ -224,7 +223,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
     if (currentEvent === eventNameEnum.none) {
       const calcPos = {
         x: e.clientX + window.scrollX,
-        y: e.clientY + window.scrollY - bannerHeight,
+        y: e.clientY + window.scrollY,
       };
       onDrag(calcPos);
     }
@@ -249,7 +248,7 @@ export const Canvas = forwardRef(({ currentEvent, setCurrentEvent, owner, canvas
 
     const fixPos = {
       x: e.clientX - sideBarWidth + window.scrollX,
-      y: e.clientY + window.scrollY - bannerHeight,
+      y: e.clientY + window.scrollY,
     };
 
     if (currentEvent === eventNameEnum.addRect) {

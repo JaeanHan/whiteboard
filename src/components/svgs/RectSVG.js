@@ -1,4 +1,4 @@
-import { SvgContainer } from "../SvgContainer";
+import { SvgContainer } from "../SvgContainer/SvgContainer";
 import { useState } from "react";
 import { SvgIdAndMutablePropsManager } from "../../eventTarget/SvgIdAndMutablePropsManager";
 export const RectSVG = ({
@@ -12,6 +12,8 @@ export const RectSVG = ({
   const { src, width, height, comment } = attachment;
   const [desc, setDesc] = useState(comment || `${id} description`);
   const num = Number(id.charAt(1));
+
+  console.log('?')
 
   const onClick = (e) => {
     if (e.ctrlKey) return;
