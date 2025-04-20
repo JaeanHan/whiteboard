@@ -157,11 +157,13 @@ export const Canvas = forwardRef(
       }
 
       const id = e.target.parentNode?.parentNode?.id;
+      const scrollY = canvasWrapRef.current.scrollTop;
+      const scrollX = canvasWrapRef.current.scrollLeft;
 
       if (currentEvent === eventNameEnum.none && id && id === 'root') {
         const fixPos = {
-          x: e.clientX - sideBarWidth + window.scrollX,
-          y: e.clientY + window.scrollY,
+          x: e.clientX - sideBarWidth + scrollX,
+          y: e.clientY + scrollY,
         };
 
         if (initClientSelectBoxSize(fixPos)) {
@@ -171,18 +173,20 @@ export const Canvas = forwardRef(
       }
 
       setDiffPosOnAll({
-        x: e.clientX + window.scrollX,
-        y: e.clientY + window.scrollY,
+        x: e.clientX + scrollX,
+        y: e.clientY + scrollY,
       });
     };
 
     const onMouseMove = e => {
       e.preventDefault();
+      const scrollY = canvasWrapRef.current.scrollTop;
+      const scrollX = canvasWrapRef.current.scrollLeft;
 
       if (cursorMode === cursorModeEnum.write) {
         const fixPos = {
-          x: e.clientX - sideBarWidth + window.scrollX,
-          y: e.clientY + window.scrollY,
+          x: e.clientX - sideBarWidth + scrollX,
+          y: e.clientY + scrollY,
         };
         addPointOnSet(fixPos);
         return;
@@ -190,8 +194,8 @@ export const Canvas = forwardRef(
 
       if (currentEvent === eventNameEnum.multiSelect) {
         const fixPos = {
-          x: e.clientX - sideBarWidth + window.scrollX,
-          y: e.clientY + window.scrollY,
+          x: e.clientX - sideBarWidth + scrollX,
+          y: e.clientY + scrollY,
         };
         setClientSelectBoxSize(fixPos);
         return;
@@ -202,7 +206,6 @@ export const Canvas = forwardRef(
 
         if (isLeftButtonClicked) {
           const id = e.target.parentNode?.parentNode?.id;
-
           if (id && id !== 'root') {
             deleteSvgById(id);
             SIMP.setIdUpdateFlagMap(id);
@@ -219,8 +222,8 @@ export const Canvas = forwardRef(
 
       if (currentEvent === eventNameEnum.none) {
         const calcPos = {
-          x: e.clientX + window.scrollX,
-          y: e.clientY + window.scrollY,
+          x: e.clientX + scrollX,
+          y: e.clientY + scrollY,
         };
         onDrag(calcPos);
       }
@@ -231,6 +234,9 @@ export const Canvas = forwardRef(
     };
 
     const onMouseUp = e => {
+      const scrollY = canvasWrapRef.current.scrollTop;
+      const scrollX = canvasWrapRef.current.scrollLeft;
+
       if (cursorMode === cursorModeEnum.write) {
         setIsDrawing(false);
         return;
@@ -244,8 +250,8 @@ export const Canvas = forwardRef(
       }
 
       const fixPos = {
-        x: e.clientX - sideBarWidth + window.scrollX,
-        y: e.clientY + window.scrollY,
+        x: e.clientX - sideBarWidth + scrollX,
+        y: e.clientY + scrollY,
       };
 
       if (currentEvent === eventNameEnum.addRect) {
